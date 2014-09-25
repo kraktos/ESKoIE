@@ -51,11 +51,11 @@ public class BootStrapMethod {
 		Constants.RELOAD_TYPE = false;
 
 		// take the output file generated
-		createSameAsHypotheses("/home/adutta/git/OIE-Integration/src/main/resources/output/ds_"
+		createSameAsHypotheses("src/main/resources/output/ds_"
 				+ Constants.PREDICATE + "/out.db");
 
-		createSubObjLists("/home/adutta/git/OIE-Integration/src/main/resources/output/ds_"
-				+ Constants.PREDICATE + "/out.db");
+		createSubObjLists("src/main/resources/output/ds_" + Constants.PREDICATE
+				+ "/out.db");
 
 		BufferedWriter domRangPrefWriter = new BufferedWriter(new FileWriter(
 				Constants.DOMAIN_RANGE_BS_PREFERENCE_FILE));

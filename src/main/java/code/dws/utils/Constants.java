@@ -34,7 +34,7 @@ public class Constants {
 
 	public static int TOP_K_MATCHES = 1;
 
-	public static String OIE_DATA_PATH = "src/main/resources/input/noDigitHighAll.csv";
+	public static String OIE_DATA_PATH;
 	/**
 	 * location of the output file generated the IE Engine ReVerb
 	 */
