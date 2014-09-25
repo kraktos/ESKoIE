@@ -16,6 +16,8 @@ import code.dws.markovLogic.YagoDbpediaMapping;
 import code.dws.utils.Constants;
 
 /**
+ * INCEPTION POINT !!
+ * 
  * @author Arnab Dutta
  */
 public class ExperimentAutomation {
@@ -36,7 +38,6 @@ public class ExperimentAutomation {
 
 		Constants.loadConfigParameters(args);
 		Constants.BOOTSTRAP = false;
-
 		runAll();
 	}
 
@@ -49,13 +50,12 @@ public class ExperimentAutomation {
 	private static void runAll() throws IOException,
 			OWLOntologyCreationException, Exception {
 
-		// inititate yago info
+		// initiate yago info
 		if (Constants.INCLUDE_YAGO_TYPES)
 			YagoDbpediaMapping.main(new String[] { "" });
 
 		EvidenceBuilder.main(new String[] { Constants.PREDICATE });
 
 		AutomatedNodeScoringWrapper.main(new String[] { Constants.PREDICATE });
-
 	}
 }

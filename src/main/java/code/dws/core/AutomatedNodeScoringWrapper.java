@@ -32,7 +32,7 @@ public class AutomatedNodeScoringWrapper {
 	 */
 	public void buildDomRan(String property) throws IOException {
 
-		this.dbTOp = new DBPediaTreeOperation("dbpediaTBox.owl");
+		this.dbTOp = new DBPediaTreeOperation(Constants.DBPEDIA_TBOX);
 
 		// run the learner to score the nodes
 		// the class tree hierarchy is to be build just for top-1 candidate

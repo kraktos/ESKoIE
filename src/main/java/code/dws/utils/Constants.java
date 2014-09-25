@@ -16,6 +16,7 @@ import java.util.Set;
  * @author Arnab Dutta
  */
 public class Constants {
+
 	public static enum OIE {
 		NELL, REVERB
 	}
@@ -109,32 +110,20 @@ public class Constants {
 	 */
 	public static final String sample_dumps = "src/main/resources/output/ds_";
 
-	public static final String ALL_MLN_EVIDENCE = sample_dumps + PREDICATE
-			+ "/AllEvidence.db";
+	public static String ALL_MLN_EVIDENCE;
 
 	/**
 	 * gold standard evidence file, post-fixed
 	 */
-	public static final String ALL_MLN_EVIDENCE_T1 = sample_dumps + PREDICATE
-			+ "/AllEvidence_T1.db";
+	public static String ALL_MLN_EVIDENCE_T1;
+	public static String BASIC_REASON_OUT_FILE;
 
-	public static final String BASIC_REASON_OUT_FILE = sample_dumps + PREDICATE
-			+ "/out.db";
+	public static String DOMAIN_RANGE_PREFERENCE_FILE;
 
-	public static final String DOMAIN_RANGE_PREFERENCE_FILE = sample_dumps
-			+ PREDICATE + "/domRanAlpha" + PROPGTN_FACTOR + "."
-			+ String.valueOf(USE_LOGIT) + ".out";
+	public static String DOMAIN_RANGE_EVIDENCE_FILE;
+	public static String DOMAIN_RANGE_BS_PREFERENCE_FILE;
 
-	public static final String DOMAIN_RANGE_EVIDENCE_FILE = sample_dumps
-			+ PREDICATE + "/domRanEvidence.db";
-
-	public static final String DOMAIN_RANGE_BS_PREFERENCE_FILE = sample_dumps
-			+ PREDICATE + "/domRanAlphaBS" + PROPGTN_FACTOR + "."
-			+ String.valueOf(USE_LOGIT) + ".out";
-
-	public static final String DOMAIN_RANGE_BS_EVIDENCE_FILE = sample_dumps
-			+ PREDICATE + "/domRanEvidenceBS.db";
-
+	public static String DOMAIN_RANGE_BS_EVIDENCE_FILE;
 	/**
 	 * SQL queries
 	 */
@@ -154,6 +143,8 @@ public class Constants {
 	public static final String OIE_POSTFIXED = "INSERT INTO OIE_REFINED (OIE_SUB, OIE_PRED, OIE_OBJ, OIE_PFX_SUB, OIE_PFX_OBJ, DBP_SUB, DBP_OBJ) VALUES (?, ?, ?, ?, ?, ?, ?);";
 
 	public static final String GET_DBPTYPE = "select INSTANCE_TYPE from DBPEDIA_TYPES where DBPEDIA_INSTANCE=?";
+
+	public static String DBPEDIA_TBOX;
 
 	/**
 	 * insert DBPedia types SQL
@@ -225,9 +216,36 @@ public class Constants {
 			WORKFLOW_NORMAL = Boolean.valueOf(prop
 					.getProperty("WORKFLOW_NORMAL"));
 
+			DBPEDIA_TBOX = prop.getProperty("DBPEDIA_TBOX");
+
+			init();
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
 	}
 
+	public static void init() {
+		ALL_MLN_EVIDENCE = sample_dumps + PREDICATE + "/AllEvidence.db";
+
+		/**
+		 * gold standard evidence file, post-fixed
+		 */
+		ALL_MLN_EVIDENCE_T1 = sample_dumps + PREDICATE + "/AllEvidence_T1.db";
+
+		BASIC_REASON_OUT_FILE = sample_dumps + PREDICATE + "/out.db";
+
+		DOMAIN_RANGE_PREFERENCE_FILE = sample_dumps + PREDICATE
+				+ "/domRanAlpha" + PROPGTN_FACTOR + "."
+				+ String.valueOf(USE_LOGIT) + ".out";
+
+		DOMAIN_RANGE_EVIDENCE_FILE = sample_dumps + PREDICATE
+				+ "/domRanEvidence.db";
+
+		DOMAIN_RANGE_BS_PREFERENCE_FILE = sample_dumps + PREDICATE
+				+ "/domRanAlphaBS" + PROPGTN_FACTOR + "."
+				+ String.valueOf(USE_LOGIT) + ".out";
+
+		DOMAIN_RANGE_BS_EVIDENCE_FILE = sample_dumps + PREDICATE
+				+ "/domRanEvidenceBS.db";
+	}
 }

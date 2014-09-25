@@ -121,7 +121,7 @@ public class DBPediaTreeOperation {
 	public static void main(String[] args) throws IOException {
 
 		DBPediaTreeOperation dbTOp = new DBPediaTreeOperation(
-				"/home/arnab/Work/data/DBPedia/ontology/dbpediaTBox.owl");
+				Constants.DBPEDIA_TBOX);
 
 		// run the learner to score the nodes
 		dbTOp.buildDomRan(new String[] { "bookwriter", "1" });
@@ -282,18 +282,6 @@ public class DBPediaTreeOperation {
 
 	}
 
-	// private List<Pair<String, Double>> dummyTestSet() {
-	// List<Pair<String, Double>> test = new ArrayList<Pair<String, Double>>();
-	// test.add(new Pair<String, Double>("Work", 1072D));
-	// test.add(new Pair<String, Double>("WrittenWork", 797D));
-	// test.add(new Pair<String, Double>("Book", 764D));
-	// test.add(new Pair<String, Double>("Film", 213D));
-	// test.add(new Pair<String, Double>("TelevisionShow", 26D));
-	// test.add(new Pair<String, Double>("Play", 27D));
-	// test.add(new Pair<String, Double>("FictionalCharacter", 30D));
-	// return test;
-	// }
-
 	/**
 	 * method to construct the tree structure
 	 */
@@ -354,10 +342,6 @@ public class DBPediaTreeOperation {
 					if (isDirectSubClsOfThing(child.getNodeName())) {
 						child.setNodeDownScore(child.getNodeUpScore());
 					} else {
-						// if (child.getNodeName().toString()
-						// .indexOf("http://dbpedia.org/ontology/Model") != -1)
-						// System.out.println("" +
-						// node.getNodeName().toString());
 
 						child.setNodeDownScore(getParentsDownScore(node)
 								+ downScore(child));
@@ -418,20 +402,6 @@ public class DBPediaTreeOperation {
 			return 0;
 		}
 	}
-
-	// private OWLClass parentOfNode(GenericTreeNode node) {
-	// List<OWLClass> parent = new ArrayList<OWLClass>();
-	//
-	// Set<OWLClass> set = reasoner.getSuperClasses(node.getNodeName(), true)
-	// .getFlattened();
-	// for (OWLClass clas : set) {
-	// if (clas.getIRI().toURI().toString()
-	// .indexOf(Constants.ONTOLOGY_NAMESPACE) != -1) {
-	// parent.add(clas);
-	// }
-	// }
-	// return parent.get(0);
-	// }
 
 	/**
 	 * computes the value from the leaves up to the top level. This is
