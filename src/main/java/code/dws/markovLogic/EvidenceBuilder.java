@@ -21,7 +21,6 @@ import java.util.Set;
 
 import code.dws.dbConnectivity.DBWrapper;
 import code.dws.query.SPARQLEndPointQueryAPI;
-import code.dws.reverb.ReverbPropertyReNaming;
 import code.dws.utils.Constants;
 import code.dws.utils.Constants.OIE;
 import code.dws.utils.Utilities;
@@ -51,12 +50,12 @@ public class EvidenceBuilder {
 
 		} else {
 			if (!Constants.WORKFLOW_NORMAL) {
-				ReverbPropertyReNaming.main(new String[] { "" });
-
-				// retrieve only the properties relavant to the given cluster
-				// name
-				this.propertyNames = ReverbPropertyReNaming
-						.getReNamedProperties().get(args[0]);
+				// ReverbPropertyReNaming.main(new String[] { "" });
+				//
+				// // retrieve only the properties relavant to the given cluster
+				// // name
+				// this.propertyNames = ReverbPropertyReNaming
+				// .getReNamedProperties().get(args[0]);
 			} else {
 
 				this.propertyNames = new ArrayList<String>();
@@ -79,14 +78,12 @@ public class EvidenceBuilder {
 	 */
 	public static void main(String[] args) throws IOException {
 
-		EvidenceBuilder evdBuilder = null;
-
 		if (args.length < 1)
 			throw (new RuntimeException(
 					"Usage : java -jar DS.jar <inputFilePath> <topK>"));
 		else {
 			// start processing the triples
-			evdBuilder = new EvidenceBuilder(args);
+			new EvidenceBuilder(args);
 
 		}
 	}
@@ -267,16 +264,16 @@ public class EvidenceBuilder {
 		/**
 		 * create top-k evidences for subject
 		 */
-		List<String> mappingsSub = createEvidenceForTopKCandidates(
-				allEvidenceWriterTop1, allEvidenceWriter, nellSub, nellSubPFxd,
-				termConceptPairSet, Constants.DOMAIN);
+		createEvidenceForTopKCandidates(allEvidenceWriterTop1,
+				allEvidenceWriter, nellSub, nellSubPFxd, termConceptPairSet,
+				Constants.DOMAIN);
 
 		/**
 		 * create top-k evidences for object
 		 */
-		List<String> mappingsObj = createEvidenceForTopKCandidates(
-				allEvidenceWriterTop1, allEvidenceWriter, nellObj, nellObjPFxd,
-				termConceptPairSet, Constants.RANGE);
+		createEvidenceForTopKCandidates(allEvidenceWriterTop1,
+				allEvidenceWriter, nellObj, nellObjPFxd, termConceptPairSet,
+				Constants.RANGE);
 
 	}
 

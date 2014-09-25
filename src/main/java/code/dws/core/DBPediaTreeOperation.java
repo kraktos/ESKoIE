@@ -28,7 +28,6 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
-import code.dws.core.DistantSupervised;
 import code.dws.dao.GenericTreeNode;
 import code.dws.utils.Constants;
 
@@ -171,13 +170,12 @@ public class DBPediaTreeOperation {
 		double totalScore = 0;
 		Map<String, Double> rankedNodesMap = new HashMap<String, Double>();
 
-		String nodeName = null;
 		GenericTreeNode node = null;
 
 		// find scores of each node in the tree
 		for (Map.Entry<String, GenericTreeNode> entry : COLLECTION_NODES
 				.entrySet()) {
-			nodeName = entry.getKey();
+
 			node = entry.getValue();
 
 			// sum up the original scores
@@ -187,59 +185,6 @@ public class DBPediaTreeOperation {
 			rankedNodesMap.put(node.getNodeName().getIRI().toURI().toString()
 					.replaceAll(",", "_"), node.getNodeDownScore());
 		}
-
-		// iterate the input list of DBPedia types
-		// for (String type : dbPediaTypes) {
-		//
-		// if (COLLECTION_NODES.containsKey(Constants.ONTOLOGY_NAMESPACE +
-		// type)) {
-		//
-		// // sum up the original scores
-		// totalScore = totalScore
-		// + COLLECTION_NODES.get(Constants.ONTOLOGY_NAMESPACE +
-		// type).getNodeValue();
-		//
-		// // put the nodes with computed scores in a collection
-		// rankedNodesMap.put(COLLECTION_NODES.get(Constants.ONTOLOGY_NAMESPACE
-		// + type)
-		// .getNodeName().getIRI().toURI()
-		// .toString() + "~~" +
-		// COLLECTION_NODES.get(Constants.ONTOLOGY_NAMESPACE +
-		// type).getNodeValue(),
-		// COLLECTION_NODES.get(Constants.ONTOLOGY_NAMESPACE + type)
-		// .getNodeDownScore());
-		//
-		// //
-		// System.out.println(COLLECTION_NODES.get(Constants.ONTOLOGY_NAMESPACE
-		// + type).getNodeName().getIRI().toURI()
-		// // .toString() + "\t\t" +
-		// // COLLECTION_NODES.get(Constants.ONTOLOGY_NAMESPACE +
-		// type).getNodeValue() + "\t\t" +
-		// // COLLECTION_NODES.get(Constants.ONTOLOGY_NAMESPACE +
-		// type).getNodeDownScore());
-		// }
-		// }
-
-		// this is functional in bootstrapping stage.
-		// if (fullSetOfTpes != null) {
-		// List<String> allDbPediaTypes = new ArrayList<String>(fullSetOfTpes);
-		//
-		// // iterate the input list of DBPedia types
-		// for (String type : allDbPediaTypes) {
-		// if (COLLECTION_NODES.containsKey(Constants.ONTOLOGY_NAMESPACE +
-		// type)) {
-		//
-		// // put the nodes with computed scores in a collection
-		// rankedNodesMap.put(COLLECTION_NODES.get(Constants.ONTOLOGY_NAMESPACE
-		// + type)
-		// .getNodeName().getIRI().toURI()
-		// .toString(),
-		// COLLECTION_NODES.get(Constants.ONTOLOGY_NAMESPACE + type)
-		// .getNodeDownScore());
-		//
-		// }
-		// }
-		// }
 
 		// with the total score, we should also add the score of the UNTYPED
 		// node.

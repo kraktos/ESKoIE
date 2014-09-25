@@ -5,9 +5,6 @@
 package code.dws.utils;
 
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -25,12 +22,8 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
-
-import code.dws.relationMap.workflow2.ClusteringWithDbpedia;
-import code.dws.wordnet.SimilatityWebService;
 
 /**
  * All different kinds of utility methods are placed here
@@ -50,9 +43,6 @@ public class Utilities {
 	// define Logger
 
 	static Set<Long> UNIQUE_PROPERTIES = new HashSet<Long>();
-
-	// pattern for allowing english text only during indexing
-	static Pattern pattern = Pattern.compile(Constants.ALLOWED_ENGLISH_TEXT);
 
 	// set of stop words
 	static final Set<String> STOP_WORDS = new HashSet<String>(Arrays.asList(
@@ -108,47 +98,6 @@ public class Utilities {
 	}
 
 	/**
-	 * Takes a set of Strings and writes to the output file
-	 * 
-	 * @param SET_DBPEDIA_TERMS
-	 *            set of string values
-	 * @param targetFilePath
-	 *            putput file location
-	 * @throws IOException
-	 */
-	public static void writeSetToFile(Set<String> SET_DBPEDIA_TERMS,
-			String targetFilePath) throws IOException {
-
-		FileWriter fstream = new FileWriter(targetFilePath);
-		BufferedWriter out = new BufferedWriter(fstream);
-
-		Iterator<?> it = SET_DBPEDIA_TERMS.iterator();
-		while (it.hasNext()) {
-			FileUtil.writeToFlatFile(out, it.next() + "\n");
-		}
-
-		out.close();
-	}
-
-	/**
-	 * Method to check if a given String value exists in the given set
-	 * 
-	 * @param set
-	 *            The set to check
-	 * @param stringValue
-	 *            The value to check
-	 * @return a flag stating if input is in the given set
-	 */
-	public static boolean checkUniqueness(Set<String> set, String stringValue) {
-
-		if (!set.contains(stringValue)) {
-			set.add(stringValue);
-			return true;
-		}
-		return false;
-	}
-
-	/**
 	 * @param start
 	 *            the timer start point
 	 * @param message
@@ -175,24 +124,6 @@ public class Utilities {
 		for (int listCounter = 0; listCounter < resultList.size(); listCounter++) {
 			logger.info(resultList.get(listCounter).toString());
 		}
-	}
-
-	/**
-	 * function to check if the string input contains non-English characters
-	 * 
-	 * @param strInput
-	 *            input test
-	 * @return boolean value to indicate if it contains or not
-	 */
-	public static boolean containsNonEnglish(String strInput) {
-		return pattern.matcher(strInput).find();
-	}
-
-	public static void splitIntoBagOfWords(String string)
-			throws FileNotFoundException {
-		split("", string);
-
-		System.out.println(set.iterator().next());
 	}
 
 	public static void split(String head, String in) {
@@ -310,7 +241,7 @@ public class Utilities {
 	 * @return
 	 */
 	public static double convertProbabilityToWeight(double prob) {
-		if (Constants.USE_LOGIT_FUNC) {
+		if (Constants.USE_LOGIT) {
 			// smoothing
 			if (prob >= 1)
 				prob = 1 - Math.pow(10, -6);
@@ -426,102 +357,6 @@ public class Utilities {
 				result.put(entry.getKey(), entry.getValue());
 		}
 		return result;
-	}
-
-	/**
-	 * overloaded function to compute pairwise similarity of contents of two
-	 * collections
-	 * 
-	 * @param feedDBPediaProperties3
-	 * @param arg2Map
-	 * @param writer
-	 * @param check
-	 * @throws IOException
-	 */
-	public static void getPairwiseSimScore(Map<String, String> arg1Map,
-			Map<String, String> arg2Map, BufferedWriter writer, boolean check)
-			throws IOException {
-
-		ClusteringWithDbpedia.logger.info("Size of Arg1 = " + arg1Map.size());
-		ClusteringWithDbpedia.logger.info("Size of Arg2 = " + arg2Map.size());
-
-		for (Entry<String, String> eOuter : arg1Map.entrySet()) {
-			for (Entry<String, String> eInner : arg2Map.entrySet()) {
-				if (check) {
-					if (eOuter.getKey().hashCode() > eInner.getKey().hashCode()) {
-						try {
-							// based on Wordnet scores
-							SimilatityWebService.getWordNetSimilarityScores(
-									eOuter.getKey(), eInner.getKey(), writer);
-						} catch (Exception e) {
-							ClusteringWithDbpedia.logger.error(e.getMessage());
-						}
-					}
-				} else {
-					try {
-						// based on Wordnet scores
-						SimilatityWebService.getWordNetSimilarityScores(
-								eOuter.getKey(), eInner.getKey(), writer);
-					} catch (Exception e) {
-						ClusteringWithDbpedia.logger.error(e.getMessage());
-					}
-				}
-			}
-			writer.flush();
-		}
-	}
-
-	/**
-	 * overloaded
-	 * 
-	 * @param arg1
-	 * @param arg2
-	 * @param writer
-	 * @param check
-	 * @throws IOException
-	 */
-	public static void getPairwiseSimScore(List<String> arg1,
-			List<String> arg2, BufferedWriter writer, boolean check)
-			throws IOException {
-
-		logger.info("Size of Arg1 = " + arg1.size());
-		logger.info("Size of Arg2 = " + arg2.size());
-
-		long cnt = 0;
-		long val = (check) ? (arg1.size() * (arg2.size() - 1) / 2) : (arg1
-				.size() * arg2.size());
-
-		for (int outer = 0; outer < arg1.size(); outer++) {
-
-			for (int inner = 0; inner < arg2.size(); inner++) {
-
-				if (check) {
-					if (outer < inner) {
-						cnt++;
-						try {
-							// based on Wordnet scores
-							// SimilatityWebService.getWordNetSimilarityScores(
-							// arg1.get(outer), arg2.get(inner), writer);
-						} catch (Exception e) {
-							ClusteringWithDbpedia.logger.error(e.getMessage());
-						}
-					}
-				} else {
-					cnt++;
-					try {
-						// based on Wordnet scores
-						// SimilatityWebService.getWordNetSimilarityScores(
-						// arg1.get(outer), arg2.get(inner), writer);
-					} catch (Exception e) {
-						ClusteringWithDbpedia.logger.error(e.getMessage());
-					}
-				}
-			}
-
-			logger.info("Completed " + (double) 100 * cnt / val + " %");
-
-			writer.flush();
-		}
 	}
 
 	/**

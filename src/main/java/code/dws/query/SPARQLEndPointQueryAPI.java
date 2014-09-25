@@ -16,7 +16,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import code.dws.markovLogic.YagoDbpediaMapping;
-import code.dws.ontology.GenericConverter;
 import code.dws.utils.Constants;
 import code.dws.utils.Utilities;
 
@@ -53,10 +52,8 @@ public class SPARQLEndPointQueryAPI {
 		// get the result set
 		ResultSet results = qexec.execSelect();
 
-		@SuppressWarnings("unchecked")
 		List<QuerySolution> listResults = ResultSetFormatter.toList(results);
 
-		@SuppressWarnings("unchecked")
 		List<String> listVarnames = results.getResultVars();
 
 		for (QuerySolution querySol : listResults) {
@@ -216,7 +213,6 @@ public class SPARQLEndPointQueryAPI {
 		String sparqlQuery = null;
 
 		try {
-			ResultSet results = null;
 			sparqlQuery = "select ?val where{ <"
 					+ inst
 					+ "> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?val} ";
@@ -230,8 +226,7 @@ public class SPARQLEndPointQueryAPI {
 					result.add(querySol.get("val").toString());
 			}
 		} catch (Exception e) {
-			GenericConverter.logger.info("problem with " + sparqlQuery + " "
-					+ e.getMessage());
+			logger.info("problem with " + sparqlQuery + " " + e.getMessage());
 		}
 		return result;
 	}

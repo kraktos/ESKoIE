@@ -76,6 +76,10 @@ public class Constants {
 	public static String ONTOLOGY_NAMESPACE = "http://dbpedia.org/ontology/";
 	public static String DBPEDIA_NAMESPACE = "http://dbpedia.org/";
 
+	public static String DBPEDIA_INSTANCE_NS = DBPEDIA_NAMESPACE + "resource/";
+	public static String DBPEDIA_CONCEPT_NS = DBPEDIA_NAMESPACE + "ontology/";
+	public static String DBPEDIA_PREDICATE_NS = DBPEDIA_NAMESPACE + "ontology/";
+
 	/**
 	 * delimiter for the the CSV file coming as input from extraction engines'
 	 * output
@@ -146,6 +150,35 @@ public class Constants {
 	 * given a surface form, fetch top titles it refers to
 	 */
 	public static final String GET_WIKI_TITLES_SQL = "select URI, SUM(COUNT) as cnt from wikiPrep where SF = ? group by BINARY URI order by cnt desc limit ?";
+
+	public static final String OIE_POSTFIXED = "INSERT INTO OIE_REFINED (OIE_SUB, OIE_PRED, OIE_OBJ, OIE_PFX_SUB, OIE_PFX_OBJ, DBP_SUB, DBP_OBJ) VALUES (?, ?, ?, ?, ?, ?, ?);";
+
+	public static final String GET_DBPTYPE = "select INSTANCE_TYPE from DBPEDIA_TYPES where DBPEDIA_INSTANCE=?";
+
+	/**
+	 * insert DBPedia types SQL
+	 */
+	public static String INSERT_DBP_TYPES = "INSERT IGNORE INTO DBPEDIA_TYPES (DBPEDIA_INSTANCE, INSTANCE_TYPE) VALUES ( ?, ? )";
+
+	/*
+	 * DB Details
+	 */
+
+	// DB Driver name
+	public static String DRIVER_NAME = "com.mysql.jdbc.Driver";
+
+	// Url to conenct to the Database
+	// public static String CONNECTION_URL = "jdbc:mysql://134.155.86.39/";
+	public static String CONNECTION_URL = "jdbc:mysql://134.155.95.117:3306/";
+
+	// name of the database
+	public static String DB_NAME = "wikiStat";
+
+	// user of the database. Make sure this user is created for the DB
+	public static String DB_USER = "root";
+
+	// password for the user
+	public static String DB_PWD = "mannheim1234";
 
 	public static Set<String> SUB_SET_TYPES = new HashSet<String>();
 	public static Set<String> OBJ_SET_TYPES = new HashSet<String>();

@@ -25,7 +25,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import code.dws.bootstrap.BootStrapMethod;
 import code.dws.dbConnectivity.DBWrapper;
 import code.dws.query.SPARQLEndPointQueryAPI;
-import code.dws.reverb.ReverbPropertyReNaming;
 import code.dws.utils.Constants;
 import code.dws.utils.Constants.OIE;
 import code.dws.utils.Utilities;
@@ -68,8 +67,8 @@ public class DistantSupervised {
 			oieFile = new File(Constants.NELL_DATA_PATH);
 		} else {
 			if (!Constants.WORKFLOW_NORMAL) {
-				this.propertyNames = ReverbPropertyReNaming
-						.getReNamedProperties().get(args[0]);
+				// this.propertyNames = ReverbPropertyReNaming
+				// .getReNamedProperties().get(args[0]);
 			} else {
 				this.propertyNames = new ArrayList<String>();
 				this.propertyNames
