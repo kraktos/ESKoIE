@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   name=""
+   repos="https://reason-oie.googlecode.com/svn"
+   revision="80"
+   last-author="arnab.dutta@gmail.com"
+   url="https://reason-oie.googlecode.com/svn/trunk/reasoning-OIE/src/code/dws/query"
+   uuid="e7952d70-17fb-c739-96eb-f61dbd1427f4"
+   committed-rev="75"
+   kind="dir"
+   committed-date="2014-02-11T16:55:12.214647Z"/>
+<entry
+   name="SPARQLEndPointQueryAPI.java"
+   checksum="d36b5f7e832b1668c6befceae42aceea"
+   last-author="arnab.dutta@gmail.com"
+   text-time="2014-01-24T11:08:07.000000Z"
+   committed-rev="75"
+   kind="file"
+   committed-date="2014-02-11T16:55:12.214000Z"/>
+</wc-entries>
