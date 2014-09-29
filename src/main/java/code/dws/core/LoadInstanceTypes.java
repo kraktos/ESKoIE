@@ -77,6 +77,7 @@ public class LoadInstanceTypes {
 
 		try {
 			Scanner scan = new Scanner(new File(OIE_DATA_PATH));
+			long start = Utilities.startTimer();
 			while (scan.hasNextLine()) {
 				line = scan.nextLine();
 				arr = line.split(";");
@@ -93,8 +94,11 @@ public class LoadInstanceTypes {
 					}
 				}
 
-				if (cnt % 1000 == 0 && cnt > 1000)
-					logger.info("Completed " + (100 * (double) cnt / 2578152));
+				if (cnt % Constants.BATCH_SIZE == 0
+						&& cnt > Constants.BATCH_SIZE) {
+					Utilities.endTimer(start, (100 * (double) cnt / 2578152)
+							+ "% completion takes ");
+				}
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

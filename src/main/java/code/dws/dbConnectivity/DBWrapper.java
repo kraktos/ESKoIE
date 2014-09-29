@@ -147,13 +147,14 @@ public class DBWrapper {
 			insertDBPTypePrepstmnt.clearParameters();
 
 			batchCounter++;
-			if (batchCounter % Constants.BATCH_SIZE == 0) { // batches are
-															// flushed at
-															// a time
+			if (batchCounter % Constants.BATCH_SIZE == 0
+					&& batchCounter > Constants.BATCH_SIZE) { // batches are
+				// flushed at
+				// a time
 				// execute batch update
 				insertDBPTypePrepstmnt.executeBatch();
 
-				// System.out.println("FLUSHED TO DBPEDIA_TYPES");
+				logger.info("FLUSHED TO DBPEDIA_TYPES");
 				connection.commit();
 				insertDBPTypePrepstmnt.clearBatch();
 			}
