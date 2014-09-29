@@ -45,6 +45,7 @@ public class PropertyGoldStandard {
 	public static int TOPK_REV_PROPS = 500;
 	private static String OIE_FILE_PATH = null;
 	private static Map<String, Long> COUNT_PROPERTY_INST = new HashMap<String, Long>();
+	private static Map<String, Long> EMPTY_PROPERTY_MAP = new HashMap<String, Long>();
 	private static Map<Long, Long> COUNT_FREQUENY = new HashMap<Long, Long>();
 
 	private static Map<String, Long> revbProps = null;
@@ -73,7 +74,8 @@ public class PropertyGoldStandard {
 		if (args.length == 1)
 			OIE_FILE_PATH = args[0];
 
-		// READ THE INPUT RAW FILE AND FETCH THE TOP-K PROPERTIES
+		// READ THE INPUT RAW FILE AND FETCH THE PROPERTIES with atleast k
+		// instances
 		getReverbProperties(OIE_FILE_PATH, -1, 10L);
 
 		logger.info("Distinct Properties in data set = "
@@ -86,6 +88,11 @@ public class PropertyGoldStandard {
 		// read the file again to randomly select from those finally filtered
 		// property
 		createGoldStandard();
+
+		for (Entry e : EMPTY_PROPERTY_MAP.entrySet()) {
+			logger.info(e.getKey() + "\t" + e.getValue() + "\t"
+					+ COUNT_PROPERTY_INST.get(e.getKey()));
+		}
 
 	}
 
@@ -173,116 +180,6 @@ public class PropertyGoldStandard {
 		return ret;
 	}
 
-	private static void createGSFromRandomSample() throws IOException {
-		String line = null;
-		String[] arr = null;
-		String oieSub = null;
-		String oieProp = null;
-		String oieObj = null;
-
-		List<String> topkSubjects = null;
-		List<String> topkObjects = null;
-
-		// writing annotation file to
-		BufferedWriter writer = new BufferedWriter(new FileWriter(new File(
-				OIE_FILE_PATH).getParent() + "/sample.500.Annotated.csv"));
-
-		// Reading from
-		Scanner scan = new Scanner(new File(SAMPLE_OIE_FILE_PATH));
-
-		// init DB
-		DBWrapper.init(Constants.GET_WIKI_LINKS_APRIORI_SQL);
-
-		while (scan.hasNextLine()) {
-			line = scan.nextLine();
-			arr = line.split(";");
-			oieSub = Utilities.clean(arr[0]);
-			oieProp = arr[1];
-			oieObj = Utilities.clean(arr[2]);
-
-			// get top-k candidates of the subject
-			topkSubjects = DBWrapper.fetchTopKLinksWikiPrepProb(oieSub, 5);
-
-			// get the topk instances for oieObj
-			topkObjects = DBWrapper.fetchTopKLinksWikiPrepProb(oieObj, 5);
-
-			// ITERATE AND WRITE OUT EACH POSSIBLE PAIR
-
-			writer.write(oieSub + "\t" + oieProp + "\t" + oieObj + "\t" + "?"
-					+ "\t" + "?" + "\t" + "?" + "\n");
-
-			ioRoutine(oieProp, topkSubjects, topkObjects, writer);
-
-			writer.write("\n");
-			writer.flush();
-		}
-		writer.close();
-		DBWrapper.shutDown();
-	}
-
-	private static void topKTriples() throws IOException {
-		String line = null;
-		String[] arr = null;
-
-		BufferedWriter writer = null;
-
-		try {
-			Scanner scan = new Scanner(new File(OIE_FILE_PATH));
-			writer = new BufferedWriter(new FileWriter(
-					new File(OIE_FILE_PATH).getParent() + "/topKTriples.csv"));
-
-			while (scan.hasNextLine()) {
-				line = scan.nextLine();
-				arr = line.split(";");
-				if (revbProps.containsKey(arr[1])) {
-					writer.write(line + "\n");
-					writer.flush();
-				}
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private static Map<String, Long> loadRandomTriples()
-			throws FileNotFoundException {
-		String line = null;
-		String[] arr = null;
-		long val = 0;
-		int c = 0;
-		Map<String, Long> ret = new HashMap<String, Long>();
-
-		try {
-			Scanner scan = new Scanner(new File(OIE_FILE_PATH));
-
-			while (scan.hasNextLine()) {
-				line = scan.nextLine();
-				arr = line.split(";");
-
-				if (COUNT_PROPERTY_INST.containsKey(arr[1])) {
-					val = COUNT_PROPERTY_INST.get(arr[1]);
-					val++;
-				} else {
-					val = 1;
-				}
-				COUNT_PROPERTY_INST.put(arr[1], val);
-
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		COUNT_PROPERTY_INST = Utilities.sortByValue(COUNT_PROPERTY_INST);
-
-		for (Entry<String, Long> e : COUNT_PROPERTY_INST.entrySet()) {
-			ret.put(e.getKey(), e.getValue());
-			c++;
-			if (c == TOPK_REV_PROPS)
-				return ret;
-		}
-
-		return ret;
-	}
-
 	/**
 	 * 
 	 * @throws IOException
@@ -301,7 +198,7 @@ public class PropertyGoldStandard {
 		// writing annotation file to
 		BufferedWriter writer = new BufferedWriter(new FileWriter(new File(
 				OIE_FILE_PATH).getParent()
-				+ "/gs.reverb.sample."
+				+ "/test.gs.reverb.sample."
 				+ SIZE
 				+ ".csv"));
 
@@ -354,6 +251,7 @@ public class PropertyGoldStandard {
 						TOP_K);
 
 				if (!linkExists(topkSubjects, topkObjects)) {
+
 					randomNumSet.add(randomNum);
 
 					writer.write(oieSub + "\t" + oieProp + "\t" + oieObj + "\t"

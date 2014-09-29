@@ -180,6 +180,16 @@
 			<artifactId>guava-collections</artifactId>
 			<version>r03</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.directory.studio</groupId>
+			<artifactId>org.apache.commons.io</artifactId>
+			<version>2.4</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava-io</artifactId>
+			<version>r03</version>
+		</dependency>
 	</dependencies>
 	
 	

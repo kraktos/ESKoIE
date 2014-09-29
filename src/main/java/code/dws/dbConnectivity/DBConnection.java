@@ -88,7 +88,7 @@ public class DBConnection {
 	static {
 		registerDriver();
 
-		logger.info(driverName + " Registered!\n");
+		logger.debug(driverName + " Registered!\n");
 
 	}
 

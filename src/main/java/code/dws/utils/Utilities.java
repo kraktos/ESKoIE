@@ -106,7 +106,7 @@ public class Utilities {
 	public static void endTimer(final long start, final String message) {
 		long end = System.currentTimeMillis();
 		long execTime = end - start;
-		logger.debug(message
+		logger.info(message
 				+ " "
 				+ String.format("%02d ms",
 						TimeUnit.MILLISECONDS.toMillis(execTime)));

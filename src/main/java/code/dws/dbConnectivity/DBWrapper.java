@@ -168,9 +168,6 @@ public class DBWrapper {
 	public static List<String> getDBPInstanceType(String instance) {
 		List<String> types = new ArrayList<String>();
 
-		if (instance.indexOf("Ring") != -1)
-			System.out.println();
-
 		try {
 			fetchDbpTypePrepstmnt.setString(1, instance);
 			ResultSet rs = fetchDbpTypePrepstmnt.executeQuery();

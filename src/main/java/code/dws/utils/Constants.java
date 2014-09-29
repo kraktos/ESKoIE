@@ -48,6 +48,8 @@ public class Constants {
 
 	public static boolean RELOAD_TYPE;
 
+	public static boolean LOAD_TYPES;
+
 	public static int SCALE_WEIGHT;
 
 	public static boolean ENGAGE_INTER_STEP;
@@ -201,6 +203,8 @@ public class Constants {
 					.getProperty("INCLUDE_YAGO_TYPES"));
 
 			RELOAD_TYPE = Boolean.valueOf(prop.getProperty("RELOAD_TYPE"));
+			LOAD_TYPES = Boolean.valueOf(prop.getProperty("LOAD_TYPES"));
+
 			BATCH_SIZE = Integer.parseInt(prop.getProperty("BATCH_SIZE"));
 
 			SCALE_WEIGHT = Integer.parseInt(prop.getProperty("SCALE_WEIGHT"));

@@ -195,7 +195,7 @@ public class DistantSupervised {
 			candidates.clear();
 		}
 
-		DBWrapper.saveResidualDBPTypes();
+//		DBWrapper.saveResidualDBPTypes();
 		DBWrapper.shutDown();
 
 	}

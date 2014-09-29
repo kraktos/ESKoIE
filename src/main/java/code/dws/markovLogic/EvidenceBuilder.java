@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
+
 import code.dws.dbConnectivity.DBWrapper;
 import code.dws.query.SPARQLEndPointQueryAPI;
 import code.dws.utils.Constants;
@@ -112,6 +114,7 @@ public class EvidenceBuilder {
 		// DBWrapper.init(Constants.GET_WIKI_TITLES_SQL);
 
 		BufferedReader input = null;
+		List<String> oieLines = null;
 
 		// the file where the evidences for the MLN are written out
 		BufferedWriter allEvidenceWriter = new BufferedWriter(new FileWriter(
@@ -166,10 +169,13 @@ public class EvidenceBuilder {
 						new FileInputStream(inputFile)));
 
 				// iterate the file from OIE and process each triple at a time
-				while ((triple = input.readLine()) != null) {
+				long s1 = Utilities.startTimer();
+				oieLines = FileUtils.readLines(inputFile);
 
+				// while ((triple = input.readLine()) != null) {
+				for (String line : oieLines) {
 					// split on the delimiter
-					arrStr = triple.split(delimit);
+					arrStr = line.split(delimit);
 
 					// if the property is the one we want to sample upon
 					if (this.propertyName.equals(arrStr[1])) {
@@ -180,6 +186,7 @@ public class EvidenceBuilder {
 								allEvidenceWriter, termConceptPairSet);
 					}
 				}
+				Utilities.endTimer(s1, "looping thru whole file = ");
 			}
 		}
 
@@ -315,9 +322,7 @@ public class EvidenceBuilder {
 				// back to character again
 				conc = Utilities.utf8ToCharacter(val.split("\t")[0]);
 
-				// if (conc.indexOf("We_are_the_99") != -1)
-				// System.out.println();
-
+				// the type info are written out to the writer object
 				generateDBPediaTypeMLN(conc, allEvidenceWriter);
 
 				conc = Utilities.removeTags("DBP#resource/"
