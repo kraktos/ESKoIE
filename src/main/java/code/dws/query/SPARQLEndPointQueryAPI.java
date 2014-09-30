@@ -4,9 +4,10 @@
 
 package code.dws.query;
 
+import gnu.trove.map.hash.THashMap;
+
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -36,7 +37,7 @@ public class SPARQLEndPointQueryAPI {
 			.getLogger(SPARQLEndPointQueryAPI.class.getName());
 
 	// map of class and its subclasses
-	private static Map<String, Set<String>> classAndSubClassesMap = new HashMap<String, Set<String>>();
+	private static THashMap<String, Set<String>> classAndSubClassesMap = new THashMap<String, Set<String>>();
 
 	public static void queryDBPedia(final String QUERY) {
 

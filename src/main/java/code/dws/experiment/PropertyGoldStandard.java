@@ -3,6 +3,8 @@
  */
 package code.dws.experiment;
 
+import gnu.trove.map.hash.THashMap;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -10,7 +12,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -22,12 +23,12 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hp.hpl.jena.query.QuerySolution;
-
 import code.dws.dbConnectivity.DBWrapper;
 import code.dws.query.SPARQLEndPointQueryAPI;
 import code.dws.utils.Constants;
 import code.dws.utils.Utilities;
+
+import com.hp.hpl.jena.query.QuerySolution;
 
 /**
  * A gold standard creation for property mapping
@@ -44,9 +45,9 @@ public class PropertyGoldStandard {
 	private static final String SAMPLE_OIE_FILE_PATH = "src/main/resources/input/sample.500.csv";
 	public static int TOPK_REV_PROPS = 500;
 	private static String OIE_FILE_PATH = null;
-	private static Map<String, Long> COUNT_PROPERTY_INST = new HashMap<String, Long>();
-	private static Map<String, Long> EMPTY_PROPERTY_MAP = new HashMap<String, Long>();
-	private static Map<Long, Long> COUNT_FREQUENY = new HashMap<Long, Long>();
+	private static THashMap<String, Long> COUNT_PROPERTY_INST = new THashMap<String, Long>();
+	private static THashMap<String, Long> EMPTY_PROPERTY_MAP = new THashMap<String, Long>();
+	private static THashMap<Long, Long> COUNT_FREQUENY = new THashMap<Long, Long>();
 
 	private static Map<String, Long> revbProps = null;
 
@@ -147,7 +148,7 @@ public class PropertyGoldStandard {
 		long val = 0;
 		int c = 0;
 		List<String> ret = new ArrayList<String>();
-		COUNT_PROPERTY_INST = new HashMap<String, Long>();
+		COUNT_PROPERTY_INST = new THashMap<String, Long>();
 
 		try {
 			Scanner scan = new Scanner(new File(OIE_FILE));

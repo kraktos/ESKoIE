@@ -4,14 +4,14 @@
 
 package code.dws.core;
 
+import gnu.trove.map.hash.THashMap;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +58,7 @@ public class DBPediaTreeOperation {
 	GenericTreeNode UNTYPEDNODE = null;
 
 	// A collection of all the scored up nodes
-	static Map<String, GenericTreeNode> COLLECTION_NODES = new HashMap<String, GenericTreeNode>();
+	static THashMap<String, GenericTreeNode> COLLECTION_NODES = new THashMap<String, GenericTreeNode>();
 
 	String identifier = null;
 
@@ -164,11 +164,11 @@ public class DBPediaTreeOperation {
 	 * @throws IOException
 	 */
 
-	public Map<String, Pair<Double, Double>> getNodeScore(
+	public THashMap<String, Pair<Double, Double>> getNodeScore(
 			List<String> dbPediaTypes, Set<String> fullSetOfTpes) {
 
 		double totalScore = 0;
-		Map<String, Double> rankedNodesMap = new HashMap<String, Double>();
+		THashMap<String, Double> rankedNodesMap = new THashMap<String, Double>();
 
 		GenericTreeNode node = null;
 
@@ -203,7 +203,7 @@ public class DBPediaTreeOperation {
 	 * @return
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	static Map<String, Pair<Double, Double>> sortByValue(Map map,
+	static THashMap<String, Pair<Double, Double>> sortByValue(THashMap map,
 			double totalScore) {
 		List list = new LinkedList(map.entrySet());
 		Collections.sort(list, new Comparator() {
@@ -213,7 +213,7 @@ public class DBPediaTreeOperation {
 			}
 		});
 
-		Map result = new LinkedHashMap();
+		THashMap result = new THashMap();
 		for (Iterator it = list.iterator(); it.hasNext();) {
 			Map.Entry entry = (Map.Entry) it.next();
 			result.put(entry.getKey(), new ImmutablePair<Double, Double>(

@@ -4,6 +4,8 @@
 
 package code.dws.core;
 
+import gnu.trove.map.hash.THashMap;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -70,8 +72,8 @@ public class AutomatedNodeScoringWrapper {
 
 		this.dbTOp.getUNTYPEDNODE();
 
-		Map<String, Pair<Double, Double>> testMap = this.dbTOp.getNodeScore(
-				dbPediaTypes, fullSetOfTpes);
+		THashMap<String, Pair<Double, Double>> testMap = this.dbTOp
+				.getNodeScore(dbPediaTypes, fullSetOfTpes);
 
 		for (Map.Entry<String, Pair<Double, Double>> entry : testMap.entrySet()) {
 

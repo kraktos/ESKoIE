@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import code.dws.markovLogic.EvidenceBuilder;
 import code.dws.utils.Constants;
 import code.dws.utils.Utilities;
 
@@ -76,30 +77,6 @@ public class DBWrapper {
 		}
 	}
 
-	public static List<String> fetchWikiTitles(String arg) {
-		ResultSet rs = null;
-		List<String> results = null;
-
-		try {
-			pstmt.setString(1, arg.trim());
-			// pstmt.setInt(2, Constants.ATLEAST_LINKS);
-			pstmt.setInt(2, Constants.TOP_K_MATCHES);
-			// run the query finally
-			rs = pstmt.executeQuery();
-			results = new ArrayList<String>();
-
-			while (rs.next()) {
-				results.add(rs.getString(1));
-			}
-
-		} catch (Exception e) {
-			logger.error(" exception while fetching " + arg + " "
-					+ e.getMessage());
-		}
-
-		return results;
-	}
-
 	public static void saveToOIEPostFxd(String oieSub, String oiePred,
 			String oieObj, String oieSubPfxd, String oieObjPfxd) {
 
@@ -117,9 +94,10 @@ public class DBWrapper {
 			insertOIEPFxdPrepstmnt.clearParameters();
 
 			batchCounter++;
-			if (batchCounter % Constants.BATCH_SIZE == 0) { // batches are
-															// flushed at
-															// a time
+			if (batchCounter % Constants.BATCH_SIZE == 0
+					&& batchCounter > Constants.BATCH_SIZE) { // batches are
+				// flushed at
+				// a time
 				// execute batch update
 				insertOIEPFxdPrepstmnt.executeBatch();
 
@@ -170,45 +148,96 @@ public class DBWrapper {
 		List<String> types = new ArrayList<String>();
 
 		try {
-			fetchDbpTypePrepstmnt.setString(1, instance);
-			ResultSet rs = fetchDbpTypePrepstmnt.executeQuery();
+			// if not cached
+			if (!EvidenceBuilder.INSTANCE_TYPES.containsKey(instance)) {
 
-			while (rs.next()) {
-				types.add(rs.getString(1));
+				fetchDbpTypePrepstmnt.setString(1, instance);
+				ResultSet rs = fetchDbpTypePrepstmnt.executeQuery();
+
+				while (rs.next()) {
+					types.add(rs.getString(1));
+				}
+				// cache it
+				EvidenceBuilder.INSTANCE_TYPES.put(instance, types);
+			} else {
+				return EvidenceBuilder.INSTANCE_TYPES.get(instance);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+
 		return types;
+	}
+
+	public static List<String> fetchWikiTitles(String arg) {
+		ResultSet rs = null;
+		List<String> results = null;
+
+		try {
+
+			pstmt.setString(1, arg.trim());
+			// pstmt.setInt(2, Constants.ATLEAST_LINKS);
+			pstmt.setInt(2, Constants.TOP_K_MATCHES);
+			// run the query finally
+			rs = pstmt.executeQuery();
+			results = new ArrayList<String>();
+
+			while (rs.next()) {
+				results.add(rs.getString(1));
+			}
+
+		} catch (Exception e) {
+			logger.error(" exception while fetching " + arg + " "
+					+ e.getMessage());
+		}
+
+		return results;
 	}
 
 	public static List<String> fetchTopKLinksWikiPrepProb(String arg, int limit) {
 		ResultSet rs = null;
 		List<String> results = null;
+		List<String> temp = null;
 
 		DecimalFormat decimalFormatter = new DecimalFormat("0.00000");
 
 		try {
-			pstmt.setString(1, arg.trim());
-			pstmt.setString(2, arg.trim());
-			pstmt.setInt(3, limit);
+			if (!EvidenceBuilder.INSTANCE_CANDIDATES.containsKey(arg)) {
 
-			rs = pstmt.executeQuery();
-			results = new ArrayList<String>();
+				pstmt.setString(1, arg.trim());
+				pstmt.setString(2, arg.trim());
+				pstmt.setInt(3, limit);
 
-			while (rs.next()) {
+				rs = pstmt.executeQuery();
+				results = new ArrayList<String>();
+				temp = new ArrayList<String>();
 
-				results.add(Utilities.characterToUTF8((rs.getString(1))
-						.replaceAll("\\s", "_"))
-						+ "\t"
-						+ decimalFormatter.format(rs.getDouble(2)));
+				while (rs.next()) {
+
+					results.add(Utilities.characterToUTF8((rs.getString(1))
+							.replaceAll("\\s", "_"))
+							+ "\t"
+							+ decimalFormatter.format(rs.getDouble(2)));
+
+					temp.add(Utilities.characterToUTF8((rs.getString(1))
+							.replaceAll("\\s", "_"))
+							+ "\t"
+							+ decimalFormatter.format(rs.getDouble(2)));
+				}
+
+				EvidenceBuilder.INSTANCE_CANDIDATES.put(arg, temp);
+			} else {
+				return EvidenceBuilder.INSTANCE_CANDIDATES.get(arg);
 			}
-
 		} catch (Exception e) {
 
 			logger.error(" exception while fetching " + arg + " "
 					+ e.getMessage());
 		}
+
+		// cache it
+		// if (!EvidenceBuilder.INSTANCE_CANDIDATES.containsKey(arg))
+		// EvidenceBuilder.INSTANCE_CANDIDATES.put(arg, temp);
 
 		return results;
 	}

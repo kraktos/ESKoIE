@@ -3,14 +3,14 @@
  */
 package code.dws.markovLogic;
 
+import gnu.trove.map.hash.THashMap;
+
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,10 +43,10 @@ public class YagoDbpediaMapping {
 	private static final String EVIDENCE = "DBP.YAGO.EVIDENCES.db";
 
 	// stores the YAGO class hierarchy reasoned with MLN
-	private static final Map<String, String> YAGO_SUBCLASS_MAP = new HashMap<String, String>();
+	private static final THashMap<String, String> YAGO_SUBCLASS_MAP = new THashMap<String, String>();
 
 	// stores the YAGO to DBP mappings already known
-	private static final Map<String, String> YAGO_DBP_MAP = new HashMap<String, String>();
+	private static final THashMap<String, String> YAGO_DBP_MAP = new THashMap<String, String>();
 
 	private static ArrayList<ArrayList<String>> dbpYagoClassEquiv;
 

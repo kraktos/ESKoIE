@@ -202,7 +202,7 @@ public class Constants {
 			INCLUDE_YAGO_TYPES = Boolean.valueOf(prop
 					.getProperty("INCLUDE_YAGO_TYPES"));
 
-			RELOAD_TYPE = Boolean.valueOf(prop.getProperty("RELOAD_TYPE"));
+			RELOAD_TYPE = false;//Boolean.valueOf(prop.getProperty("RELOAD_TYPE"));
 			LOAD_TYPES = Boolean.valueOf(prop.getProperty("LOAD_TYPES"));
 
 			BATCH_SIZE = Integer.parseInt(prop.getProperty("BATCH_SIZE"));

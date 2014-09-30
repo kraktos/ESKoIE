@@ -19,11 +19,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import code.dws.bootstrap.BootStrapMethod;
 import code.dws.dbConnectivity.DBWrapper;
+import code.dws.markovLogic.EvidenceBuilder;
 import code.dws.query.SPARQLEndPointQueryAPI;
 import code.dws.utils.Constants;
 import code.dws.utils.Constants.OIE;
@@ -37,6 +41,12 @@ import code.dws.utils.Utilities;
  * @author Arnab Dutta
  */
 public class DistantSupervised {
+	/**
+	 * logger
+	 */
+	public final static Logger logger = LoggerFactory
+			.getLogger(DistantSupervised.class);
+
 	static String[] pNames = { "bookwriter", "actorstarredinmovie",
 			"bankbankincountry", "personleadsorganization",
 			"athleteledsportsteam", "citylocatedinstate", "companyalsoknownas",
@@ -154,8 +164,8 @@ public class DistantSupervised {
 		domainClassMap = sortByValue(domainClassMap);
 		rangeClassMap = sortByValue(rangeClassMap);
 
-		System.out.println("DOMAIN MAP = " + domainClassMap);
-		System.out.println("RANGE MAP = " + rangeClassMap);
+		logger.info("DOMAIN MAP = " + domainClassMap);
+		logger.info("RANGE MAP = " + rangeClassMap);
 	}
 
 	/**
@@ -195,7 +205,7 @@ public class DistantSupervised {
 			candidates.clear();
 		}
 
-//		DBWrapper.saveResidualDBPTypes();
+		// DBWrapper.saveResidualDBPTypes();
 		DBWrapper.shutDown();
 
 	}
@@ -278,7 +288,7 @@ public class DistantSupervised {
 		System.out.println("DOMAIN MAP = " + domainClassMap);
 		System.out.println("RANGE MAP = " + rangeClassMap);
 
-		DBWrapper.saveResidualDBPTypes();
+		// DBWrapper.saveResidualDBPTypes();
 		DBWrapper.shutDown();
 	}
 
@@ -298,18 +308,47 @@ public class DistantSupervised {
 	public void processEachTriple(String sub, String prop, String obj,
 			OIE oieType) {
 
+		List<String> subs = new ArrayList<String>();
+		List<String> objs = new ArrayList<String>();
+
 		// fetch the most probable matched entities both for subject and object
-		List<String> subjConcepts = DBWrapper
-				.fetchWikiTitles((oieType == Constants.OIE.NELL) ? Utilities
-						.cleanse(sub).replaceAll("\\_+", " ") : Utilities
-						.cleanse(sub).replaceAll("\\_+", " "));
+		// List<String> subjConcepts = DBWrapper
+		// .fetchWikiTitles((oieType == Constants.OIE.NELL) ? Utilities
+		// .cleanse(sub).replaceAll("\\_+", " ") : Utilities
+		// .cleanse(sub).replaceAll("\\_+", " "));
+		//
+		// List<String> objConcepts = DBWrapper
+		// .fetchWikiTitles(((oieType == Constants.OIE.NELL) ? Utilities
+		// .cleanse(obj).replaceAll("\\_+", " ") : Utilities
+		// .cleanse(obj).replaceAll("\\_+", " ")));
 
-		List<String> objConcepts = DBWrapper
-				.fetchWikiTitles((oieType == Constants.OIE.NELL) ? Utilities
-						.cleanse(obj).replaceAll("\\_+", " ") : Utilities
-						.cleanse(obj).replaceAll("\\_+", " "));
+		List<String> tempSubs = EvidenceBuilder.INSTANCE_CANDIDATES
+				.get(Utilities.cleanse(sub).replaceAll("\\_+", " "));
 
-		populateDomainAndRangeMaps(subjConcepts, objConcepts);
+		List<String> tempObjs = EvidenceBuilder.INSTANCE_CANDIDATES
+				.get(Utilities.cleanse(obj).replaceAll("\\_+", " "));
+
+		String subjConcept = "";
+		if (tempSubs != null && tempSubs.size() > 0)
+			subjConcept = StringUtils.replace(
+					Utilities.utf8ToCharacter(tempSubs.get(0).split("\t")[0]),
+					"_", " ");
+		subs.add(subjConcept);
+
+		String objConcept = "";
+		if (tempObjs != null && tempObjs.size() > 0)
+			objConcept = StringUtils.replace(
+					Utilities.utf8ToCharacter(tempObjs.get(0).split("\t")[0]),
+					"_", " ");
+		objs.add(objConcept);
+
+		// List<String> objConcepts = EvidenceBuilder.INSTANCE_CANDIDATES
+		// .get((oieType == Constants.OIE.NELL) ? Utilities.cleanse(obj)
+		// .replaceAll("\\_+", " ") : Utilities.cleanse(obj)
+		// .replaceAll("\\_+", " "));
+
+		// populateDomainAndRangeMaps(subjConcepts, objConcepts);
+		populateDomainAndRangeMaps(subs, objs);
 
 	}
 
@@ -364,10 +403,10 @@ public class DistantSupervised {
 
 				// System.out.println("UNTYPED FOR " + dbpEntity);
 
-				if (Constants.RELOAD_TYPE)
-					DBWrapper.saveToDBPediaTypes(
-							Utilities.characterToUTF8(dbpEntity),
-							Constants.UNTYPED);
+				// if (Constants.RELOAD_TYPE)
+				// DBWrapper.saveToDBPediaTypes(
+				// Utilities.characterToUTF8(dbpEntity),
+				// Constants.UNTYPED);
 
 			} else { // normal processing
 
@@ -389,10 +428,10 @@ public class DistantSupervised {
 						}
 					}
 
-					if (Constants.RELOAD_TYPE)
-						DBWrapper.saveToDBPediaTypes(
-								Utilities.characterToUTF8(dbpEntity),
-								entityType);
+					// if (Constants.RELOAD_TYPE)
+					// DBWrapper.saveToDBPediaTypes(
+					// Utilities.characterToUTF8(dbpEntity),
+					// entityType);
 				}
 			}
 		}
@@ -435,10 +474,10 @@ public class DistantSupervised {
 					domainClassMap.put("UNTYPED", 1D);
 				}
 
-				if (Constants.RELOAD_TYPE)
-					DBWrapper.saveToDBPediaTypes(
-							Utilities.characterToUTF8(dbpEntity),
-							Constants.UNTYPED);
+				// if (Constants.RELOAD_TYPE)
+				// DBWrapper.saveToDBPediaTypes(
+				// Utilities.characterToUTF8(dbpEntity),
+				// Constants.UNTYPED);
 
 			} else {
 
@@ -450,10 +489,10 @@ public class DistantSupervised {
 						domainClassMap.put(entityType, 1D);
 					}
 
-					if (Constants.RELOAD_TYPE)
-						DBWrapper.saveToDBPediaTypes(
-								Utilities.characterToUTF8(dbpEntity),
-								entityType);
+					// if (Constants.RELOAD_TYPE)
+					// DBWrapper.saveToDBPediaTypes(
+					// Utilities.characterToUTF8(dbpEntity),
+					// entityType);
 				}
 			}
 		}
@@ -483,10 +522,10 @@ public class DistantSupervised {
 					rangeClassMap.put("UNTYPED", 1D);
 				}
 
-				if (Constants.RELOAD_TYPE)
-					DBWrapper.saveToDBPediaTypes(
-							Utilities.characterToUTF8(dbpEntity),
-							Constants.UNTYPED);
+				// if (Constants.RELOAD_TYPE)
+				// DBWrapper.saveToDBPediaTypes(
+				// Utilities.characterToUTF8(dbpEntity),
+				// Constants.UNTYPED);
 
 			} else {
 				for (String entityType : entityTypes) {
@@ -497,10 +536,10 @@ public class DistantSupervised {
 						rangeClassMap.put(entityType, 1D);
 					}
 
-					if (Constants.RELOAD_TYPE)
-						DBWrapper.saveToDBPediaTypes(
-								Utilities.characterToUTF8(dbpEntity),
-								entityType);
+					// if (Constants.RELOAD_TYPE)
+					// DBWrapper.saveToDBPediaTypes(
+					// Utilities.characterToUTF8(dbpEntity),
+					// entityType);
 
 				}
 			}
@@ -523,16 +562,40 @@ public class DistantSupervised {
 			}
 		});
 
-		Map result = new LinkedHashMap();
+		Map<String, Double> result = new LinkedHashMap<String, Double>();
 		for (Iterator it = list.iterator(); it.hasNext();) {
-			Map.Entry entry = (Map.Entry) it.next();
-
-			// result.put(entry.getKey(), (Double) entry.getValue()/
-			// (tripleCounter * Constants.TOP_ANCHORS));
-			result.put(entry.getKey(), (Double) entry.getValue());
+			Map.Entry<String, Double> entry = (Map.Entry) it.next();
+			result.put(entry.getKey(), entry.getValue());
 		}
 		return result;
 	}
+
+	/**
+	 * sort a map by value descending
+	 * 
+	 * @param map
+	 * @return
+	 */
+	// @SuppressWarnings({ "rawtypes", "unchecked" })
+	// public static Map<String, Double> sortByValue(Map map) {
+	// List list = new LinkedList(map.entrySet());
+	// Collections.sort(list, new Comparator() {
+	// public int compare(Object o2, Object o1) {
+	// return ((Comparable) ((Map.Entry) (o1)).getValue())
+	// .compareTo(((Map.Entry) (o2)).getValue());
+	// }
+	// });
+	//
+	// Map result = new HashMap();
+	// for (Iterator it = list.iterator(); it.hasNext();) {
+	// Map.Entry entry = (Map.Entry) it.next();
+	//
+	// // result.put(entry.getKey(), (Double) entry.getValue()/
+	// // (tripleCounter * Constants.TOP_ANCHORS));
+	// result.put(entry.getKey(), (Double) entry.getValue());
+	// }
+	// return result;
+	// }
 
 	/**
 	 * @return the typeCountSubjectMap

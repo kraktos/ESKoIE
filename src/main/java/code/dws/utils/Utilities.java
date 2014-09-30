@@ -4,6 +4,8 @@
 
 package code.dws.utils;
 
+import gnu.trove.map.hash.THashMap;
+
 import java.io.BufferedWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -18,11 +20,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 /**
@@ -126,38 +128,6 @@ public class Utilities {
 		}
 	}
 
-	public static void split(String head, String in) {
-
-		// System.out.println(head + "  " + in);
-		// head + " " + in is a segmentation
-		String segment = head + " " + in;
-
-		// count number of dictionary words
-		int count = 0;
-		Scanner phraseScan = new Scanner(segment);
-		while (phraseScan.hasNext()) {
-			String word = phraseScan.next();
-			if (dict.contains(word))
-				count++;
-		}
-
-		if (count < countGlbl) {
-			if (set.size() > 0) {
-				set.clear();
-			}
-			set.add(segment);
-		}
-
-		if (count == 4)
-			System.out.println(segment + "\t" + count + " English words");
-
-		// recursive calls
-		for (int i = 2; i < in.length(); i++) {
-			split(head + " " + in.substring(0, i), in.substring(i, in.length()));
-		}
-
-	}
-
 	public static String prun(String uri) {
 		String s = uri.substring(uri.lastIndexOf("/") + 1, uri.length());
 		if (s.indexOf(":") != -1)
@@ -167,7 +137,9 @@ public class Utilities {
 	}
 
 	public static String cleanse(String arg) {
-		arg = arg.substring(arg.lastIndexOf(":") + 1, arg.length());
+		// arg = arg.substring(arg.lastIndexOf(":") + 1, arg.length());
+		if (arg.indexOf(":") != -1)
+			arg = StringUtils.substringAfter(arg, ":");
 		return arg.toLowerCase();
 	}
 
@@ -341,7 +313,7 @@ public class Utilities {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static Map<String, Long> sortByValue(Map map, Long cutOff) {
+	public static THashMap<String, Long> sortByValue(THashMap map, Long cutOff) {
 		List list = new LinkedList(map.entrySet());
 		Collections.sort(list, new Comparator() {
 			public int compare(Object o2, Object o1) {
@@ -350,7 +322,7 @@ public class Utilities {
 			}
 		});
 
-		Map result = new LinkedHashMap();
+		THashMap result = new THashMap();
 		for (Iterator it = list.iterator(); it.hasNext();) {
 			Map.Entry<String, Long> entry = (Map.Entry) it.next();
 			if (entry.getValue() >= cutOff)
@@ -383,23 +355,48 @@ public class Utilities {
 	 */
 	public static String removeTags(String arg) {
 
-		arg = arg.replaceAll("_:", "");
-		arg = arg.replaceAll("<", "");
-		arg = arg.replaceAll(">\\)", "");
-		arg = arg.replaceAll(">", "");
-		arg = arg.replaceAll(",", "~2C");
-		arg = arg.replaceAll("'", "*");
-		arg = arg.replaceAll("%", "~");
+		arg = StringUtils.replace(arg, "_:", "");
+		arg = StringUtils.replace(arg, "<", "");
+		arg = StringUtils.replace(arg, ">\\)", "");
+		arg = StringUtils.replace(arg, ">", "");
+		arg = StringUtils.replace(arg, ",", "~2C");
+		arg = StringUtils.replace(arg, "'", "*");
+		arg = StringUtils.replace(arg, "%", "~");
+		arg = StringUtils.replace(arg, "~28", "[");
+		arg = StringUtils.replace(arg, "~29", "]");
+		arg = StringUtils.replace(arg, "~27", "*");
+		arg = StringUtils.replace(arg, "Node\\(", "");
+		arg = StringUtils.replace(arg, "\\)", "]");
+		arg = StringUtils.replace(arg, "\\(", "[");
+		arg = StringUtils.replace(arg, "http://dbpedia.org/", "DBP#");
+		arg = StringUtils.replace(arg, "\\(", "[");
+		arg = StringUtils.replace(arg, "http://dws/OIE", "NELL");
 
-		arg = arg.replaceAll("~28", "[");
-		arg = arg.replaceAll("~29", "]");
-		arg = arg.replaceAll("~27", "*");
+		// arg = arg.replaceAll("_:", "");
+		// arg = arg.replaceAll("<", "");
+		// arg = arg.replaceAll(">\\)", "");
+		// arg = arg.replaceAll(">", "");
 
-		arg = arg.replaceAll("Node\\(", "");
-		arg = arg.replaceAll("\\)", "]");
-		arg = arg.replaceAll("\\(", "[");
-		arg = arg.replaceAll("http://dbpedia.org/", "DBP#");
-		arg = arg.replaceAll("http://dws/OIE", "NELL");
+		// arg = arg.replaceAll(",", "~2C");
+		// arg = arg.replaceAll("'", "*");
+		// arg = arg.replaceAll("%", "~");
+		//
+		// arg = arg.replaceAll("~28", "[");
+		// arg = arg.replaceAll("~29", "]");
+		// arg = arg.replaceAll("~27", "*");
+		//
+		// arg = arg.replaceAll("Node\\(", "");
+		// arg = arg.replaceAll("\\)", "]");
+		// arg = arg.replaceAll("\\(", "[");
+		// arg = arg.replaceAll("http://dbpedia.org/", "DBP#");
+		// arg = arg.replaceAll("http://dws/OIE", "NELL");
 		return "\"" + arg.trim() + "\"";
+	}
+
+	public static String format(String arg) {
+		arg = StringUtils.replace(arg, ",", "~2C");
+		arg = StringUtils.replace(arg, "\\$", "~24");
+		arg = StringUtils.replace(arg, "%", "~25");
+		return arg;
 	}
 }

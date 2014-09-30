@@ -4,6 +4,8 @@
 
 package code.dws.markovLogic;
 
+import gnu.trove.map.hash.THashMap;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -13,13 +15,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import code.dws.dbConnectivity.DBWrapper;
 import code.dws.query.SPARQLEndPointQueryAPI;
@@ -32,13 +32,25 @@ import code.dws.utils.Utilities;
  */
 public class EvidenceBuilder {
 
+	/**
+	 * logger
+	 */
+	public final static Logger logger = LoggerFactory
+			.getLogger(EvidenceBuilder.class);
+
 	private String propertyName;
 	private List<String> propertyNames;
 
-	public static Map<String, Long> MAP_COUNTER = new HashMap<String, Long>();
+	public static THashMap<String, Long> MAP_COUNTER = new THashMap<String, Long>();
+
+	public static THashMap<String, List<String>> INSTANCE_CANDIDATES = new THashMap<String, List<String>>();
+	// public static THashMap<String, List<String>> INSTANCE_CANDIDATES2 = new
+	// THashMap<String, List<String>>();
+
+	public static THashMap<String, List<String>> INSTANCE_TYPES = new THashMap<String, List<String>>();
 
 	// The input OIE file with raw web extracted data
-	static File oieFile = null;
+	public static File oieFile = null;
 
 	public EvidenceBuilder(String[] args) throws IOException {
 
@@ -108,10 +120,7 @@ public class EvidenceBuilder {
 		String triple;
 		String[] arrStr = null;
 
-		Set<String> termConceptPairSet = new HashSet<String>();
-
-		// initiate DB
-		// DBWrapper.init(Constants.GET_WIKI_TITLES_SQL);
+		THashMap<String, String> termConceptPair = new THashMap<String, String>();
 
 		BufferedReader input = null;
 		List<String> oieLines = null;
@@ -120,16 +129,8 @@ public class EvidenceBuilder {
 		BufferedWriter allEvidenceWriter = new BufferedWriter(new FileWriter(
 				Constants.ALL_MLN_EVIDENCE));
 
-		BufferedWriter allEvidenceWriterTop1 = new BufferedWriter(
-				new FileWriter(Constants.ALL_MLN_EVIDENCE_T1));
-
-		// the file where the evidences for the MLN are written out
-		// BufferedWriter goldEvidenceWriter = new BufferedWriter(new
-		// FileWriter(
-		// Constants.GOLD_MLN_EVIDENCE_ALL));
-
-		// load the gold standard file.
-		// loadGoldStandard();
+		// BufferedWriter allEvidenceWriterTop1 = new BufferedWriter(
+		// new FileWriter(Constants.ALL_MLN_EVIDENCE_T1));
 
 		// init DB
 		DBWrapper.init(Constants.GET_WIKI_LINKS_APRIORI_SQL);
@@ -150,8 +151,7 @@ public class EvidenceBuilder {
 
 						// process them
 						this.createEvidences(arrStr[0], arrStr[1], arrStr[2],
-								arrStr[3], allEvidenceWriterTop1,
-								allEvidenceWriter, termConceptPairSet);
+								arrStr[3], allEvidenceWriter, termConceptPair);
 					}
 
 			}
@@ -161,10 +161,7 @@ public class EvidenceBuilder {
 			for (String prop : this.propertyNames) {
 
 				this.propertyName = prop;
-
-				System.out
-						.println("Creating evidence for " + this.propertyName);
-
+				logger.info("Creating evidence for " + this.propertyName);
 				input = new BufferedReader(new InputStreamReader(
 						new FileInputStream(inputFile)));
 
@@ -182,8 +179,7 @@ public class EvidenceBuilder {
 
 						// process them
 						this.createEvidences(arrStr[0], arrStr[1], arrStr[2],
-								arrStr[3], allEvidenceWriterTop1,
-								allEvidenceWriter, termConceptPairSet);
+								arrStr[3], allEvidenceWriter, termConceptPair);
 					}
 				}
 				Utilities.endTimer(s1, "looping thru whole file = ");
@@ -191,25 +187,20 @@ public class EvidenceBuilder {
 		}
 
 		// remove from memory
-		termConceptPairSet.clear();
+		termConceptPair.clear();
 
 		// close stream writer
-		allEvidenceWriterTop1.close();
+		// allEvidenceWriterTop1.close();
 		allEvidenceWriter.close();
 		// goldEvidenceWriter.close();
 
 		// flush residuals
-		DBWrapper.saveResidualDBPTypes();
+		// DBWrapper.saveResidualDBPTypes();
 		DBWrapper.saveResidualOIERefined();
 
 		// shutdown DB
 		DBWrapper.shutDown();
 
-	}
-
-	private static String format(String arg) {
-		return arg.replaceAll(",", "~2C").replaceAll("\\$", "~24")
-				.replaceAll("%", "~25");
 	}
 
 	/**
@@ -221,66 +212,64 @@ public class EvidenceBuilder {
 	 * @param conf
 	 * @param oieType
 	 * @param allEvidenceWriter
-	 * @param termConceptPairSet
+	 * @param termConceptPair
 	 * @param goldEvidenceWriter
 	 * @throws IOException
 	 */
 	private void createEvidences(String sub, String prop, String obj,
-			String conf, BufferedWriter allEvidenceWriterTop1,
-			BufferedWriter allEvidenceWriter, Set<String> termConceptPairSet)
-			throws IOException {
+			String conf, BufferedWriter allEvidenceWriter,
+			THashMap<String, String> termConceptPair) throws IOException {
 
-		String nellSub = null;
-		String nellPred = null;
-		String nellObj = null;
+		String oieSub = null;
+		String oiePred = null;
+		String oieObj = null;
 		double confidence = 0;
 
-		String nellSubPFxd = null;
-		String nellObjPFxd = null;
+		String oieSubPFxd = null;
+		String oieObjPFxd = null;
 
-		nellSub = Utilities.getInst(sub);
-		nellPred = prop;
-		nellObj = Utilities.getInst(obj);
+		oieSub = Utilities.getInst(sub);
+		oiePred = prop;
+		oieObj = Utilities.getInst(obj);
 		confidence = Double.parseDouble(conf);
 
 		// uniquely identify each instance by concating a post fixd number
-		nellSubPFxd = generateUniqueURI(nellSub.replaceAll("\\s+", "_"));
-		nellObjPFxd = generateUniqueURI(nellObj.replaceAll("\\s+", "_"));
+		oieSubPFxd = generateUniqueURI(oieSub.replaceAll("\\s+", "_"));
+		oieObjPFxd = generateUniqueURI(oieObj.replaceAll("\\s+", "_"));
 
 		// create a list of local mapping pair and return it
 		// save to DB these post fixed mappings, needed later for property
 		// discovery
-		saveToDB(nellSub, nellPred, nellObj, nellSubPFxd, nellObjPFxd);
+		DBWrapper.saveToOIEPostFxd(oieSub, oiePred, oieObj, oieSubPFxd,
+				oieObjPFxd);
 
 		/**
 		 * create the property assertions
 		 */
 		allEvidenceWriter.write("propAsstConf(\"NELL#Predicate/"
-				+ nellPred.replaceAll("\\s+", "_") + "\", \"NELL#Instance/"
-				+ format(nellSubPFxd) + "\", \"NELL#Instance/"
-				+ format(nellObjPFxd) + "\", " + confidence + ")\n");
+				+ oiePred.replaceAll("\\s+", "_") + "\", \"NELL#Instance/"
+				+ Utilities.format(oieSubPFxd) + "\", \"NELL#Instance/"
+				+ Utilities.format(oieObjPFxd) + "\", " + confidence + ")\n");
 
 		/**
 		 * create the property assertions
 		 */
-		allEvidenceWriterTop1.write("propAsstConf(\"NELL#Predicate/"
-				+ nellPred.replaceAll("\\s+", "_") + "\", \"NELL#Instance/"
-				+ format(nellSubPFxd) + "\", \"NELL#Instance/"
-				+ format(nellObjPFxd) + "\", " + confidence + ")\n");
+		// allEvidenceWriterTop1.write("propAsstConf(\"NELL#Predicate/"
+		// + oiePred.replaceAll("\\s+", "_") + "\", \"NELL#Instance/"
+		// + format(oieSubPFxd) + "\", \"NELL#Instance/"
+		// + format(oieObjPFxd) + "\", " + confidence + ")\n");
 
 		/**
 		 * create top-k evidences for subject
 		 */
-		createEvidenceForTopKCandidates(allEvidenceWriterTop1,
-				allEvidenceWriter, nellSub, nellSubPFxd, termConceptPairSet,
-				Constants.DOMAIN);
+		createEvidenceForTopKCandidates(allEvidenceWriter, oieSub, oieSubPFxd,
+				termConceptPair, Constants.DOMAIN);
 
 		/**
 		 * create top-k evidences for object
 		 */
-		createEvidenceForTopKCandidates(allEvidenceWriterTop1,
-				allEvidenceWriter, nellObj, nellObjPFxd, termConceptPairSet,
-				Constants.RANGE);
+		createEvidenceForTopKCandidates(allEvidenceWriter, oieObj, oieObjPFxd,
+				termConceptPair, Constants.RANGE);
 
 	}
 
@@ -288,17 +277,15 @@ public class EvidenceBuilder {
 	 * fetch the top-k instances and confidences for the subject
 	 * 
 	 * @param allEvidenceWriter
-	 * @param nellInst
-	 * @param nellPostFixdInst
-	 * @param termConceptPairSet
+	 * @param oieInst
+	 * @param oiePostFixdInst
+	 * @param termConceptPair
 	 * @param identifier
-	 * @return
 	 * @throws IOException
 	 */
-	public List<String> createEvidenceForTopKCandidates(
-			BufferedWriter allEvidenceWriterTop1,
-			BufferedWriter allEvidenceWriter, String nellInst,
-			String nellPostFixdInst, Set<String> termConceptPairSet,
+	public void createEvidenceForTopKCandidates(
+			BufferedWriter allEvidenceWriter, String oieInst,
+			String oiePostFixdInst, THashMap<String, String> termConceptPair,
 			String identifier) throws IOException {
 
 		DecimalFormat decimalFormatter = new DecimalFormat("0.00000000");
@@ -309,15 +296,13 @@ public class EvidenceBuilder {
 		// get the top-k concepts, confidence pairs
 		// UTF-8 at this stage
 		sameAsConfidences = DBWrapper.fetchTopKLinksWikiPrepProb(Utilities
-				.cleanse(nellInst).replaceAll("\\_+", " "),
+				.cleanse(oieInst).replaceAll("\\_+", " "),
 				Constants.TOP_K_MATCHES);
-
-		List<String> listMappings = new ArrayList<String>();
 
 		for (String val : sameAsConfidences) {
 
 			// if one instance-dbpedia pair is already in, skip it
-			if (!termConceptPairSet.contains(nellPostFixdInst + val)) {
+			if (!termConceptPair.containsKey(oiePostFixdInst + val)) {
 
 				// back to character again
 				conc = Utilities.utf8ToCharacter(val.split("\t")[0]);
@@ -332,43 +317,16 @@ public class EvidenceBuilder {
 				allEvidenceWriter.write("sameAsConf("
 						+ conc
 						+ ", \"NELL#Instance/"
-						+ format(nellPostFixdInst)
+						+ Utilities.format(oiePostFixdInst)
 						+ "\", "
 						+ decimalFormatter.format(Utilities
 								.convertProbabilityToWeight(Double
 										.parseDouble(val.split("\t")[1])))
 						+ ")\n");
 
-				listMappings.add(conc);
-
-				termConceptPairSet.add(nellPostFixdInst + val);
+				termConceptPair.put(oiePostFixdInst + val, "");
 			}
 		}
-
-		if (sameAsConfidences.size() > 0) {
-			// write it out to the evidence file
-
-			conc = Utilities.utf8ToCharacter(sameAsConfidences.get(0).split(
-					"\t")[0]);
-			conc = Utilities.removeTags("DBP#resource/"
-					+ Utilities.characterToUTF8(conc.replaceAll("~", "%")));
-
-			allEvidenceWriterTop1.write("sameAsConf("
-					+ conc
-					+ ", \"NELL#Instance/"
-					+ nellPostFixdInst
-					+ "\", "
-					+ decimalFormatter.format(Utilities
-							.convertProbabilityToWeight(Double
-									.parseDouble(sameAsConfidences.get(0)
-											.split("\t")[1]))) + ")\n");
-		}
-
-		// cache the type information for the top most candidate, the 0th
-		// element is the most frequent candidate
-		// cacheType(sameAsConfidences.get(0), identifier);
-
-		return listMappings;
 	}
 
 	/**
@@ -408,10 +366,10 @@ public class EvidenceBuilder {
 						+ Utilities.removeTags("DBP#resource/"
 								+ Utilities.characterToUTF8(tempInst)) + ")\n");
 
-				if (Constants.RELOAD_TYPE)
-					DBWrapper.saveToDBPediaTypes(
-							Utilities.characterToUTF8(tempInst),
-							Constants.UNTYPED);
+				// if (Constants.RELOAD_TYPE)
+				// DBWrapper.saveToDBPediaTypes(
+				// Utilities.characterToUTF8(tempInst),
+				// Constants.UNTYPED);
 
 			} else if (listTypes.size() > 0) {
 
@@ -432,9 +390,9 @@ public class EvidenceBuilder {
 					// parameters to
 					// reload fresh data and should be run once in a week or
 					// so..
-					if (Constants.RELOAD_TYPE)
-						DBWrapper.saveToDBPediaTypes(
-								Utilities.characterToUTF8(tempInst), type);
+					// if (Constants.RELOAD_TYPE)
+					// DBWrapper.saveToDBPediaTypes(
+					// Utilities.characterToUTF8(tempInst), type);
 				}
 			}
 
@@ -442,12 +400,6 @@ public class EvidenceBuilder {
 			System.err.println("Exception in generateDBPediaTypeMLN() "
 					+ e.getMessage());
 		}
-	}
-
-	private void saveToDB(String oieSub, String oiePred, String oieObj,
-			String oieSubPfxd, String oieObjPfxd) {
-		DBWrapper.saveToOIEPostFxd(oieSub, oiePred, oieObj, oieSubPfxd,
-				oieObjPfxd);
 	}
 
 	/**
@@ -461,20 +413,21 @@ public class EvidenceBuilder {
 	 * @return
 	 */
 	private static String generateUniqueURI(String nellInst) {
+		long value = 0;
+
 		// check if this URI is already there
 		if (MAP_COUNTER.containsKey(nellInst)) {
-			long value = MAP_COUNTER.get(nellInst);
-			MAP_COUNTER.put(nellInst, value + 1);
+			value = MAP_COUNTER.get(nellInst);
+			value = value + 1;
 
 			// create an unique URI because same entity already has been
 			// encountered before
-			nellInst = nellInst + Constants.POST_FIX
-					+ String.valueOf(value + 1);
-
+			nellInst = nellInst + Constants.POST_FIX + String.valueOf(value);
 		} else {
-			MAP_COUNTER.put(nellInst, 1L);
+			value = 1L;
 		}
 
+		MAP_COUNTER.put(nellInst, value);
 		return nellInst;
 	}
 
