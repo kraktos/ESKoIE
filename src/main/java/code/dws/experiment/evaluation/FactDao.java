@@ -31,6 +31,27 @@ public class FactDao {
 		this.obj = obj;
 	}
 
+	/**
+	 * @return the sub
+	 */
+	public String getSub() {
+		return sub;
+	}
+
+	/**
+	 * @return the relation
+	 */
+	public String getRelation() {
+		return relation;
+	}
+
+	/**
+	 * @return the obj
+	 */
+	public String getObj() {
+		return obj;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -87,8 +108,8 @@ public class FactDao {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("FactDao [sub=").append(sub).append(", relation=")
-				.append(relation).append(", obj=").append(obj).append("]");
+		builder.append(sub).append(", ").append(relation).append(", ")
+				.append(obj);
 		return builder.toString();
 	}
 
