@@ -146,6 +146,8 @@ public class Constants {
 
 	public static final String GET_DBPTYPE = "select INSTANCE_TYPE from DBPEDIA_TYPES where DBPEDIA_INSTANCE=?";
 
+	public static final String UPDT_OIE_POSTFIXED = "UPDATE OIE_REFINED SET DBP_SUB=?, DBP_OBJ=? WHERE OIE_PFX_SUB=? AND OIE_PFX_OBJ=? AND OIE_PRED=?";
+
 	public static String DBPEDIA_TBOX;
 
 	/**
@@ -202,7 +204,7 @@ public class Constants {
 			INCLUDE_YAGO_TYPES = Boolean.valueOf(prop
 					.getProperty("INCLUDE_YAGO_TYPES"));
 
-			RELOAD_TYPE = false;//Boolean.valueOf(prop.getProperty("RELOAD_TYPE"));
+			RELOAD_TYPE = false;// Boolean.valueOf(prop.getProperty("RELOAD_TYPE"));
 			LOAD_TYPES = Boolean.valueOf(prop.getProperty("LOAD_TYPES"));
 
 			BATCH_SIZE = Integer.parseInt(prop.getProperty("BATCH_SIZE"));

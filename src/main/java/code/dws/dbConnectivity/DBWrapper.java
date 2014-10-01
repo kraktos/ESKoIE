@@ -46,7 +46,7 @@ public class DBWrapper {
 	static int batchCounter = 0;
 
 	/**
-	 * initiats the connection parameters
+	 * initiates the connection parameters
 	 * 
 	 * @param sql
 	 */
@@ -235,10 +235,6 @@ public class DBWrapper {
 					+ e.getMessage());
 		}
 
-		// cache it
-		// if (!EvidenceBuilder.INSTANCE_CANDIDATES.containsKey(arg))
-		// EvidenceBuilder.INSTANCE_CANDIDATES.put(arg, temp);
-
 		return results;
 	}
 
@@ -251,6 +247,53 @@ public class DBWrapper {
 			}
 		} catch (SQLException e) {
 		}
+	}
+
+	public static void updateResidualOIERefined() {
+		try {
+			if (batchCounter % Constants.BATCH_SIZE != 0) {
+				pstmt.executeBatch();
+				logger.info("FLUSHED TO OIE_REFINED...");
+				connection.commit();
+			}
+		} catch (SQLException e) {
+		}
+	}
+
+	public static void updateOIEPostFxd(String oieSub, String oiePred,
+			String oieObj, String dbpS, String dbpO) {
+
+		try {
+
+			pstmt.setString(1, dbpS);
+			pstmt.setString(2, dbpO);
+
+			pstmt.setString(3, oieSub);
+			pstmt.setString(4, oieObj);
+			pstmt.setString(5, oiePred);
+
+			pstmt.addBatch();
+			pstmt.clearParameters();
+
+			batchCounter++;
+
+			if (batchCounter % Constants.BATCH_SIZE == 0
+					&& batchCounter > Constants.BATCH_SIZE) { // batches are
+				// flushed at
+				// a time
+				// execute batch update
+				pstmt.executeBatch();
+
+				logger.info("FLUSHED TO OIE_REFINED");
+				connection.commit();
+				pstmt.clearBatch();
+			}
+
+		} catch (SQLException e) {
+			logger.error("Error with batch update of OIE_REFINED .."
+					+ e.getMessage());
+		}
+
 	}
 
 	public static void saveResidualDBPTypes() {
