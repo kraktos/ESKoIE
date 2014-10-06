@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import code.dws.experiment.evaluation.FactDao;
 import code.dws.markovLogic.EvidenceBuilder;
 import code.dws.utils.Constants;
 import code.dws.utils.Utilities;
@@ -142,6 +143,33 @@ public class DBWrapper {
 					+ e.getMessage());
 		}
 
+	}
+
+	public static FactDao getRefinedDBPFact(FactDao key) {
+
+		String dbpSub = null;
+		String dbpObj = null;
+
+		try {
+
+			pstmt.setString(1, key.getSub());
+			pstmt.setString(2, key.getRelation());
+			pstmt.setString(3, key.getObj());
+			ResultSet rs = pstmt.executeQuery();
+
+			if (rs.next()) {
+				dbpSub = (rs.getString(1).equals("X")) ? "?" : rs.getString(1);
+				dbpObj = (rs.getString(2).equals("X")) ? "?" : rs.getString(2);
+
+				return new FactDao(Utilities.utf8ToCharacter(dbpSub), "?",
+						Utilities.utf8ToCharacter(dbpObj));
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return null;
 	}
 
 	public static List<String> getDBPInstanceType(String instance) {
