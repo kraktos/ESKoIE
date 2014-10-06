@@ -413,21 +413,20 @@ public class EvidenceBuilder {
 	 * @return
 	 */
 	private static String generateUniqueURI(String nellInst) {
-		long value = 0;
-
 		// check if this URI is already there
 		if (MAP_COUNTER.containsKey(nellInst)) {
-			value = MAP_COUNTER.get(nellInst);
-			value = value + 1;
+			long value = MAP_COUNTER.get(nellInst);
+			MAP_COUNTER.put(nellInst, value + 1);
 
 			// create an unique URI because same entity already has been
 			// encountered before
-			nellInst = nellInst + Constants.POST_FIX + String.valueOf(value);
+			nellInst = nellInst + Constants.POST_FIX
+					+ String.valueOf(value + 1);
+
 		} else {
-			value = 1L;
+			MAP_COUNTER.put(nellInst, 1L);
 		}
 
-		MAP_COUNTER.put(nellInst, value);
 		return nellInst;
 	}
 

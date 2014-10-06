@@ -38,7 +38,7 @@ public class Evaluation {
 		// load the respective gold standard and methods in memeory
 		setup();
 
-		// perform comparision
+		// perform comparison
 		compare();
 	}
 
@@ -50,7 +50,6 @@ public class Evaluation {
 		FactDao annotatedGoldFact = null;
 
 		try {
-
 			// init DB
 			DBWrapper.init(Constants.GET_REFINED_FACT);
 
@@ -65,15 +64,14 @@ public class Evaluation {
 				dbpFact = DBWrapper.getRefinedDBPFact(entry.getKey());
 
 				if (dbpFact != null) {
-					logger.info(entry.getKey());
-					logger.info("==>" + annotatedGoldFact);
-					logger.info("==>" + dbpFact);
+					logger.debug(entry.getKey());
+					logger.debug("==>" + annotatedGoldFact);
+					logger.debug("==>" + dbpFact);
 
 					// take the instances in Gold standard which have a
 					// corresponding refinement done.
 					algo.put(entry.getKey(), dbpFact);
 					gold.put(entry.getKey(), annotatedGoldFact);
-
 				}
 			}
 
@@ -111,7 +109,6 @@ public class Evaluation {
 
 			if (line.indexOf("\tIP") != -1 || line.indexOf("\tUC") != -1) {
 
-				// if (line.indexOf(Constants.DBPEDIA_NAMESPACE) != -1) {
 				arr = line.split("\t");
 				oieFact = new FactDao(arr[0], arr[1], arr[2]);
 				dbpFact = new FactDao(StringUtils.replace(arr[3],
@@ -123,10 +120,7 @@ public class Evaluation {
 
 				cnt++;
 			}
-
-			// }
 		}
-
 		return goldFacts;
 	}
 
