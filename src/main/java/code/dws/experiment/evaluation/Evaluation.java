@@ -64,9 +64,9 @@ public class Evaluation {
 				dbpFact = DBWrapper.getRefinedDBPFact(entry.getKey());
 
 				if (dbpFact != null) {
-					logger.debug(entry.getKey());
-					logger.debug("==>" + annotatedGoldFact);
-					logger.debug("==>" + dbpFact);
+					logger.info(entry.getKey());
+					logger.info("==>" + annotatedGoldFact);
+					logger.info("==>" + dbpFact);
 
 					// take the instances in Gold standard which have a
 					// corresponding refinement done.

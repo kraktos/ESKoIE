@@ -133,7 +133,8 @@ public class ScriptGenarator {
 			} else {
 
 				List<String> props = PropertyGoldStandard.getReverbProperties(
-						oieFilePath, -1, 100L);
+						oieFilePath, -1,
+						Long.parseLong(Constants.INSTANCE_THRESHOLD));
 
 				// List<String> props = ReverbClusterProperty
 				// .getReverbProperties(Constants.REVERB_DATA_PATH,

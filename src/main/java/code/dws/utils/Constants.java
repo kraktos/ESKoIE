@@ -6,6 +6,7 @@ package code.dws.utils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
@@ -21,7 +22,11 @@ public class Constants {
 		NELL, REVERB
 	}
 
+	public static DecimalFormat formatter = new DecimalFormat("#.############");
+
 	public static String DBPEDIA_TBOX;
+
+	public static String INSTANCE_THRESHOLD;
 
 	public static final String DELIMIT = "\",";
 
@@ -226,6 +231,8 @@ public class Constants {
 
 			DBPEDIA_TBOX = prop.getProperty("DBPEDIA_TBOX");
 
+			INSTANCE_THRESHOLD = prop.getProperty("INSTANCE_THRESHOLD");
+
 			init();
 		} catch (IOException ex) {
 			ex.printStackTrace();
@@ -255,5 +262,6 @@ public class Constants {
 
 		DOMAIN_RANGE_BS_EVIDENCE_FILE = sample_dumps + PREDICATE
 				+ "/domRanEvidenceBS.db";
+
 	}
 }
