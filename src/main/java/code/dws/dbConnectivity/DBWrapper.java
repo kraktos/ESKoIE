@@ -145,6 +145,23 @@ public class DBWrapper {
 
 	}
 
+	public static List<String> getFullyMappedFacts() {
+		List<String> types = new ArrayList<String>();
+
+		try {
+
+			ResultSet rs = pstmt.executeQuery();
+
+			while (rs.next()) {
+				types.add(rs.getString(1));
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return types;
+	}
+
 	public static FactDao getRefinedDBPFact(FactDao key) {
 
 		String dbpSub = null;

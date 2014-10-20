@@ -19,19 +19,21 @@ import org.apache.http.util.EntityUtils;
 import code.dws.utils.Constants;
 
 public class SimilatityWebService {
+
+	static String response = null;
+	static double score = 0;
+
+	static String uri = "http://swoogle.umbc.edu/SimService/GetSimilarity?operation=api";
+
+	static HttpClient httpclient = new DefaultHttpClient();
+	static HttpPost httppost = new HttpPost(uri);
+
 	public static void main(String[] args) throws Exception {
 		System.out.println(getSimScore("be in", "turn to"));
 
 	}
 
 	public static double getSimScore(String arg1, String arg2) throws Exception {
-		String response = null;
-		double score = 0;
-
-		String uri = "http://swoogle.umbc.edu/SimService/GetSimilarity?operation=api";
-
-		HttpClient httpclient = new DefaultHttpClient();
-		HttpPost httppost = new HttpPost(uri);
 
 		try {
 			// Add your data

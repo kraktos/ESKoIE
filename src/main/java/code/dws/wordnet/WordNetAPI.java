@@ -44,42 +44,50 @@ public class WordNetAPI {
 	/**
 	 * Main entry point. The command-line arguments are concatenated together
 	 * (separated by spaces) and used as the word form to look up.
+	 * 
+	 * @throws Exception
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		ILexicalDatabase db = new NictWordNet();
 
-		RelatednessCalculator[] rcs = { new WuPalmer(db), new HirstStOnge(db),
-				new LeacockChodorow(db), new Lesk(db), new Resnik(db),
-				new JiangConrath(db), new Lin(db), new Path(db) };
+		// new HirstStOnge(db)
+
+		// new WuPalmer(db), new HirstStOnge(db),
+		// new LeacockChodorow(db), new Lesk(db), new Resnik(db),
+		// new JiangConrath(db), new Lin(db), new Path(db)
+
+		RelatednessCalculator[] rcs = { new WuPalmer(db) };
+
+		System.out.println(scoreWordNet(rcs, "is a parent of".split(" "),
+				"is a father of".split(" "))
+				+ "\t"
+				+ SimilatityWebService.getSimScore("is a parent of",
+						"is a father of"));
 
 		System.out.println(scoreWordNet(rcs, "is a town in".split(" "),
-				"is a father of".split(" ")));
+				"is awarded to".split(" "))
+				+ "\t"
+				+ SimilatityWebService.getSimScore("is a town in",
+						"is awarded to"));
 
 		System.out.println(scoreWordNet(rcs, "is a town in".split(" "),
-				"is awarded to".split(" ")));
+				"is a parent of".split(" "))
+				+ "\t"
+				+ SimilatityWebService.getSimScore("is a town in",
+						"is a parent of"));
+
 		System.out.println(scoreWordNet(rcs, "is a town in".split(" "),
-				"is a parent of".split(" ")));
-		System.out.println(scoreWordNet(rcs, "is a town in".split(" "),
-				"is a suburb".split(" ")));
-		// if (args.length > 0) {
-		//
-		//
-		// // Concatenate the command-line arguments
-		// StringBuffer buffer = new StringBuffer();
-		// for (int i = 0; i < args.length; i++) {
-		// buffer.append((i > 0 ? " " : "") + args[i]);
-		// }
-		// wordForm = buffer.toString();
-		// wordForm = "ball";
-		//
-		// System.out.println(getSynonyms(wordForm));
-		//
-		// } else {
-		// wordForm = "February";
-		//
-		// System.out.println(getSynonyms(wordForm));
-		//
-		// }
+				"is a suburb".split(" "))
+				+ "\t"
+				+ SimilatityWebService.getSimScore("is a town in",
+						"is a suburb"));
+
+		System.out.println(scoreWordNet(rcs, "studied at".split(" "),
+				"has studied at".split(" "))
+				+ "\t"
+				+ SimilatityWebService.getSimScore("has studied at",
+						"studied at"));
+
 	}
 
 	/**
@@ -131,11 +139,14 @@ public class WordNetAPI {
 		int dnm = 0;
 
 		double[][] d = rcs[0].getNormalizedSimilarityMatrix(strArg1, strArg2);
-		double[][] d2 = rcs[1].getNormalizedSimilarityMatrix(strArg1, strArg2);
-		double[][] d3 = rcs[2].getNormalizedSimilarityMatrix(strArg1, strArg2);
-		double[][] d4 = rcs[3].getNormalizedSimilarityMatrix(strArg1, strArg2);
-		double[][] d5 = rcs[4].getNormalizedSimilarityMatrix(strArg1, strArg2);
-		double[][] d6 = rcs[5].getNormalizedSimilarityMatrix(strArg1, strArg2);
+//		double[][] d2 = rcs[1].getNormalizedSimilarityMatrix(strArg1, strArg2);
+//		double[][] d3 = rcs[2].getNormalizedSimilarityMatrix(strArg1, strArg2);
+		// double[][] d4 = rcs[3].getNormalizedSimilarityMatrix(strArg1,
+		// strArg2);
+		// double[][] d5 = rcs[4].getNormalizedSimilarityMatrix(strArg1,
+		// strArg2);
+		// double[][] d6 = rcs[5].getNormalizedSimilarityMatrix(strArg1,
+		// strArg2);
 		// double[][] d7 = rcs[6].getNormalizedSimilarityMatrix(strArg1,
 		// strArg2);
 		// double[][] d8 = rcs[7].getNormalizedSimilarityMatrix(strArg1,
@@ -145,9 +156,8 @@ public class WordNetAPI {
 			for (int column = 0; column < d[row].length; column++) {
 				if (d[row][column] > 0) {
 					score = score
-							+ (double) (d[row][column] + d2[row][column]
-									+ d3[row][column] + d4[row][column]
-									+ d5[row][column] + d6[row][column]) / 6;
+							+ (double) (d[row][column] )
+							/ 1;
 
 					dnm++;
 				}

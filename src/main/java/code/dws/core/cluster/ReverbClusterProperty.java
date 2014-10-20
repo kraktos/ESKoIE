@@ -3,15 +3,6 @@
  */
 package code.dws.core.cluster;
 
-import edu.cmu.lti.lexical_db.ILexicalDatabase;
-import edu.cmu.lti.lexical_db.NictWordNet;
-import edu.cmu.lti.ws4j.RelatednessCalculator;
-import edu.cmu.lti.ws4j.impl.JiangConrath;
-import edu.cmu.lti.ws4j.impl.LeacockChodorow;
-import edu.cmu.lti.ws4j.impl.Lin;
-import edu.cmu.lti.ws4j.impl.Path;
-import edu.cmu.lti.ws4j.impl.Resnik;
-import edu.cmu.lti.ws4j.impl.WuPalmer;
 import edu.cmu.lti.ws4j.util.WS4JConfiguration;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
@@ -24,7 +15,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -38,13 +28,11 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
-import code.dws.experiment.PropertyGoldStandard;
+import code.dws.dbConnectivity.DBWrapper;
 import code.dws.utils.Constants;
+import code.dws.utils.FileUtil;
 import code.dws.utils.Utilities;
 import code.dws.wordnet.SimilatityWebService;
-import code.dws.wordnet.WordNetAPI;
-
-import com.google.common.collect.Sets;
 
 /**
  * this class clubs together properties with similar domain, range distribution
@@ -71,7 +59,7 @@ public class ReverbClusterProperty {
 
 	private static final String CLUSTERS_NAME = "src/main/resources/input/CLUSTERS_";
 
-	private static List<String> revbProps = null;
+	private static List<Pair<String, String>> revbProps = null;
 
 	private static Map<String, THashSet<ImmutablePair<String, String>>> ALL_PROPS = new HashMap<String, THashSet<ImmutablePair<String, String>>>();
 
@@ -96,17 +84,24 @@ public class ReverbClusterProperty {
 		logger.info("Running " + ReverbClusterProperty.class.getName());
 
 		// retrieve a set of OIE properties
-		revbProps = PropertyGoldStandard.getReverbProperties(
-				Constants.OIE_DATA_PATH, -1,
-				Long.parseLong(Constants.INSTANCE_THRESHOLD));
+		// revbProps = PropertyGoldStandard.getReverbProperties(
+		// Constants.OIE_DATA_PATH, -1,
+		// Long.parseLong(Constants.INSTANCE_THRESHOLD));
 
-		logger.info("Loaded " + revbProps.size() + " OIE properties");
+		// only f+ properties
+		DBWrapper.init(Constants.GET_FULLY_MAPPED_OIE_PROPS_SQL);
+		// revbProps = DBWrapper.getFullyMappedFacts();
+
+		revbProps = FileUtil.readPairsOfProperties(args[1], DELIMIT);
+
+		logger.info("Loaded " + revbProps.size() + " OIE property pairs from "
+				+ args[1]);
 
 		// Wordnet specific init block
 		System.setProperty("wordnet.database.dir", Constants.WORDNET_DICTIONARY);
 		WS4JConfiguration.getInstance().setMFS(true);
 
-		doBasicPatternClustering();
+		// doBasicPatternClustering();
 
 		// enable scoring mechanism
 		doScoring();
@@ -115,111 +110,106 @@ public class ReverbClusterProperty {
 
 	}
 
-	private static void doBasicPatternClustering() throws IOException {
+	/*
+	 * A pattern based cluster
+	 */
 
-		String arg1 = null;
-		String arg2 = null;
-		String newKey = null;
-		Set<String> newValues = null;
-		Set<String> props = null;
-		Set<String> currentList = null;
+	// private static void doBasicPatternClustering() throws IOException {
+	//
+	// String arg1 = null;
+	// String arg2 = null;
+	// String newKey = null;
+	// Set<String> newValues = null;
+	// Set<String> props = null;
+	// Set<String> currentList = null;
+	//
+	// try {
+	//
+	// // iterate the list of size n, n(n-1)/2 comparison !! :D
+	// for (int outerIdx = 0; outerIdx < revbProps.size(); outerIdx++) {
+	// // init list
+	// props = new HashSet<String>();
+	// for (int innerIdx = outerIdx + 1; innerIdx < revbProps.size();
+	// innerIdx++) {
+	//
+	// arg1 = revbProps.get(outerIdx);
+	// arg2 = revbProps.get(innerIdx);
+	//
+	// // apply modular clustering technique
+	// // first group all properties with similar patterns (was
+	// // student at is currently student at..so on)
+	//
+	// if (canBeAdded(arg1, arg2)) {
+	// props.add(arg2);
+	// }
+	// }
+	// // if (arg1.indexOf("married to") != -1)
+	// propertBasicCluster.put(arg1, props);
+	// }
+	//
+	// logger.info("Before pattern clustering "
+	// + propertBasicCluster.size());
+	//
+	// // collate the clusters
+	// for (Map.Entry<String, Set<String>> e : propertBasicCluster
+	// .entrySet()) {
+	//
+	// currentList = e.getValue();
+	//
+	// newKey = e.getKey();
+	// for (String s : currentList) {
+	// if (s.length() < newKey.length())
+	// newKey = s;
+	// }
+	// if (!newKey.equals(e.getKey())) {
+	// currentList.remove(newKey);
+	// currentList.add(e.getKey());
+	//
+	// newValues = propertBasicCluster.get(newKey);
+	// currentList.addAll(newValues);
+	// propertBasicCluster.remove(e.getKey());
+	// propertBasicCluster.put(newKey, currentList);
+	// }
+	// }
+	//
+	// // at this point there is a basic pattern based cluster already in
+	// // place..improve more with markov cluster.
+	// for (Map.Entry<String, Set<String>> e : propertBasicCluster
+	// .entrySet()) {
+	// if (e.getValue().size() == 0) {
+	// propertBasicCluster.remove(e.getKey());
+	// } else {
+	// BASIC_CLUSTER_DICT.put(e.getKey(), e.getKey());
+	// for (String elem : e.getValue()) {
+	// BASIC_CLUSTER_DICT.put(elem, e.getKey());
+	// }
+	// }
+	// }
+	// logger.info("After pattern clustering "
+	// + propertBasicCluster.size());
+	//
+	// } catch (Exception e) {
+	// logger.error(e.getMessage());
+	// }
+	// }
 
-		try {
-
-			// iterate the list of size n, n(n-1)/2 comparison !! :D
-			for (int outerIdx = 0; outerIdx < revbProps.size(); outerIdx++) {
-				// init list
-				props = new HashSet<String>();
-				for (int innerIdx = outerIdx + 1; innerIdx < revbProps.size(); innerIdx++) {
-
-					arg1 = revbProps.get(outerIdx);
-					arg2 = revbProps.get(innerIdx);
-
-					// apply modular clustering technique
-					// first group all properties with similar patterns (was
-					// student at is currently student at..so on)
-
-					if (canBeAdded(arg1, arg2)) {
-						props.add(arg2);
-					}
-				}
-				// if (arg1.indexOf("married to") != -1)
-				propertBasicCluster.put(arg1, props);
-			}
-
-			logger.info("Before pattern clustering "
-					+ propertBasicCluster.size());
-
-			// collate the clusters
-			for (Map.Entry<String, Set<String>> e : propertBasicCluster
-					.entrySet()) {
-
-				currentList = e.getValue();
-
-				newKey = e.getKey();
-				for (String s : currentList) {
-					if (s.length() < newKey.length())
-						newKey = s;
-				}
-				if (!newKey.equals(e.getKey())) {
-					currentList.remove(newKey);
-					currentList.add(e.getKey());
-
-					newValues = propertBasicCluster.get(newKey);
-					currentList.addAll(newValues);
-					propertBasicCluster.remove(e.getKey());
-					propertBasicCluster.put(newKey, currentList);
-				}
-			}
-
-			// at this point there is a basic pattern based cluster already in
-			// place..improve more with markov cluster.
-			for (Map.Entry<String, Set<String>> e : propertBasicCluster
-					.entrySet()) {
-				if (e.getValue().size() == 0) {
-					propertBasicCluster.remove(e.getKey());
-				} else {
-					BASIC_CLUSTER_DICT.put(e.getKey(), e.getKey());
-					for (String elem : e.getValue()) {
-						BASIC_CLUSTER_DICT.put(elem, e.getKey());
-					}
-				}
-			}
-			logger.info("After pattern clustering "
-					+ propertBasicCluster.size());
-
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-		}
-	}
-
+	/**
+	 * read the basic cluster pattern and try to improve the scoring
+	 * 
+	 * @throws IOException
+	 */
 	private static void doScoring() throws IOException {
 		String arg1 = null;
 		String arg2 = null;
 
 		long cnt = 0;
 
-		double ovlapScore = 0;
 		double wnScore = 0;
-		double tokenScore = 0;
 
 		BufferedWriter writerRevWordnetSims = new BufferedWriter(
 				new FileWriter(new File(Constants.OIE_DATA_PATH).getParent()
-						+ "/all.trvb.wordnet.sim.csv"));
-
-		BufferedWriter writerRevOverlapSims = new BufferedWriter(
-				new FileWriter(new File(Constants.OIE_DATA_PATH).getParent()
-						+ "/all.trvb.overlap.sim.csv"));
-
-		ILexicalDatabase db = new NictWordNet();
-
-		RelatednessCalculator[] rcs = { new WuPalmer(db),
-				new LeacockChodorow(db), new Resnik(db), new JiangConrath(db),
-				new Lin(db), new Path(db) };
-
-		// BufferedWriter writerRevDbpWordnetSims = new BufferedWriter(
-		// new FileWriter(new File(Constants.REVERB_DATA_PATH).getParent()
-		// + "/all.trvb.dbp.wordnet.sim.csv"));
+						+ "/all.trvb.wordnet.sim."
+						+ Constants.SIMILARITY_FACTOR + ".csv"));
 
 		long start = Utilities.startTimer();
 
@@ -228,108 +218,32 @@ public class ReverbClusterProperty {
 
 		try {
 
-			// iterate the list of size n, n(n-1)/2 comparison !! :D
-			for (int outerIdx = 0; outerIdx < revbProps.size(); outerIdx++) {
+			for (Pair<String, String> pair : revbProps) {
+				cnt++;
 
-				for (int innerIdx = outerIdx + 1; innerIdx < revbProps.size(); innerIdx++) {
+				arg1 = pair.getLeft();
+				arg2 = pair.getRight();
 
-					cnt++;
+				// Web based call, better but slower
+				wnScore = SimilatityWebService.getSimScore(arg1, arg2);
 
-					arg1 = revbProps.get(outerIdx);
-					arg2 = revbProps.get(innerIdx);
+				if (wnScore > 0)
+					writerRevWordnetSims.write(arg1 + "\t" + arg2 + "\t"
+							+ Constants.formatter.format(wnScore) + "\n");
 
-					if (!isPatternClustered(arg1, arg2)) {
-						tokenScore = getTokenScore(arg1.split(" "),
-								arg2.split(" "));
-						wnScore = WordNetAPI.scoreWordNet(rcs, arg1.split(" "),
-								arg2.split(" "));
-
-						if (wnScore > 0) {
-							if (wnScore == 1)
-								writerRevWordnetSims.write(arg1 + "\t" + arg2
-										+ "\t" + tokenScore + "\n");
-							else
-								writerRevWordnetSims.write(arg1 + "\t" + arg2
-										+ "\t" + Math.max(wnScore, tokenScore)
-										+ "\n");
-						}
-					} else {
-						writerRevWordnetSims.write(arg1 + "\t" + arg2 + "\t"
-								+ 1.00 + "\n");
-					}
-					// List<Worker> workerList = new ArrayList<Worker>();
-					// for (int i = 0; i < nrOfProcessors; i++) {
-					// workerList.add(new Worker(db, rcs,
-					// revbProps.get(outerIdx), revbProps.get(innerIdx)));
-					// innerIdx++;
-					// }
-
-					// results = eservice.invokeAll(workerList);
-
-					// for (int i = 0; i < nrOfProcessors; i++) {
-					// futuresList.add(eservice.submit(new Worker(db, rcs,
-					// revbProps.get(outerIdx), revbProps
-					// .get(innerIdx))));
-					// }
-					// int i = 0;
-					// Double[] wnScore = new Double[nrOfProcessors];
-					//
-					// for (Future<Double> future : results) {
-					// try {
-					// wnScore[i++] = future.get();
-					// // System.out.println(revbProps.get(outerIdx) + "\t" +
-					// revbProps.get(innerIdx) + "\t"
-					// // + wnScore);
-					// } catch (InterruptedException e) {
-					// } catch (ExecutionException e) {
-					// }
-					// }
-
-					// based on number of common instance pairs for each
-					// property
-					// ovlapScore = getInstanceOverlapSimilarityScores(outerIdx,
-					// innerIdx);
-					//
-					// cnt++;
-					// // System.out.println(cnt + "\t"
-					// // + (System.currentTimeMillis() - start));
-					//
-					// if (ovlapScore != 0) {
-					// writerRevOverlapSims.write(revbProps.get(outerIdx)
-					// + "\t" + revbProps.get(innerIdx) + "\t"
-					// + ovlapScore + "\n");
-					//
-					// // wnScore = getWordNetSimilarityScores(outerIdx,
-					// // innerIdx);
-					// wnScore = WordNetAPI.scoreWordNet(rcs,
-					// revbProps.get(outerIdx).split(" "),
-					// revbProps.get(innerIdx).split(" "));
-					// System.out.println(revbProps.get(outerIdx) + "\t"
-					// + revbProps.get(innerIdx) + "\t" + wnScore);
-					// if (wnScore > 0)
-					// writerRevWordnetSims.write(revbProps.get(outerIdx)
-					// + "\t" + revbProps.get(innerIdx) + "\t"
-					// + wnScore + "\n");
-					// }
-
-					// writerRevOverlapSims.flush();
-					// writerRevWordnetSims.flush();
-
-					if (cnt > 1000 && cnt % 1000 == 0)
-						Utilities.endTimer(start, 200 * ((double) cnt / size)
-								+ " percent done in ");
-				}
-
-				writerRevOverlapSims.flush();
 				writerRevWordnetSims.flush();
-			}
 
+				if (cnt > 1000 && cnt % 1000 == 0)
+					Utilities.endTimer(start, 200 * ((double) cnt / size)
+							+ " percent done in ");
+
+				writerRevWordnetSims.flush();
+
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			writerRevOverlapSims.close();
 			writerRevWordnetSims.close();
-
 		}
 	}
 
@@ -521,35 +435,35 @@ public class ReverbClusterProperty {
 	 * @return
 	 * @throws Exception
 	 */
-	private static double getInstanceOverlapSimilarityScores(int outerIdx,
-			int innerIdx) throws Exception {
-
-		String propArg1 = revbProps.get(outerIdx);
-		String propArg2 = revbProps.get(innerIdx);
-
-		THashSet<ImmutablePair<String, String>> revbSubObj1 = ALL_PROPS
-				.get(propArg1);
-
-		THashSet<ImmutablePair<String, String>> revbSubObj2 = ALL_PROPS
-				.get(propArg2);
-
-		long min = Math.min(revbSubObj1.size(), revbSubObj2.size());
-
-		double scoreOverlap = 0;
-
-		// scoreOverlap = (double) CollectionUtils.intersection(revbSubObj1,
-		// revbSubObj2)
-		// .size() / min;
-
-		scoreOverlap = (double) Sets.intersection(revbSubObj1, revbSubObj2)
-				.size() / min;
-
-		if (scoreOverlap > 0.002
-				&& min >= Long.parseLong(Constants.INSTANCE_THRESHOLD))
-			return scoreOverlap;
-
-		return 0;
-	}
+	// private static double getInstanceOverlapSimilarityScores(int outerIdx,
+	// int innerIdx) throws Exception {
+	//
+	// String propArg1 = revbProps.get(outerIdx);
+	// String propArg2 = revbProps.get(innerIdx);
+	//
+	// THashSet<ImmutablePair<String, String>> revbSubObj1 = ALL_PROPS
+	// .get(propArg1);
+	//
+	// THashSet<ImmutablePair<String, String>> revbSubObj2 = ALL_PROPS
+	// .get(propArg2);
+	//
+	// long min = Math.min(revbSubObj1.size(), revbSubObj2.size());
+	//
+	// double scoreOverlap = 0;
+	//
+	// // scoreOverlap = (double) CollectionUtils.intersection(revbSubObj1,
+	// // revbSubObj2)
+	// // .size() / min;
+	//
+	// scoreOverlap = (double) Sets.intersection(revbSubObj1, revbSubObj2)
+	// .size() / min;
+	//
+	// if (scoreOverlap > 0.002
+	// && min >= Long.parseLong(Constants.INSTANCE_THRESHOLD))
+	// return scoreOverlap;
+	//
+	// return 0;
+	// }
 
 	/**
 	 * call the web service to compute the inter phrase similarity
@@ -561,15 +475,15 @@ public class ReverbClusterProperty {
 	 * @return
 	 * @throws Exception
 	 */
-	private static double getWordNetSimilarityScores(int id, int id2)
-			throws Exception {
-
-		double score = SimilatityWebService.getSimScore(revbProps.get(id),
-				revbProps.get(id2));
-
-		return score;
-
-	}
+	// private static double getWordNetSimilarityScores(int id, int id2)
+	// throws Exception {
+	//
+	// double score = SimilatityWebService.getSimScore(revbProps.get(id),
+	// revbProps.get(id2));
+	//
+	// return score;
+	//
+	// }
 
 	/**
 	 * write out the clusters to a file
