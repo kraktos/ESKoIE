@@ -23,9 +23,6 @@ public class ScriptGenarator {
 	public final static Logger logger = LoggerFactory
 			.getLogger(ScriptGenarator.class);
 
-	// data separator of the NELL data file
-	private static final String PATH_SEPERATOR = ",";
-
 	static List<String> PROPS = new ArrayList<String>();
 
 	private static final String SHELL_SCRIPT = "src/main/resources/script/PIPELINE.sh";
@@ -81,8 +78,6 @@ public class ScriptGenarator {
 	 * @param oieFilePath
 	 */
 	private static void loadOIEProps(String oieFilePath) {
-		String oieProp = null;
-		boolean flag = false;
 
 		if (Constants.IS_NELL) {
 			// // load the NELL file in memory as a collection

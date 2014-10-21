@@ -108,18 +108,18 @@ public class ClusteringWithDbpedia {
 				.getRuntime().availableProcessors());
 
 		try {
-			for (int outer = 0; outer < dbpProps.size(); outer++) {
-				for (int inner = outer + 1; inner < dbpProps.size(); inner++) {
+			for (int outer = 0; outer < 6; outer++) {
+				for (int inner = outer + 1; inner < 6; inner++) {
 
 					cnt++;
 
 					arg1 = Utilities.splitAtCapitals(dbpProps.get(outer));
 					arg2 = Utilities.splitAtCapitals(dbpProps.get(inner));
 
-					Future<Double> future = executorPool.submit(new Worker(
-							arg1, arg2));
-
 					try {
+						Future<Double> future = executorPool.submit(new Worker(
+								arg1, arg2));
+
 						if (future.get() != null) {
 							simScore = future.get();
 							writerDbpProps.write(arg1 + "\t" + arg2 + "\t"
@@ -127,7 +127,7 @@ public class ClusteringWithDbpedia {
 							writerDbpProps.flush();
 						}
 					} catch (ExecutionException e) {
-
+						logger.error(e.getMessage());
 					}
 
 					if (cnt > 1000 && cnt % 1000 == 0)

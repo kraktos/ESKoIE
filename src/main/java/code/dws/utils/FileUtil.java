@@ -59,6 +59,7 @@ public class FileUtil {
 		List<Pair<String, String>> retList = new ArrayList<Pair<String, String>>();
 
 		try {
+			@SuppressWarnings("resource")
 			Scanner scan = new Scanner(new File(string));
 
 			while (scan.hasNextLine()) {

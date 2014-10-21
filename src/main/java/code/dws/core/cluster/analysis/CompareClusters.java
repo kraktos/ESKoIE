@@ -128,6 +128,7 @@ public class CompareClusters {
 		writer.close();
 	}
 
+	@SuppressWarnings("resource")
 	private static void loadScores(String file, String delimit)
 			throws FileNotFoundException {
 
@@ -153,6 +154,7 @@ public class CompareClusters {
 		}
 	}
 
+	@SuppressWarnings("resource")
 	private static void readMarkovClusters(String output) throws IOException {
 
 		Scanner scan;

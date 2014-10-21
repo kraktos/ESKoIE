@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Scanner;
@@ -42,14 +41,11 @@ public class PropertyGoldStandard {
 	public final static Logger logger = LoggerFactory
 			.getLogger(PropertyGoldStandard.class);
 
-	private static final String SAMPLE_OIE_FILE_PATH = "src/main/resources/input/sample.500.csv";
 	public static int TOPK_REV_PROPS = 500;
 	private static String OIE_FILE_PATH = null;
 	private static THashMap<String, Long> COUNT_PROPERTY_INST = new THashMap<String, Long>();
 	private static THashMap<String, Long> EMPTY_PROPERTY_MAP = new THashMap<String, Long>();
 	private static THashMap<Long, Long> COUNT_FREQUENY = new THashMap<Long, Long>();
-
-	private static Map<String, Long> revbProps = null;
 
 	private static final String HEADER = "http://dbpedia.org/resource/";
 
@@ -90,7 +86,7 @@ public class PropertyGoldStandard {
 		// property
 		createGoldStandard();
 
-		for (Entry e : EMPTY_PROPERTY_MAP.entrySet()) {
+		for (Entry<String, Long> e : EMPTY_PROPERTY_MAP.entrySet()) {
 			logger.info(e.getKey() + "\t" + e.getValue() + "\t"
 					+ COUNT_PROPERTY_INST.get(e.getKey()));
 		}
@@ -151,6 +147,7 @@ public class PropertyGoldStandard {
 		COUNT_PROPERTY_INST = new THashMap<String, Long>();
 
 		try {
+			@SuppressWarnings("resource")
 			Scanner scan = new Scanner(new File(OIE_FILE));
 
 			while (scan.hasNextLine()) {
@@ -204,6 +201,7 @@ public class PropertyGoldStandard {
 				+ ".csv"));
 
 		// Reading from
+		@SuppressWarnings("resource")
 		Scanner scan = new Scanner(new File(OIE_FILE_PATH));
 
 		// init DB

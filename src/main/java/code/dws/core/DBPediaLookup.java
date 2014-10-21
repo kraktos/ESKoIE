@@ -10,9 +10,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 import org.apache.log4j.Logger;
@@ -45,15 +43,10 @@ public class DBPediaLookup {
 	private static final String PATH_SEPERATOR = (Constants.IS_NELL) ? ","
 			: ";";
 
-	private static Map<String, List<String>> GLOBAL_PROPERTY_MAPPINGS = new HashMap<String, List<String>>();
-
 	// flag to determine the property fetch mode. If set to false, then just
 	// queries the sparql endpoint, else looks for sophisticated
 	// graph exploratory search modes.
 	private static boolean multiHop = false;
-
-	private static Map<String, List<String>> propertyClusterNames;
-	private static List<String> propertyNames = new ArrayList<String>();
 
 	/**
 	 * @param args
@@ -306,17 +299,14 @@ public class DBPediaLookup {
 	@SuppressWarnings("finally")
 	private static String getTypeInfo(String inst) {
 		String mostSpecificVal = "";
-		String mostGeneralVal = "";
 
 		List<String> types = SPARQLEndPointQueryAPI.getInstanceTypes(Utilities
 				.utf8ToCharacter(inst));
 
-		
-//		
-//		listTypes = DBWrapper.getDBPInstanceType(Utilities
-//				.characterToUTF8(tempInst));
-		
-		
+		//
+		// listTypes = DBWrapper.getDBPInstanceType(Utilities
+		// .characterToUTF8(tempInst));
+
 		try {
 			mostSpecificVal = SPARQLEndPointQueryAPI.getLowestType(types)
 					.get(0);
@@ -335,18 +325,18 @@ public class DBPediaLookup {
 	 * @param nellRawPred
 	 * @param probablePredicates
 	 */
-	private static void updateTheCollection(String nellRawPred,
-			List<String> probablePredicates) {
-		List<String> propValues = null;
-		if (!GLOBAL_PROPERTY_MAPPINGS.containsKey(nellRawPred)) {
-			propValues = new ArrayList<String>();
-
-		} else {
-			propValues = GLOBAL_PROPERTY_MAPPINGS.get(nellRawPred);
-		}
-		propValues.addAll(probablePredicates);
-		GLOBAL_PROPERTY_MAPPINGS.put(nellRawPred, propValues);
-	}
+	// private static void updateTheCollection(String nellRawPred,
+	// List<String> probablePredicates) {
+	// List<String> propValues = null;
+	// if (!GLOBAL_PROPERTY_MAPPINGS.containsKey(nellRawPred)) {
+	// propValues = new ArrayList<String>();
+	//
+	// } else {
+	// propValues = GLOBAL_PROPERTY_MAPPINGS.get(nellRawPred);
+	// }
+	// propValues.addAll(probablePredicates);
+	// GLOBAL_PROPERTY_MAPPINGS.put(nellRawPred, propValues);
+	// }
 
 	/**
 	 * get the possible predicates for a particular combination
@@ -530,6 +520,7 @@ public class DBPediaLookup {
 		InputStream is = DBPediaLookup.class.getResourceAsStream(path
 				.toString().replaceAll("./src/main/resources", ""));
 
+		@SuppressWarnings("resource")
 		Scanner scan = new Scanner(is, "UTF-8");
 
 		while (scan.hasNextLine()) {

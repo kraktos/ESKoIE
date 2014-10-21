@@ -3,7 +3,6 @@
  */
 package code.dws.core.cluster;
 
-import edu.cmu.lti.ws4j.util.WS4JConfiguration;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TLinkedHashSet;
@@ -19,10 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -55,9 +50,6 @@ public class ReverbClusterProperty {
 	/*
 	 * output location for the type pairs and the properties that are common
 	 */
-	private static final String CLUSTERS = "CLUSTERS_TYPE";
-
-	private static final String CLUSTERS_NAME = "src/main/resources/input/CLUSTERS_";
 
 	private static List<Pair<String, String>> revbProps = null;
 
@@ -69,10 +61,6 @@ public class ReverbClusterProperty {
 	public ReverbClusterProperty() {
 		//
 	}
-
-	private static Map<Pair<String, String>, Map<String, Double>> MAP_CLUSTER = new HashMap<Pair<String, String>, Map<String, Double>>();
-	private static Map<String, Set<String>> propertBasicCluster = new ConcurrentHashMap<String, Set<String>>();
-	private static THashMap<String, String> BASIC_CLUSTER_DICT = new THashMap<String, String>();
 
 	/**
 	 * @param args
@@ -98,8 +86,9 @@ public class ReverbClusterProperty {
 				+ args[1]);
 
 		// Wordnet specific init block
-		System.setProperty("wordnet.database.dir", Constants.WORDNET_DICTIONARY);
-		WS4JConfiguration.getInstance().setMFS(true);
+		// System.setProperty("wordnet.database.dir",
+		// Constants.WORDNET_DICTIONARY);
+		// WS4JConfiguration.getInstance().setMFS(true);
 
 		// doBasicPatternClustering();
 
@@ -247,56 +236,56 @@ public class ReverbClusterProperty {
 		}
 	}
 
-	private static double getTokenScore(String[] split, String[] split2) {
+	// private static double getTokenScore(String[] split, String[] split2) {
+	//
+	// int num = 0;
+	// int denom = split.length + split2.length;
+	// for (String s1 : split) {
+	// for (String s2 : split2) {
+	// if (s1.equals(s2))
+	// num++;
+	// }
+	// }
+	// return (double) 2 * num / denom;
+	// }
 
-		int num = 0;
-		int denom = split.length + split2.length;
-		for (String s1 : split) {
-			for (String s2 : split2) {
-				if (s1.equals(s2))
-					num++;
-			}
-		}
-		return (double) 2 * num / denom;
-	}
+	// private static boolean isPatternClustered(String arg1, String arg2) {
+	//
+	// if (BASIC_CLUSTER_DICT.get(arg2) != null
+	// && BASIC_CLUSTER_DICT.get(arg1) != null) {
+	// if (arg1.equals(BASIC_CLUSTER_DICT.get(arg2))
+	// || BASIC_CLUSTER_DICT.get(arg1).equals(
+	// BASIC_CLUSTER_DICT.get(arg2))) {
+	// logger.info("Skipping " + arg1 + "\t" + arg2);
+	// return true;
+	// } else
+	// return false;
+	// } else
+	// return false;
+	// }
 
-	private static boolean isPatternClustered(String arg1, String arg2) {
-
-		if (BASIC_CLUSTER_DICT.get(arg2) != null
-				&& BASIC_CLUSTER_DICT.get(arg1) != null) {
-			if (arg1.equals(BASIC_CLUSTER_DICT.get(arg2))
-					|| BASIC_CLUSTER_DICT.get(arg1).equals(
-							BASIC_CLUSTER_DICT.get(arg2))) {
-				logger.info("Skipping " + arg1 + "\t" + arg2);
-				return true;
-			} else
-				return false;
-		} else
-			return false;
-	}
-
-	private static boolean canBeAdded(String arg1, String arg2) {
-		boolean flag1 = false;
-		boolean flag2 = false;
-
-		String regex = "\\b" + arg2 + "\\b";
-		Pattern pattern = Pattern.compile(regex);
-		Matcher matcher = pattern.matcher(arg1);
-
-		if (matcher.find()) {
-			flag1 = true;
-		}
-
-		regex = "\\b" + arg1 + "\\b";
-		pattern = Pattern.compile(regex);
-		matcher = pattern.matcher(arg2);
-
-		if (matcher.find()) {
-			flag2 = true;
-		}
-
-		return flag1 || flag2;
-	}
+	// private static boolean canBeAdded(String arg1, String arg2) {
+	// boolean flag1 = false;
+	// boolean flag2 = false;
+	//
+	// String regex = "\\b" + arg2 + "\\b";
+	// Pattern pattern = Pattern.compile(regex);
+	// Matcher matcher = pattern.matcher(arg1);
+	//
+	// if (matcher.find()) {
+	// flag1 = true;
+	// }
+	//
+	// regex = "\\b" + arg1 + "\\b";
+	// pattern = Pattern.compile(regex);
+	// matcher = pattern.matcher(arg2);
+	//
+	// if (matcher.find()) {
+	// flag2 = true;
+	// }
+	//
+	// return flag1 || flag2;
+	// }
 
 	/**
 	 * get the list of Reverb properties CAn be used to get both top-k
@@ -313,12 +302,12 @@ public class ReverbClusterProperty {
 		String line = null;
 		String[] arr = null;
 		long val = 0;
-		int c = 0;
 		List<String> ret = new ArrayList<String>();
 		THashSet<ImmutablePair<String, String>> list = null;
 		THashMap<String, Long> COUNT_PROPERTY_INST = new THashMap<String, Long>();
 
 		try {
+			@SuppressWarnings("resource")
 			Scanner scan = new Scanner(new File(OIE_FILE));
 
 			while (scan.hasNextLine()) {
@@ -374,6 +363,7 @@ public class ReverbClusterProperty {
 		THashSet<ImmutablePair<String, String>> list = null;
 
 		try {
+			@SuppressWarnings("resource")
 			Scanner scan = new Scanner(new File(OIE_FILE));
 
 			while (scan.hasNextLine()) {
@@ -490,29 +480,29 @@ public class ReverbClusterProperty {
 	 * 
 	 * @throws IOException
 	 */
-	private static void dumpPropCluster() throws IOException {
-		BufferedWriter outputWriter = null;
-		try {
-			outputWriter = new BufferedWriter(new FileWriter(CLUSTERS));
-			for (Entry<Pair<String, String>, Map<String, Double>> e : MAP_CLUSTER
-					.entrySet()) {
-
-				for (Entry<String, Double> propEntry : e.getValue().entrySet()) {
-
-					outputWriter.write(propEntry.getValue() + "\t"
-							+ e.getKey().getLeft() + "\t"
-							+ e.getKey().getRight() + "\t" + propEntry.getKey()
-							+ "\n");
-				}
-				outputWriter.flush();
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			outputWriter.close();
-		}
-
-	}
+	// private static void dumpPropCluster() throws IOException {
+	// BufferedWriter outputWriter = null;
+	// try {
+	// outputWriter = new BufferedWriter(new FileWriter(CLUSTERS));
+	// for (Entry<Pair<String, String>, Map<String, Double>> e : MAP_CLUSTER
+	// .entrySet()) {
+	//
+	// for (Entry<String, Double> propEntry : e.getValue().entrySet()) {
+	//
+	// outputWriter.write(propEntry.getValue() + "\t"
+	// + e.getKey().getLeft() + "\t"
+	// + e.getKey().getRight() + "\t" + propEntry.getKey()
+	// + "\n");
+	// }
+	// outputWriter.flush();
+	// }
+	//
+	// } catch (IOException e) {
+	// e.printStackTrace();
+	// } finally {
+	// outputWriter.close();
+	// }
+	//
+	// }
 
 }

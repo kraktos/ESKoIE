@@ -12,7 +12,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
@@ -25,10 +25,6 @@ public class SimilatityWebService {
 
 	static String uri = "http://swoogle.umbc.edu/SimService/GetSimilarity?operation=api";
 
-	static HttpClient httpclient = new DefaultHttpClient();
-	static HttpPost httppost = new HttpPost(uri);
-	static HttpResponse httpResponse = null;
-	static HttpEntity httpResponseEntity = null;
 	static List<NameValuePair> nameValuePairs = null;
 
 	public static void main(String[] args) throws Exception {
@@ -44,12 +40,15 @@ public class SimilatityWebService {
 			nameValuePairs.add(new BasicNameValuePair("phrase1", arg1));
 			nameValuePairs.add(new BasicNameValuePair("phrase2", arg2));
 
+			HttpClient httpclient = HttpClientBuilder.create().build();
+			HttpPost httppost = new HttpPost(uri);
+
 			httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
 			// Execute HTTP Post Request
-			httpResponse = httpclient.execute(httppost);
+			HttpResponse httpResponse = httpclient.execute(httppost);
 
-			httpResponseEntity = httpResponse.getEntity();
+			HttpEntity httpResponseEntity = httpResponse.getEntity();
 
 			if (httpResponseEntity != null) {
 				response = EntityUtils.toString(httpResponseEntity);

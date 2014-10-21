@@ -4,7 +4,6 @@
 package code.dws.core;
 
 import gnu.trove.map.hash.THashMap;
-import gnu.trove.set.hash.THashSet;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -12,10 +11,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-
-import com.google.common.io.Files;
 
 import code.dws.dbConnectivity.DBWrapper;
 import code.dws.query.SPARQLEndPointQueryAPI;
@@ -76,6 +72,7 @@ public class LoadInstanceTypes {
 		DBWrapper.init(Constants.GET_WIKI_LINKS_APRIORI_SQL);
 
 		try {
+			@SuppressWarnings("resource")
 			Scanner scan = new Scanner(new File(OIE_DATA_PATH));
 			long start = Utilities.startTimer();
 			while (scan.hasNextLine()) {
@@ -197,10 +194,9 @@ public class LoadInstanceTypes {
 		String line = null;
 		String[] arr = null;
 		long val = 0;
-		int c = 0;
-		THashSet<String> ret = new THashSet<String>();
 
 		try {
+			@SuppressWarnings("resource")
 			Scanner scan = new Scanner(new File(OIE_FILE));
 
 			while (scan.hasNextLine()) {
