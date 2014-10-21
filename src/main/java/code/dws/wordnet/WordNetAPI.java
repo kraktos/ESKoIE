@@ -82,11 +82,11 @@ public class WordNetAPI {
 				+ SimilatityWebService.getSimScore("is a town in",
 						"is a suburb"));
 
-		System.out.println(scoreWordNet(rcs, "studied at".split(" "),
-				"has studied at".split(" "))
+		System.out.println(scoreWordNet(rcs, "bandmember".split(" "),
+				"formerbandmember".split(" "))
 				+ "\t"
-				+ SimilatityWebService.getSimScore("has studied at",
-						"studied at"));
+				+ SimilatityWebService.getSimScore("band member",
+						"former band member"));
 
 	}
 

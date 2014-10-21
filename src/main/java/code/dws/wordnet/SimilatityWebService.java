@@ -27,6 +27,9 @@ public class SimilatityWebService {
 
 	static HttpClient httpclient = new DefaultHttpClient();
 	static HttpPost httppost = new HttpPost(uri);
+	static HttpResponse httpResponse = null;
+	static HttpEntity httpResponseEntity = null;
+	static List<NameValuePair> nameValuePairs = null;
 
 	public static void main(String[] args) throws Exception {
 		System.out.println(getSimScore("be in", "turn to"));
@@ -37,16 +40,16 @@ public class SimilatityWebService {
 
 		try {
 			// Add your data
-			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+			nameValuePairs = new ArrayList<NameValuePair>(2);
 			nameValuePairs.add(new BasicNameValuePair("phrase1", arg1));
 			nameValuePairs.add(new BasicNameValuePair("phrase2", arg2));
 
 			httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
 			// Execute HTTP Post Request
-			HttpResponse httpResponse = httpclient.execute(httppost);
+			httpResponse = httpclient.execute(httppost);
 
-			HttpEntity httpResponseEntity = httpResponse.getEntity();
+			httpResponseEntity = httpResponse.getEntity();
 
 			if (httpResponseEntity != null) {
 				response = EntityUtils.toString(httpResponseEntity);

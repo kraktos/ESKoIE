@@ -399,4 +399,18 @@ public class Utilities {
 		arg = StringUtils.replace(arg, "%", "~25");
 		return arg;
 	}
+
+	public static String splitAtCapitals(String arg) {
+		String retStr = "";
+		for (int i = 0; i < arg.length(); i++) {
+			char c = arg.charAt(i);
+			if (Character.isUpperCase(c)) {
+				retStr = retStr + " " + c;
+			} else {
+				retStr = retStr + c;
+			}
+		}
+		return retStr;
+	}
+
 }
