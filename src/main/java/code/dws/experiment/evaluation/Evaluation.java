@@ -18,8 +18,6 @@ public class Evaluation {
 	// define Logger
 	static Logger logger = Logger.getLogger(Evaluation.class.getName());
 
-	private static final String GOLD_FILE = "/home/adutta/git/ReverbGS1.1.tsv";
-
 	/**
 	 * gold standard file collection
 	 */
@@ -36,16 +34,17 @@ public class Evaluation {
 	public static void main(String[] args) {
 
 		// load the respective gold standard and methods in memeory
-		setup();
+		setup(args[0]);
 
 		// perform comparison
 		compare();
 	}
 
 	/**
+	 * @param GOLD_FILE
 	 * 
 	 */
-	public static void setup() {
+	public static void setup(String GOLD_FILE) {
 		FactDao dbpFact = null;
 		FactDao annotatedGoldFact = null;
 
@@ -64,9 +63,9 @@ public class Evaluation {
 				dbpFact = DBWrapper.getRefinedDBPFact(entry.getKey());
 
 				if (dbpFact != null) {
-					logger.info(entry.getKey());
-					logger.info("==>" + annotatedGoldFact);
-					logger.info("==>" + dbpFact);
+					logger.debug(entry.getKey());
+					logger.debug("==>" + annotatedGoldFact);
+					logger.debug("==>" + dbpFact);
 
 					// take the instances in Gold standard which have a
 					// corresponding refinement done.
@@ -104,11 +103,10 @@ public class Evaluation {
 
 		// load the NELL file in memory as a collection
 		List<String> gold = FileUtils.readLines(new File(goldFile));
-		int cnt = 0;
 		for (String line : gold) {
 
-			if (line.indexOf("\tIP") != -1 || line.indexOf("\tUC") != -1) {
-
+			// if (line.indexOf("\tIP") != -1 || line.indexOf("\tUC") != -1) {
+			if (line.indexOf("\tIP") != -1) {
 				arr = line.split("\t");
 				oieFact = new FactDao(arr[0], arr[1], arr[2]);
 				dbpFact = new FactDao(StringUtils.replace(arr[3],
@@ -118,12 +116,14 @@ public class Evaluation {
 
 				goldFacts.put(oieFact, dbpFact);
 
-				cnt++;
 			}
 		}
 		return goldFacts;
 	}
 
+	/**
+	 * output the metrics values
+	 */
 	private static void compare() {
 
 		double prec = computeScore("P");
