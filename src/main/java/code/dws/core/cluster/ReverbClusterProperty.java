@@ -214,7 +214,7 @@ public class ReverbClusterProperty {
 		long start = Utilities.startTimer();
 
 		long propSize = revbProps.size();
-		long size = propSize * (propSize - 1);
+		// long size = propSize * (propSize - 1);
 
 		try {
 
@@ -234,7 +234,7 @@ public class ReverbClusterProperty {
 				writerRevWordnetSims.flush();
 
 				if (cnt > 1000 && cnt % 1000 == 0)
-					Utilities.endTimer(start, 200 * ((double) cnt / size)
+					Utilities.endTimer(start, 200 * ((double) cnt / propSize)
 							+ " percent done in ");
 
 				writerRevWordnetSims.flush();
