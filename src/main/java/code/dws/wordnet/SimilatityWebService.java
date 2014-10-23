@@ -12,30 +12,37 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Logger;
 
 import code.dws.utils.Constants;
 
 public class SimilatityWebService {
+
+	// define Logger
+	public static Logger logger = Logger.getLogger(SimilatityWebService.class
+			.getName());
 
 	static String response = null;
 	static double score = 0;
 
 	static String uri = "http://swoogle.umbc.edu/SimService/GetSimilarity?operation=api";
 
-
 	public static void main(String[] args) throws Exception {
-		System.out.println(getSimScore("be in", "turn to"));
+		System.out.println(getSimScore("also appeared in", "did not respond to"));
+		
+		
+
 
 	}
 
 	public static double getSimScore(String arg1, String arg2) throws Exception {
 
 		List<NameValuePair> nameValuePairs = null;
-		
-		
+
 		try {
 			// Add your data
 			nameValuePairs = new ArrayList<NameValuePair>(2);
@@ -43,6 +50,7 @@ public class SimilatityWebService {
 			nameValuePairs.add(new BasicNameValuePair("phrase2", arg2));
 
 			HttpClient httpclient = HttpClientBuilder.create().build();
+
 			HttpPost httppost = new HttpPost(uri);
 
 			httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
@@ -56,10 +64,13 @@ public class SimilatityWebService {
 				response = EntityUtils.toString(httpResponseEntity);
 			}
 
+		} catch (ConnectTimeoutException cTo) {
+			logger.error("ConnectTimeoutException out with " + arg1 + ", "
+					+ arg2);
 		} catch (ClientProtocolException e) {
-			e.printStackTrace();
+			logger.error("ClientProtocolException with " + arg1 + ", " + arg2);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("IOException  with " + arg1 + ", " + arg2);
 		}
 
 		try {
