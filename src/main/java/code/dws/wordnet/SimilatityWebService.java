@@ -13,7 +13,10 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ConnectTimeoutException;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
@@ -30,13 +33,29 @@ public class SimilatityWebService {
 	static double score = 0;
 
 	static String uri = "http://swoogle.umbc.edu/SimService/GetSimilarity?operation=api";
+	static CloseableHttpClient httpclient = null;
 
 	public static void main(String[] args) throws Exception {
-		System.out.println(getSimScore("also appeared in", "did not respond to"));
-		
-		
+		System.out
+				.println(getSimScore("also appeared in", "did not respond to"));
 
+	}
 
+	public static void init() {
+		PoolingHttpClientConnectionManager poolManager = new PoolingHttpClientConnectionManager();
+		poolManager.setMaxTotal(50);
+		poolManager.setDefaultMaxPerRoute(50);
+
+		httpclient = HttpClients.custom().setConnectionManager(poolManager)
+				.build();
+	}
+
+	public static void closeDown() {
+		try {
+			httpclient.close();
+		} catch (IOException e) {
+			logger.error("");
+		}
 	}
 
 	public static double getSimScore(String arg1, String arg2) throws Exception {
@@ -49,7 +68,7 @@ public class SimilatityWebService {
 			nameValuePairs.add(new BasicNameValuePair("phrase1", arg1));
 			nameValuePairs.add(new BasicNameValuePair("phrase2", arg2));
 
-			HttpClient httpclient = HttpClientBuilder.create().build();
+			// HttpClient httpclient = HttpClientBuilder.create().build();
 
 			HttpPost httppost = new HttpPost(uri);
 

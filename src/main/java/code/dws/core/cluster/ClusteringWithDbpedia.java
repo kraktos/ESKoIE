@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import code.dws.query.SPARQLEndPointQueryAPI;
 import code.dws.utils.Constants;
 import code.dws.utils.Utilities;
+import code.dws.wordnet.SimilatityWebService;
 
 import com.hp.hpl.jena.query.QuerySolution;
 
@@ -38,7 +39,6 @@ import com.hp.hpl.jena.query.QuerySolution;
 public class ClusteringWithDbpedia {
 
 	private static final String QUERY = "select distinct ?val where {?val <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty>} ";
-
 
 	/**
 	 * logger
@@ -117,6 +117,9 @@ public class ClusteringWithDbpedia {
 		ExecutorCompletionService<PairDto> completionService = new ExecutorCompletionService<PairDto>(
 				executorPool);
 
+		// init http connection pool
+		SimilatityWebService.init();
+
 		List<Future<PairDto>> taskList = new ArrayList<Future<PairDto>>();
 
 		try {
@@ -174,6 +177,9 @@ public class ClusteringWithDbpedia {
 
 		} finally {
 			writerDbpProps.close();
+
+			// init http connection pool
+			SimilatityWebService.closeDown();
 		}
 
 	}
