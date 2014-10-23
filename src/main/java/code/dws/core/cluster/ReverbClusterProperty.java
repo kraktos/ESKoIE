@@ -201,15 +201,12 @@ public class ReverbClusterProperty {
 		long starTime = 0;
 		long cntr = 0;
 
-		double wnScore = 0;
-
 		BufferedWriter writerRevWordnetSims = new BufferedWriter(
 				new FileWriter(new File(Constants.OIE_DATA_PATH).getParent()
 						+ "/all.trvb.wordnet.sim."
 						+ Constants.SIMILARITY_FACTOR + ".csv"));
 
 		long start = Utilities.startTimer();
-
 
 		int cores = Runtime.getRuntime().availableProcessors();
 		cores = (cores > Constants.THREAD_MAX_POOL_SIZE) ? cores
@@ -230,10 +227,8 @@ public class ReverbClusterProperty {
 				arg1 = pair.getLeft();
 				arg2 = pair.getRight();
 
+				// add to the pool of tasks
 				taskList.add(completionService.submit(new Worker(arg1, arg2)));
-
-				// Web based call, better but slower
-				// wnScore = SimilatityWebService.getSimScore(arg1, arg2);
 
 			}
 			// shutdown pool thread
