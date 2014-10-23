@@ -26,7 +26,7 @@ public class Worker implements Callable<Double> {
 	@Override
 	public Double call() throws Exception {
 
-		this.score = SimilatityWebService.getSimScore(arg1, arg2);
-		return this.score;
+//		return SimilatityWebService.getSimScore(this.arg1, this.arg2);
+		return 2.3;
 	}
 }
