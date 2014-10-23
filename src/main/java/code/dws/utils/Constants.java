@@ -43,6 +43,8 @@ public class Constants {
 
 	public static int TOP_K_MATCHES = 1;
 
+	public static int THREAD_MAX_POOL_SIZE = 0;
+
 	public static String OIE_DATA_PATH;
 
 	/**
@@ -256,6 +258,9 @@ public class Constants {
 			SIMILARITY_FACTOR = Double.parseDouble(prop
 					.getProperty("SIMILARITY_FACTOR"));
 
+			THREAD_MAX_POOL_SIZE= Integer.parseInt(prop
+					.getProperty("THREAD_MAX_POOL_SIZE"));
+			
 			init();
 		} catch (IOException ex) {
 			ex.printStackTrace();

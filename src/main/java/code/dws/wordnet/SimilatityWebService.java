@@ -25,7 +25,6 @@ public class SimilatityWebService {
 
 	static String uri = "http://swoogle.umbc.edu/SimService/GetSimilarity?operation=api";
 
-	static List<NameValuePair> nameValuePairs = null;
 
 	public static void main(String[] args) throws Exception {
 		System.out.println(getSimScore("be in", "turn to"));
@@ -34,6 +33,9 @@ public class SimilatityWebService {
 
 	public static double getSimScore(String arg1, String arg2) throws Exception {
 
+		List<NameValuePair> nameValuePairs = null;
+		
+		
 		try {
 			// Add your data
 			nameValuePairs = new ArrayList<NameValuePair>(2);

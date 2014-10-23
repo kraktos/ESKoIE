@@ -10,13 +10,11 @@ import code.dws.wordnet.SimilatityWebService;
 /**
  * @author arnab
  */
-public class Worker implements Callable<Double> {
+public class Worker implements Callable<PairDto> {
 
 	private String arg1;
 
 	private String arg2;
-
-	private Double score;
 
 	public Worker(String arg1, String arg2) {
 		this.arg1 = arg1;
@@ -24,9 +22,9 @@ public class Worker implements Callable<Double> {
 	}
 
 	@Override
-	public Double call() throws Exception {
+	public PairDto call() throws Exception {
 
-//		return SimilatityWebService.getSimScore(this.arg1, this.arg2);
-		return 2.3;
+		double score = SimilatityWebService.getSimScore(this.arg1, this.arg2);
+		return new PairDto(this.arg1, this.arg2, score);
 	}
 }
