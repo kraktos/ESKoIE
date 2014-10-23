@@ -39,7 +39,6 @@ public class ClusteringWithDbpedia {
 
 	private static final String QUERY = "select distinct ?val where {?val <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty>} ";
 
-	private static final long TIMEOUT_MINS = 1000;
 
 	/**
 	 * logger
@@ -109,11 +108,12 @@ public class ClusteringWithDbpedia {
 		long start = Utilities.startTimer();
 
 		int cores = Runtime.getRuntime().availableProcessors();
+		cores = (cores > Constants.THREAD_MAX_POOL_SIZE) ? cores
+				: Constants.THREAD_MAX_POOL_SIZE;
 
 		int SIZE = dbpProps.size();
 
-		ExecutorService executorPool = Executors
-				.newFixedThreadPool(Constants.THREAD_MAX_POOL_SIZE);
+		ExecutorService executorPool = Executors.newFixedThreadPool(cores);
 		ExecutorCompletionService<PairDto> completionService = new ExecutorCompletionService<PairDto>(
 				executorPool);
 
@@ -147,7 +147,7 @@ public class ClusteringWithDbpedia {
 				try {
 					cntr++;
 					Future<PairDto> futureTask = completionService.poll(
-							TIMEOUT_MINS, TimeUnit.MINUTES);
+							Constants.TIMEOUT_MINS, TimeUnit.MINUTES);
 
 					resultPair = futureTask.get();
 
@@ -158,7 +158,7 @@ public class ClusteringWithDbpedia {
 							+ "\n");
 					writerDbpProps.flush();
 
-					if (cntr % 10 == 0 && cntr > 10)
+					if (cntr % 1000 == 0 && cntr > 1000)
 						Utilities.endTimer(start, 100
 								* ((double) cntr / taskList.size())
 								+ " percent done in ");

@@ -22,6 +22,8 @@ public class Constants {
 		NELL, REVERB
 	}
 
+	public static final long TIMEOUT_MINS = 1000;
+
 	public static DecimalFormat formatter = new DecimalFormat("#.############");
 
 	public static String DBPEDIA_TBOX;
@@ -258,9 +260,9 @@ public class Constants {
 			SIMILARITY_FACTOR = Double.parseDouble(prop
 					.getProperty("SIMILARITY_FACTOR"));
 
-			THREAD_MAX_POOL_SIZE= Integer.parseInt(prop
+			THREAD_MAX_POOL_SIZE = Integer.parseInt(prop
 					.getProperty("THREAD_MAX_POOL_SIZE"));
-			
+
 			init();
 		} catch (IOException ex) {
 			ex.printStackTrace();

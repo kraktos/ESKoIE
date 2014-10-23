@@ -17,6 +17,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.Scanner;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -190,8 +195,11 @@ public class ReverbClusterProperty {
 	private static void doScoring() throws IOException {
 		String arg1 = null;
 		String arg2 = null;
+		PairDto resultPair = null;
 
 		long cnt = 0;
+		long starTime = 0;
+		long cntr = 0;
 
 		double wnScore = 0;
 
@@ -202,8 +210,17 @@ public class ReverbClusterProperty {
 
 		long start = Utilities.startTimer();
 
-		long propSize = revbProps.size();
-		// long size = propSize * (propSize - 1);
+
+		int cores = Runtime.getRuntime().availableProcessors();
+		cores = (cores > Constants.THREAD_MAX_POOL_SIZE) ? cores
+				: Constants.THREAD_MAX_POOL_SIZE;
+
+		ExecutorService executorPool = Executors.newFixedThreadPool(cores);
+		ExecutorCompletionService<PairDto> completionService = new ExecutorCompletionService<PairDto>(
+				executorPool);
+
+		// init task list
+		List<Future<PairDto>> taskList = new ArrayList<Future<PairDto>>();
 
 		try {
 
@@ -213,22 +230,47 @@ public class ReverbClusterProperty {
 				arg1 = pair.getLeft();
 				arg2 = pair.getRight();
 
+				taskList.add(completionService.submit(new Worker(arg1, arg2)));
+
 				// Web based call, better but slower
-				wnScore = SimilatityWebService.getSimScore(arg1, arg2);
-
-				if (wnScore > 0)
-					writerRevWordnetSims.write(arg1 + "\t" + arg2 + "\t"
-							+ Constants.formatter.format(wnScore) + "\n");
-
-				writerRevWordnetSims.flush();
-
-				if (cnt > 1000 && cnt % 1000 == 0)
-					Utilities.endTimer(start, 200 * ((double) cnt / propSize)
-							+ " percent done in ");
-
-				writerRevWordnetSims.flush();
+				// wnScore = SimilatityWebService.getSimScore(arg1, arg2);
 
 			}
+			// shutdown pool thread
+			executorPool.shutdown();
+
+			logger.info("Pushed " + taskList.size() + " tasks to the pool ");
+			starTime = System.currentTimeMillis();
+
+			while (!executorPool.isTerminated()) {
+				try {
+					cntr++;
+					Future<PairDto> futureTask = completionService.poll(
+							Constants.TIMEOUT_MINS, TimeUnit.MINUTES);
+
+					resultPair = futureTask.get();
+
+					// write it out
+					if (resultPair.getScore() > 0)
+						writerRevWordnetSims.write(resultPair.getArg1()
+								+ "\t"
+								+ resultPair.getArg2()
+								+ "\t"
+								+ Constants.formatter.format(resultPair
+										.getScore()) + "\n");
+
+					if (cntr % 1000 == 0 && cntr > 1000) {
+						Utilities.endTimer(start, 100
+								* ((double) cntr / taskList.size())
+								+ " percent done in ");
+						writerRevWordnetSims.flush();
+					}
+
+				} catch (InterruptedException e) {
+					logger.error(e.getMessage());
+				}
+			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
