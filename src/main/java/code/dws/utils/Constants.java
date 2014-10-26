@@ -22,7 +22,7 @@ public class Constants {
 		NELL, REVERB
 	}
 
-	public static final long TIMEOUT_MINS = 1000;
+	public static long TIMEOUT_MINS = 0;
 
 	public static DecimalFormat formatter = new DecimalFormat("#.############");
 
@@ -176,6 +176,10 @@ public class Constants {
 
 	public static final String GET_REFINED_FACT = "select DBP_SUB, DBP_OBJ from OIE_REFINED where OIE_SUB=? and OIE_PRED=? and OIE_OBJ=?";
 
+	public static int HTTP_CONN_MAX_TOTAL = 0;
+
+	public static int HTTP_CONN_MAX_TOTAL_PER_ROUTE = 0;
+
 	public static String WORDNET_DICTIONARY = null;
 
 	/**
@@ -262,6 +266,17 @@ public class Constants {
 
 			THREAD_MAX_POOL_SIZE = Integer.parseInt(prop
 					.getProperty("THREAD_MAX_POOL_SIZE"));
+
+			HTTP_CONN_MAX_TOTAL = Integer.parseInt(prop
+					.getProperty("HTTP_CONN_MAX_TOTAL"));
+
+			HTTP_CONN_MAX_TOTAL_PER_ROUTE = Integer.parseInt(prop
+					.getProperty("HTTP_CONN_MAX_TOTAL_PER_ROUTE"));
+			
+			TIMEOUT_MINS = Integer.parseInt(prop
+					.getProperty("TIMEOUT_MINS"));
+			
+			
 
 			init();
 		} catch (IOException ex) {

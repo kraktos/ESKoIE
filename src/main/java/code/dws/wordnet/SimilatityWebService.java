@@ -43,8 +43,8 @@ public class SimilatityWebService {
 
 	public static void init() {
 		PoolingHttpClientConnectionManager poolManager = new PoolingHttpClientConnectionManager();
-		poolManager.setMaxTotal(50);
-		poolManager.setDefaultMaxPerRoute(50);
+		poolManager.setMaxTotal(Constants.HTTP_CONN_MAX_TOTAL);
+		poolManager.setDefaultMaxPerRoute(Constants.HTTP_CONN_MAX_TOTAL_PER_ROUTE);
 
 		httpclient = HttpClients.custom().setConnectionManager(poolManager)
 				.build();

@@ -219,6 +219,9 @@ public class ReverbClusterProperty {
 		// init task list
 		List<Future<PairDto>> taskList = new ArrayList<Future<PairDto>>();
 
+		// init http connection pool
+		SimilatityWebService.init();
+
 		try {
 
 			for (Pair<String, String> pair : revbProps) {
@@ -242,34 +245,40 @@ public class ReverbClusterProperty {
 					cntr++;
 					Future<PairDto> futureTask = completionService.poll(
 							Constants.TIMEOUT_MINS, TimeUnit.MINUTES);
+					
+					if (futureTask != null) {
+						resultPair = futureTask.get();
 
-					resultPair = futureTask.get();
-
-					// write it out
-					if (resultPair.getScore() > 0)
-						writerRevWordnetSims.write(resultPair.getArg1()
-								+ "\t"
-								+ resultPair.getArg2()
-								+ "\t"
-								+ Constants.formatter.format(resultPair
-										.getScore()) + "\n");
-
-					if (cntr % 1000 == 0 && cntr > 1000) {
-						Utilities.endTimer(start, 100
-								* ((double) cntr / taskList.size())
-								+ " percent done in ");
-						writerRevWordnetSims.flush();
+						// write it out
+						if (resultPair.getScore() > 0)
+							writerRevWordnetSims.write(resultPair.getArg1()
+									+ "\t"
+									+ resultPair.getArg2()
+									+ "\t"
+									+ Constants.formatter.format(resultPair
+											.getScore()) + "\n");
+						if (cntr % 100000 == 0 && cntr > 100000) {
+							Utilities.endTimer(start, 100
+									* ((double) cntr / taskList.size())
+									+ " percent done in ");
+							writerRevWordnetSims.flush();
+						}
 					}
 
 				} catch (InterruptedException e) {
 					logger.error(e.getMessage());
 				}
 			}
- 
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
+
+			writerRevWordnetSims.flush();
 			writerRevWordnetSims.close();
+
+			// init http connection pool
+			SimilatityWebService.closeDown();
 		}
 	}
 
