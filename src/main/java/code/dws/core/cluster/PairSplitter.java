@@ -9,6 +9,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import code.dws.dbConnectivity.DBWrapper;
+import code.dws.query.SPARQLEndPointQueryAPI;
 import code.dws.utils.Constants;
 
 public class PairSplitter {
@@ -29,62 +30,40 @@ public class PairSplitter {
 		String arg2 = null;
 
 		BufferedWriter pairNode1 = null;
-		BufferedWriter pairNode2 = null;
-		BufferedWriter pairNode3 = null;
-		BufferedWriter pairNode4 = null;
-		BufferedWriter pairNode5 = null;
 
 		// only f+ properties
 		DBWrapper.init(Constants.GET_FULLY_MAPPED_OIE_PROPS_SQL);
 		revbProps = DBWrapper.getFullyMappedFacts();
 
 		logger.info("Loaded " + revbProps.size() + " OIE properties");
+
+		List<String> dbpProps = null;
+
+		// call to retrieve DBPedia owl object property
+		dbpProps = SPARQLEndPointQueryAPI.loadDbpediaProperties(-1);
+
+		logger.info("Loaded " + dbpProps.size() + " DBpedia properties");
+
+//		revbProps.addAll(dbpProps);
 		try {
 
 			pairNode1 = new BufferedWriter(new FileWriter(new File(
-					Constants.OIE_DATA_PATH).getParent() + "/pairNode1.csv"));
-
-			// pairNode2 = new BufferedWriter(new FileWriter(new File(
-			// Constants.OIE_DATA_PATH).getParent() + "/pairNode2.csv"));
-			//
-			// pairNode3 = new BufferedWriter(new FileWriter(new File(
-			// Constants.OIE_DATA_PATH).getParent() + "/pairNode3.csv"));
-			//
-			// pairNode4 = new BufferedWriter(new FileWriter(new File(
-			// Constants.OIE_DATA_PATH).getParent() + "/pairNode4.csv"));
-			//
-			// pairNode5 = new BufferedWriter(new FileWriter(new File(
-			// Constants.OIE_DATA_PATH).getParent() + "/pairNode5.csv"));
+					Constants.OIE_DATA_PATH).getParent() + "/pairNodeAll.csv"));
 
 			for (int outerIdx = 0; outerIdx < revbProps.size(); outerIdx++) {
 
 				arg1 = revbProps.get(outerIdx);
 
-				for (int innerIdx = outerIdx + 1; innerIdx < revbProps.size(); innerIdx++) {
+				for (int innerIdx = 0; innerIdx < dbpProps.size(); innerIdx++) {
 
-					arg2 = revbProps.get(innerIdx);
+					arg2 = dbpProps.get(innerIdx);
 
 					pairNode1.write(arg1 + "\t" + arg2 + "\n");
 
-					// if (cnt % node == 1) {
-					// pairNode1.write(arg1 + "\t" + arg2 + "\n");
-					// } else if (cnt % node == 2) {
-					// pairNode2.write(arg1 + "\t" + arg2 + "\n");
-					// } else if (cnt % node == 3) {
-					// pairNode3.write(arg1 + "\t" + arg2 + "\n");
-					// } else if (cnt % node == 4) {
-					// pairNode4.write(arg1 + "\t" + arg2 + "\n");
-					// } else if (cnt % node == 0) {
-					// pairNode5.write(arg1 + "\t" + arg2 + "\n");
-					// }
 					cnt++;
 				}
 
 				pairNode1.flush();
-				// pairNode2.flush();
-				// pairNode3.flush();
-				// pairNode4.flush();
-				// pairNode5.flush();
 			}
 
 		} catch (IOException e) {

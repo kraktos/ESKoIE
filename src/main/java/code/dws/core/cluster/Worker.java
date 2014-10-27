@@ -5,6 +5,7 @@ package code.dws.core.cluster;
 
 import java.util.concurrent.Callable;
 
+import code.dws.utils.Utilities;
 import code.dws.wordnet.SimilatityWebService;
 
 /**
@@ -24,7 +25,9 @@ public class Worker implements Callable<PairDto> {
 	@Override
 	public PairDto call() throws Exception {
 
-		double score = SimilatityWebService.getSimScore(this.arg1, this.arg2);
+		double score = SimilatityWebService.getSimScore(
+				Utilities.splitAtCapitals(this.arg1),
+				Utilities.splitAtCapitals(this.arg2));
 		return new PairDto(this.arg1, this.arg2, score);
 	}
 }
