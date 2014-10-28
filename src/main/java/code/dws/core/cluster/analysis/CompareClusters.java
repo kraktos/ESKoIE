@@ -34,6 +34,11 @@ import code.dws.utils.Constants;
  */
 public class CompareClusters {
 
+	private static final String MCL_CLUSTERS_OUTPUT = "src/main/resources/reverb_All_mcl_"; // All_mcl_";
+																							// //reverb_All_mcl_
+
+	private static final String PAIR_SCORE_FILE = "src/main/resources/all.trvb.wordnet.sim.FULL."; //FULL_PAIRS.";
+
 	// define Logger
 	public static Logger logger = Logger.getLogger(CompareClusters.class
 			.getName());
@@ -48,6 +53,9 @@ public class CompareClusters {
 	public static String CLUSTER_INDICES = null;
 
 	// public static final double SIM_SCORE_THRESHOLD = 0.01;
+	public static double BEST_SCORE = Double.MAX_VALUE;
+
+	public static double OPTIMAL_INFLATION = 0;
 
 	/**
 	 * 
@@ -64,22 +72,28 @@ public class CompareClusters {
 
 		Constants.loadConfigParameters(new String[] { "", args[0] });
 
-		CLUSTER_INDICES = "src/main/resources/KCL_MCL_CL."
-				+ Constants.SIMILARITY_FACTOR;
+		CLUSTER_INDICES = "src/main/resources/CLUSTER_SCORES_RVB."
+				+ Constants.SIMILARITY_FACTOR + ".tsv";
 
 		// load the pairwise scores of all relevant properties
-		loadScores("src/main/resources/all.trvb.wordnet.sim."
-				+ Constants.SIMILARITY_FACTOR + ".csv", "\t");
+		logger.info("Loading " + PAIR_SCORE_FILE + Constants.SIMILARITY_FACTOR
+				+ ".csv");
+
+		loadScores(PAIR_SCORE_FILE + Constants.SIMILARITY_FACTOR + ".csv", "\t");
 
 		logger.info("Loaded " + SCORE_MAP.size() + " pairs");
 		scanAndWriteClusterScores();
+
+		logger.info("Optimal Inflation at Threshold "
+				+ Constants.SIMILARITY_FACTOR + " is = " + OPTIMAL_INFLATION);
 	}
 
 	private static void scanAndWriteClusterScores() throws IOException {
 		double mclIndex = 0;
 		int inf = 0;
 
-		Path filePath = Paths.get("src/main/resources");
+		Path filePath = Paths.get(MCL_CLUSTERS_OUTPUT
+				+ Constants.SIMILARITY_FACTOR + "/");
 
 		BufferedWriter writer = new BufferedWriter(new FileWriter(
 				CLUSTER_INDICES));
@@ -93,8 +107,9 @@ public class CompareClusters {
 			@Override
 			public FileVisitResult visitFile(Path file,
 					BasicFileAttributes attrs) throws IOException {
-				if (file.toString()
-						.startsWith("src/main/resources/rev.cluster")
+				if (file.toString().startsWith(
+						MCL_CLUSTERS_OUTPUT + Constants.SIMILARITY_FACTOR + "/"
+								+ "rev.cluster")
 						&& file.toString().endsWith(".out"))
 					files.add(file);
 				return FileVisitResult.CONTINUE;
@@ -110,8 +125,13 @@ public class CompareClusters {
 				CLUSTER = new HashMap<String, List<String>>();
 				logger.info("Currently in location " + path + " .... ");
 
-				inf = Integer.parseInt((path.toString()
-						.replaceAll("[^\\d]", "")));
+				inf = Integer
+						.parseInt((path.toString()
+								.replaceAll(
+										MCL_CLUSTERS_OUTPUT
+												+ Constants.SIMILARITY_FACTOR
+												+ "/", "").replaceAll("[^\\d]",
+								"")));
 
 				readMarkovClusters(path.toString());
 				mclIndex = computeClusterIndex(CLUSTER);
@@ -121,6 +141,12 @@ public class CompareClusters {
 				writer.write(inf + "\t" + CLUSTER.size() + "\t" + mclIndex
 						+ "\n");
 				writer.flush();
+
+				// scheme for the best score
+				if (mclIndex < BEST_SCORE) {
+					BEST_SCORE = mclIndex;
+					OPTIMAL_INFLATION = inf;
+				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
