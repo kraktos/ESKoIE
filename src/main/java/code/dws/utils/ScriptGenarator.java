@@ -8,10 +8,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import code.dws.core.cluster.analysis.CompareClusters;
 import code.dws.experiment.PropertyGoldStandard;
 
 /**
@@ -39,8 +41,8 @@ public class ScriptGenarator {
 	 */
 	public static void main(String[] args) throws IOException {
 
-		Constants.loadConfigParameters(new String[] { "", "CONFIG.cfg" });
-		// loadOIEProps(GenerateNewProperties.NELL_FILE_PATH);
+		Constants.loadConfigParameters(new String[] { "", args[0] });
+
 		loadOIEProps(Constants.OIE_DATA_PATH);
 
 		generateScript();
@@ -78,6 +80,7 @@ public class ScriptGenarator {
 	 * @param oieFilePath
 	 */
 	private static void loadOIEProps(String oieFilePath) {
+		boolean flag = false;
 
 		if (Constants.IS_NELL) {
 			// // load the NELL file in memory as a collection
@@ -100,31 +103,18 @@ public class ScriptGenarator {
 
 		} else {
 			if (!Constants.WORKFLOW_NORMAL) {
+				if (Constants.WORKFLOW == 2) {
+					try {
+						CompareClusters.main(new String[] { "" });
+						for (Map.Entry<String, List<String>> e : CompareClusters
+								.getCluster().entrySet()) {
 
-				// ReverbPropertyReNaming.main(new String[] { "" });
-				// for (Entry<String, List<String>> e :
-				// ReverbPropertyReNaming
-				// .getReNamedProperties().entrySet()) {
-				//
-				// if (Constants.WORKFLOW_NORMAL) {
-				// PROPS.add(e.getKey());
-				// } else {
-				//
-				// // routine to selectively add only those clusters
-				// // having
-				// // atleast one Reverb property
-				// flag = false;
-				// for (String elem : e.getValue()) {
-				// if (elem.indexOf(" ") != -1) {
-				// flag = true;
-				// }
-				// }
-				// if (flag)
-				// PROPS.add(e.getKey());
-				// else
-				// System.out.println("Skipping " + e.getKey());
-				// }
-				// }
+							PROPS.add(e.getKey());
+						}
+					} catch (IOException e) {
+						logger.error(e.getMessage());
+					}
+				}
 			} else {
 
 				List<String> props = PropertyGoldStandard.getReverbProperties(

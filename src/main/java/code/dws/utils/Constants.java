@@ -24,6 +24,8 @@ public class Constants {
 
 	public static long TIMEOUT_MINS = 0;
 
+	public static long WORKFLOW = 0;
+
 	public static DecimalFormat formatter = new DecimalFormat("#.############");
 
 	public static String DBPEDIA_TBOX;
@@ -67,6 +69,8 @@ public class Constants {
 	public static int SCALE_WEIGHT;
 
 	public static boolean ENGAGE_INTER_STEP;
+
+	public static int OPTIMAL_INFLATION;
 
 	public static int TOP_K_NUMERIC_PROPERTIES;
 
@@ -247,6 +251,9 @@ public class Constants {
 			ENGAGE_INTER_STEP = Boolean.valueOf(prop
 					.getProperty("ENGAGE_INTER_STEP"));
 
+			OPTIMAL_INFLATION = Integer.parseInt(prop
+					.getProperty("OPTIMAL_INFLATION"));
+
 			TOP_K_NUMERIC_PROPERTIES = Integer.parseInt(prop
 					.getProperty("TOP_K_NUMERIC_PROPERTIES"));
 
@@ -272,11 +279,10 @@ public class Constants {
 
 			HTTP_CONN_MAX_TOTAL_PER_ROUTE = Integer.parseInt(prop
 					.getProperty("HTTP_CONN_MAX_TOTAL_PER_ROUTE"));
-			
-			TIMEOUT_MINS = Integer.parseInt(prop
-					.getProperty("TIMEOUT_MINS"));
-			
-			
+
+			TIMEOUT_MINS = Integer.parseInt(prop.getProperty("TIMEOUT_MINS"));
+
+			WORKFLOW = Integer.parseInt(prop.getProperty("WORKFLOW"));
 
 			init();
 		} catch (IOException ex) {

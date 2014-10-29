@@ -34,10 +34,11 @@ import code.dws.utils.Constants;
  */
 public class CompareClusters {
 
-	private static final String MCL_CLUSTERS_OUTPUT = "src/main/resources/reverb_All_mcl_"; // All_mcl_";
-																							// //reverb_All_mcl_
+	private static String MCL_CLUSTERS_OUTPUT = null;
 
-	private static final String PAIR_SCORE_FILE = "src/main/resources/all.trvb.wordnet.sim.FULL."; //FULL_PAIRS.";
+	private static String PAIR_SCORE_FILE = null;
+
+	public static String CLUSTER_INDICES = null;
 
 	// define Logger
 	public static Logger logger = Logger.getLogger(CompareClusters.class
@@ -46,16 +47,12 @@ public class CompareClusters {
 	/**
 	 * cluster collection
 	 */
-	static Map<String, List<String>> CLUSTER = new HashMap<String, List<String>>();
+	private static Map<String, List<String>> CLUSTER = new HashMap<String, List<String>>();
 
 	private static Map<Pair<String, String>, Double> SCORE_MAP = new HashMap<Pair<String, String>, Double>();
 
-	public static String CLUSTER_INDICES = null;
-
 	// public static final double SIM_SCORE_THRESHOLD = 0.01;
 	public static double BEST_SCORE = Double.MAX_VALUE;
-
-	public static double OPTIMAL_INFLATION = 0;
 
 	/**
 	 * 
@@ -70,22 +67,61 @@ public class CompareClusters {
 	 */
 	public static void main(String[] args) throws IOException {
 
-		Constants.loadConfigParameters(new String[] { "", args[0] });
+		// uncomemnt for running this as stand alone mode
+		// Constants.loadConfigParameters(new String[] { "", args[0] });
 
-		CLUSTER_INDICES = "src/main/resources/CLUSTER_SCORES_RVB."
-				+ Constants.SIMILARITY_FACTOR + ".tsv";
+		if (Constants.WORKFLOW == 2) {
+			PAIR_SCORE_FILE = "src/main/resources/all.trvb.wordnet.sim.FULL.";
+			MCL_CLUSTERS_OUTPUT = "src/main/resources/reverb_All_mcl_";
+			CLUSTER_INDICES = "src/main/resources/CLUSTER_SCORES_RVB."
+					+ Constants.SIMILARITY_FACTOR + ".tsv";
+		} else if (Constants.WORKFLOW == 3) {
+			PAIR_SCORE_FILE = "src/main/resources/FULL_PAIRS.";
+			MCL_CLUSTERS_OUTPUT = "src/main/resources/All_mcl_";
+			CLUSTER_INDICES = "src/main/resources/CLUSTER_SCORES."
+					+ Constants.SIMILARITY_FACTOR + ".tsv";
+		}
+		if (Constants.OPTIMAL_INFLATION == 0) {
+			// load the pairwise scores of all relevant properties
+			logger.info("Loading " + PAIR_SCORE_FILE
+					+ Constants.SIMILARITY_FACTOR + ".csv");
 
-		// load the pairwise scores of all relevant properties
-		logger.info("Loading " + PAIR_SCORE_FILE + Constants.SIMILARITY_FACTOR
-				+ ".csv");
+			loadScores(PAIR_SCORE_FILE + Constants.SIMILARITY_FACTOR + ".csv",
+					"\t");
 
-		loadScores(PAIR_SCORE_FILE + Constants.SIMILARITY_FACTOR + ".csv", "\t");
+			logger.info("Loaded " + SCORE_MAP.size() + " pairs");
+			scanAndWriteClusterScores();
 
-		logger.info("Loaded " + SCORE_MAP.size() + " pairs");
-		scanAndWriteClusterScores();
+			logger.info("Optimal Inflation at Threshold "
+					+ Constants.SIMILARITY_FACTOR + " is = "
+					+ Constants.OPTIMAL_INFLATION);
+		}
 
-		logger.info("Optimal Inflation at Threshold "
-				+ Constants.SIMILARITY_FACTOR + " is = " + OPTIMAL_INFLATION);
+		logger.info("Generating Clusters from the file " + MCL_CLUSTERS_OUTPUT
+				+ Constants.SIMILARITY_FACTOR + "/rev.cluster."
+				+ Constants.OPTIMAL_INFLATION + ".out");
+
+		readMarkovClusters(MCL_CLUSTERS_OUTPUT + Constants.SIMILARITY_FACTOR
+				+ "/rev.cluster." + Constants.OPTIMAL_INFLATION + ".out");
+	}
+
+	/**
+	 * returned named Clusters
+	 * 
+	 * @return
+	 */
+	public static Map<String, List<String>> getCluster() {
+		return CLUSTER;
+	}
+
+	/**
+	 * get the optimal inflation factor
+	 * 
+	 * @return optimal score
+	 */
+
+	public static double getOptimalInflation() {
+		return Constants.OPTIMAL_INFLATION;
 	}
 
 	private static void scanAndWriteClusterScores() throws IOException {
@@ -140,12 +176,13 @@ public class CompareClusters {
 				logger.info("MCL Index Score = " + mclIndex);
 				writer.write(inf + "\t" + CLUSTER.size() + "\t" + mclIndex
 						+ "\n");
+
 				writer.flush();
 
 				// scheme for the best score
 				if (mclIndex < BEST_SCORE) {
 					BEST_SCORE = mclIndex;
-					OPTIMAL_INFLATION = inf;
+					Constants.OPTIMAL_INFLATION = inf;
 				}
 			}
 		} catch (IOException e) {
@@ -195,12 +232,13 @@ public class CompareClusters {
 		while (scan.hasNextLine()) {
 			list = new ArrayList<String>();
 			sCurrentLine = scan.nextLine();
+			if(sCurrentLine.indexOf("is member of") != -1)
+				System.out.println();
 			elem = sCurrentLine.split("\t");
 			for (String s : elem)
 				list.add(s);
 
 			CLUSTER.put("C" + cnt++, list);
-
 		}
 	}
 
@@ -347,4 +385,31 @@ public class CompareClusters {
 		}
 		return score;
 	}
+
+	@SuppressWarnings("resource")
+	private static void readMarkovClusters(String inflation, String output)
+			throws IOException {
+		int cnt = 0;
+		Scanner scan;
+		scan = new Scanner(new File((output)), "UTF-8");
+
+		List<String> list = null;
+
+		String sCurrentLine = null;
+		String[] elem = null;
+
+		double infl = Double.parseDouble(inflation);
+		while (scan.hasNextLine()) {
+			list = new ArrayList<String>();
+			sCurrentLine = scan.nextLine();
+			elem = sCurrentLine.split("\t");
+			for (String s : elem)
+				list.add(s);
+
+			CLUSTER.put("C" + cnt++, list);
+
+		}
+
+	}
+
 }

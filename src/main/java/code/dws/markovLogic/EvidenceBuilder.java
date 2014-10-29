@@ -21,6 +21,7 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import code.dws.core.cluster.analysis.CompareClusters;
 import code.dws.dbConnectivity.DBWrapper;
 import code.dws.query.SPARQLEndPointQueryAPI;
 import code.dws.utils.Constants;
@@ -64,12 +65,16 @@ public class EvidenceBuilder {
 
 		} else {
 			if (!Constants.WORKFLOW_NORMAL) {
-				// ReverbPropertyReNaming.main(new String[] { "" });
-				//
-				// // retrieve only the properties relavant to the given cluster
-				// // name
-				// this.propertyNames = ReverbPropertyReNaming
-				// .getReNamedProperties().get(args[0]);
+
+				CompareClusters.main(new String[] { "" });
+				logger.info("Optimal Inflation for workflow "
+						+ Constants.WORKFLOW + " = "
+						+ CompareClusters.getOptimalInflation());
+
+				// retrieve only the properties relevant to the given cluster
+				// name
+				this.propertyNames = CompareClusters.getCluster().get(args[0]);
+
 			} else {
 
 				this.propertyNames = new ArrayList<String>();
@@ -158,16 +163,20 @@ public class EvidenceBuilder {
 
 		} else { // FOr REVERB
 
+			logger.info("Reading file " + inputFile);
+
+			input = new BufferedReader(new InputStreamReader(
+					new FileInputStream(inputFile)));
+
+			oieLines = FileUtils.readLines(inputFile);
+
 			for (String prop : this.propertyNames) {
 
 				this.propertyName = prop;
 				logger.info("Creating evidence for " + this.propertyName);
-				input = new BufferedReader(new InputStreamReader(
-						new FileInputStream(inputFile)));
 
 				// iterate the file from OIE and process each triple at a time
 				long s1 = Utilities.startTimer();
-				oieLines = FileUtils.readLines(inputFile);
 
 				// while ((triple = input.readLine()) != null) {
 				for (String line : oieLines) {
