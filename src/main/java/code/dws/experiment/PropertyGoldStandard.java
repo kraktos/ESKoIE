@@ -12,8 +12,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Scanner;
@@ -43,7 +45,7 @@ public class PropertyGoldStandard {
 
 	public static int TOPK_REV_PROPS = 500;
 	private static String OIE_FILE_PATH = null;
-	private static THashMap<String, Long> COUNT_PROPERTY_INST = new THashMap<String, Long>();
+	private static Map<String, Long> COUNT_PROPERTY_INST = new HashMap<String, Long>();
 	private static THashMap<String, Long> EMPTY_PROPERTY_MAP = new THashMap<String, Long>();
 	private static THashMap<Long, Long> COUNT_FREQUENY = new THashMap<Long, Long>();
 
@@ -131,13 +133,13 @@ public class PropertyGoldStandard {
 	 * number of instances
 	 * 
 	 * @param OIE_FILE
-	 * @param TOPK_REV_PROPS
+	 * @param topKRevbProps
 	 * @param atLeastInstancesCount
 	 * 
 	 * @return List of properties
 	 */
 	public static List<String> getReverbProperties(String OIE_FILE,
-			int TOPK_REV_PROPS, Long atLeastInstancesCount) {
+			int topKRevbProps, Long atLeastInstancesCount) {
 
 		String line = null;
 		String[] arr = null;
@@ -168,10 +170,12 @@ public class PropertyGoldStandard {
 		COUNT_PROPERTY_INST = Utilities.sortByValue(COUNT_PROPERTY_INST,
 				atLeastInstancesCount);
 
+	
 		for (Entry<String, Long> e : COUNT_PROPERTY_INST.entrySet()) {
-			ret.add(e.getKey());
+			ret.add(e.getKey());			
+
 			c++;
-			if (TOPK_REV_PROPS != -1 && c == TOPK_REV_PROPS)
+			if (topKRevbProps != -1 && c == topKRevbProps)
 				return ret;
 		}
 

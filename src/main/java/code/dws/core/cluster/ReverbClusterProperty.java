@@ -350,7 +350,7 @@ public class ReverbClusterProperty {
 		long val = 0;
 		List<String> ret = new ArrayList<String>();
 		THashSet<ImmutablePair<String, String>> list = null;
-		THashMap<String, Long> COUNT_PROPERTY_INST = new THashMap<String, Long>();
+		Map<String, Long> COUNT_PROPERTY_INST = new HashMap<String, Long>();
 
 		try {
 			@SuppressWarnings("resource")

@@ -67,26 +67,35 @@ public class CompareClusters {
 	 */
 	public static void main(String[] args) throws IOException {
 
-		// uncomemnt for running this as stand alone mode
+		// uncomment for running this as stand alone mode
 		// Constants.loadConfigParameters(new String[] { "", args[0] });
 
+		Constants.SIMILARITY_FACTOR = 1.0;
+		Constants.OPTIMAL_INFLATION = 20;
 		if (Constants.WORKFLOW == 2) {
 			PAIR_SCORE_FILE = "src/main/resources/all.trvb.wordnet.sim.FULL.";
-			MCL_CLUSTERS_OUTPUT = "src/main/resources/reverb_All_mcl_";
+			// MCL_CLUSTERS_OUTPUT = "src/main/resources/reverb_All_mcl_";
+			MCL_CLUSTERS_OUTPUT = "src/main/resources/rev.cluster.20.out";
 			CLUSTER_INDICES = "src/main/resources/CLUSTER_SCORES_RVB."
 					+ Constants.SIMILARITY_FACTOR + ".tsv";
 		} else if (Constants.WORKFLOW == 3) {
 			PAIR_SCORE_FILE = "src/main/resources/FULL_PAIRS.";
-			MCL_CLUSTERS_OUTPUT = "src/main/resources/All_mcl_";
+			// MCL_CLUSTERS_OUTPUT = "src/main/resources/All_mcl_";
+			MCL_CLUSTERS_OUTPUT = "src/main/resources/rev.cluster.20.out";
 			CLUSTER_INDICES = "src/main/resources/CLUSTER_SCORES."
+					+ Constants.SIMILARITY_FACTOR + ".tsv";
+		} else { // test arbitrary file set
+			PAIR_SCORE_FILE = "/home/adutta/git/OIE-Integration/src/main/resources/input/COMBINED_SCORE.";
+			MCL_CLUSTERS_OUTPUT = "/home/adutta/git/OIE-Integration/src/main/resources/clusters/all.";
+			CLUSTER_INDICES = "/home/adutta/git/OIE-Integration/src/main/resources/clusters/CLUSTER_SCORES."
 					+ Constants.SIMILARITY_FACTOR + ".tsv";
 		}
 		if (Constants.OPTIMAL_INFLATION == 0) {
 			// load the pairwise scores of all relevant properties
 			logger.info("Loading " + PAIR_SCORE_FILE
-					+ Constants.SIMILARITY_FACTOR + ".csv");
+					+ Constants.SIMILARITY_FACTOR + ".tsv");
 
-			loadScores(PAIR_SCORE_FILE + Constants.SIMILARITY_FACTOR + ".csv",
+			loadScores(PAIR_SCORE_FILE + Constants.SIMILARITY_FACTOR + ".tsv",
 					"\t");
 
 			logger.info("Loaded " + SCORE_MAP.size() + " pairs");
@@ -101,8 +110,10 @@ public class CompareClusters {
 				+ Constants.SIMILARITY_FACTOR + "/rev.cluster."
 				+ Constants.OPTIMAL_INFLATION + ".out");
 
-		readMarkovClusters(MCL_CLUSTERS_OUTPUT + Constants.SIMILARITY_FACTOR
-				+ "/rev.cluster." + Constants.OPTIMAL_INFLATION + ".out");
+		// readMarkovClusters(MCL_CLUSTERS_OUTPUT + Constants.SIMILARITY_FACTOR
+		// + "/rev.cluster." + Constants.OPTIMAL_INFLATION + ".out");
+
+		readMarkovClusters(MCL_CLUSTERS_OUTPUT);
 	}
 
 	/**
@@ -192,7 +203,7 @@ public class CompareClusters {
 	}
 
 	@SuppressWarnings("resource")
-	private static void loadScores(String file, String delimit)
+	public static void loadScores(String file, String delimit)
 			throws FileNotFoundException {
 
 		String sCurrentLine;
@@ -232,7 +243,7 @@ public class CompareClusters {
 		while (scan.hasNextLine()) {
 			list = new ArrayList<String>();
 			sCurrentLine = scan.nextLine();
-			if(sCurrentLine.indexOf("is member of") != -1)
+			if (sCurrentLine.indexOf("is member of") != -1)
 				System.out.println();
 			elem = sCurrentLine.split("\t");
 			for (String s : elem)

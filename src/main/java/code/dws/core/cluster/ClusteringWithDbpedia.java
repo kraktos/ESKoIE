@@ -44,7 +44,7 @@ public class ClusteringWithDbpedia {
 
 	static BufferedWriter writerDbpProps = null;
 
-	static int k = -1; // ReverbClusterProperty.TOPK_REV_PROPS;
+	static int k = 100; // ReverbClusterProperty.TOPK_REV_PROPS;
 
 	/**
 	 * initialize writers.
@@ -98,7 +98,7 @@ public class ClusteringWithDbpedia {
 
 		logger.info("Writing sim scores to "
 				+ new File(Constants.OIE_DATA_PATH).getParent()
-				+ "/all.trvb.dbp." + k + ".pairwise.sim.csv");
+				+ "/dbp." + k + ".pairwise.sim.csv");
 
 		long start = Utilities.startTimer();
 

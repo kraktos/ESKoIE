@@ -4,8 +4,6 @@
 
 package code.dws.utils;
 
-import gnu.trove.map.hash.THashMap;
-
 import java.io.BufferedWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -313,16 +311,16 @@ public class Utilities {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static THashMap<String, Long> sortByValue(THashMap map, Long cutOff) {
+	public static Map sortByValue(Map map, Long cutOff) {
 		List list = new LinkedList(map.entrySet());
 		Collections.sort(list, new Comparator() {
-			public int compare(Object o2, Object o1) {
-				return ((Comparable) ((Map.Entry) (o1)).getValue())
-						.compareTo(((Map.Entry) (o2)).getValue());
+			public int compare(Object o1, Object o2) {
+				return ((Comparable) ((Map.Entry) (o2)).getValue())
+						.compareTo(((Map.Entry) (o1)).getValue());
 			}
 		});
 
-		THashMap result = new THashMap();
+		Map result = new LinkedHashMap();
 		for (Iterator it = list.iterator(); it.hasNext();) {
 			Map.Entry<String, Long> entry = (Map.Entry) it.next();
 			if (entry.getValue() >= cutOff)
