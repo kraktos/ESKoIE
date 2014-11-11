@@ -14,6 +14,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import antlr.collections.impl.Vector;
+import code.dws.core.cluster.vector.VectorCluster;
 import code.dws.experiment.evaluation.FactDao;
 import code.dws.markovLogic.EvidenceBuilder;
 import code.dws.utils.Constants;
@@ -154,6 +156,32 @@ public class DBWrapper {
 
 			while (rs.next()) {
 				types.add(rs.getString(1));
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return types;
+	}
+
+	/**
+	 * works for both somain and range
+	 * 
+	 * @param param
+	 * 
+	 * @return
+	 */
+	public static List<String> getOIEFeatures(String param) {
+		List<String> types = new ArrayList<String>();
+
+		try {
+			pstmt.setString(1, param);
+			ResultSet rs = pstmt.executeQuery();
+
+			while (rs.next()) {
+				types.add(rs.getString(1));
+				if (!VectorCluster.featureSpace.contains(rs.getString(1)))
+					VectorCluster.featureSpace.add(rs.getString(1));
 			}
 
 		} catch (SQLException e) {

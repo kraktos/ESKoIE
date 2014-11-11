@@ -85,9 +85,9 @@ public class CompareClusters {
 			CLUSTER_INDICES = "src/main/resources/CLUSTER_SCORES."
 					+ Constants.SIMILARITY_FACTOR + ".tsv";
 		} else { // test arbitrary file set
-			PAIR_SCORE_FILE = "/home/adutta/git/ESKoIE/src/main/resources/dbp.props.ALL.00.csv";
-			MCL_CLUSTERS_OUTPUT = "/home/adutta/git/ESKoIE/src/main/resources/DBP_All_mcl";
-			CLUSTER_INDICES = "/home/adutta/git/ESKoIE/src/main/resources/CLUSTER_SCORES."
+			PAIR_SCORE_FILE = "/home/adutta/git/ESKoIE/src/main/resources/dbp.-1.props.csv";
+			MCL_CLUSTERS_OUTPUT = "/home/adutta/git/ESKoIE/src/main/resources/oli_Clusters";
+			CLUSTER_INDICES = "/home/adutta/git/ESKoIE/src/main/resources/oli_Clusters/CLUSTER_SCORES."
 					+ Constants.SIMILARITY_FACTOR + ".tsv";
 		}
 		if (Constants.OPTIMAL_INFLATION == 0) {
