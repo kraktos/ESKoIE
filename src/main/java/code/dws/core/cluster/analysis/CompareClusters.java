@@ -68,10 +68,10 @@ public class CompareClusters {
 	public static void main(String[] args) throws IOException {
 
 		// uncomment for running this as stand alone mode
-		// Constants.loadConfigParameters(new String[] { "", args[0] });
+		Constants.loadConfigParameters(new String[] { "", args[0] });
 
-		Constants.SIMILARITY_FACTOR = 1.0;
-		Constants.OPTIMAL_INFLATION = 20;
+		// Constants.SIMILARITY_FACTOR = 1.0;
+		// Constants.OPTIMAL_INFLATION = 20;
 		if (Constants.WORKFLOW == 2) {
 			PAIR_SCORE_FILE = "src/main/resources/all.trvb.wordnet.sim.FULL.";
 			// MCL_CLUSTERS_OUTPUT = "src/main/resources/reverb_All_mcl_";
@@ -85,18 +85,16 @@ public class CompareClusters {
 			CLUSTER_INDICES = "src/main/resources/CLUSTER_SCORES."
 					+ Constants.SIMILARITY_FACTOR + ".tsv";
 		} else { // test arbitrary file set
-			PAIR_SCORE_FILE = "/home/adutta/git/OIE-Integration/src/main/resources/input/COMBINED_SCORE.";
-			MCL_CLUSTERS_OUTPUT = "/home/adutta/git/OIE-Integration/src/main/resources/clusters/all.";
-			CLUSTER_INDICES = "/home/adutta/git/OIE-Integration/src/main/resources/clusters/CLUSTER_SCORES."
+			PAIR_SCORE_FILE = "/home/adutta/git/ESKoIE/src/main/resources/dbp.props.ALL.00.csv";
+			MCL_CLUSTERS_OUTPUT = "/home/adutta/git/ESKoIE/src/main/resources/DBP_All_mcl";
+			CLUSTER_INDICES = "/home/adutta/git/ESKoIE/src/main/resources/CLUSTER_SCORES."
 					+ Constants.SIMILARITY_FACTOR + ".tsv";
 		}
 		if (Constants.OPTIMAL_INFLATION == 0) {
 			// load the pairwise scores of all relevant properties
-			logger.info("Loading " + PAIR_SCORE_FILE
-					+ Constants.SIMILARITY_FACTOR + ".tsv");
+			logger.info("Loading " + PAIR_SCORE_FILE					 );
 
-			loadScores(PAIR_SCORE_FILE + Constants.SIMILARITY_FACTOR + ".tsv",
-					"\t");
+			loadScores(PAIR_SCORE_FILE, "\t");
 
 			logger.info("Loaded " + SCORE_MAP.size() + " pairs");
 			scanAndWriteClusterScores();
@@ -107,13 +105,13 @@ public class CompareClusters {
 		}
 
 		logger.info("Generating Clusters from the file " + MCL_CLUSTERS_OUTPUT
-				+ Constants.SIMILARITY_FACTOR + "/rev.cluster."
-				+ Constants.OPTIMAL_INFLATION + ".out");
+				+ "/rev.cluster." + Constants.OPTIMAL_INFLATION + ".out");
 
 		// readMarkovClusters(MCL_CLUSTERS_OUTPUT + Constants.SIMILARITY_FACTOR
 		// + "/rev.cluster." + Constants.OPTIMAL_INFLATION + ".out");
 
-		readMarkovClusters(MCL_CLUSTERS_OUTPUT);
+		readMarkovClusters(MCL_CLUSTERS_OUTPUT + "/rev.cluster."
+				+ Constants.OPTIMAL_INFLATION + ".out");
 	}
 
 	/**
@@ -140,7 +138,7 @@ public class CompareClusters {
 		int inf = 0;
 
 		Path filePath = Paths.get(MCL_CLUSTERS_OUTPUT
-				+ Constants.SIMILARITY_FACTOR + "/");
+				 + "/");
 
 		BufferedWriter writer = new BufferedWriter(new FileWriter(
 				CLUSTER_INDICES));
@@ -155,7 +153,7 @@ public class CompareClusters {
 			public FileVisitResult visitFile(Path file,
 					BasicFileAttributes attrs) throws IOException {
 				if (file.toString().startsWith(
-						MCL_CLUSTERS_OUTPUT + Constants.SIMILARITY_FACTOR + "/"
+						MCL_CLUSTERS_OUTPUT  + "/"
 								+ "rev.cluster")
 						&& file.toString().endsWith(".out"))
 					files.add(file);
@@ -172,13 +170,10 @@ public class CompareClusters {
 				CLUSTER = new HashMap<String, List<String>>();
 				logger.info("Currently in location " + path + " .... ");
 
-				inf = Integer
-						.parseInt((path.toString()
-								.replaceAll(
-										MCL_CLUSTERS_OUTPUT
-												+ Constants.SIMILARITY_FACTOR
-												+ "/", "").replaceAll("[^\\d]",
-								"")));
+				inf = Integer.parseInt((path.toString().replaceAll(
+						MCL_CLUSTERS_OUTPUT
+
+						+ "/", "").replaceAll("[^\\d]", "")));
 
 				readMarkovClusters(path.toString());
 				mclIndex = computeClusterIndex(CLUSTER);

@@ -411,4 +411,26 @@ public class Utilities {
 		return retStr;
 	}
 
+	/**
+	 * extended splitter to take care of data type properties with
+	 * /ontologu/A/prop structure
+	 * 
+	 * @param arg
+	 * @return
+	 */
+	public static String splitAtCapitalsExt(String arg) {
+		String retStr = "";
+		if (arg.indexOf("/") != -1) {
+			arg = arg.substring(arg.lastIndexOf("/") + 1, arg.length());
+		}
+		for (int i = 0; i < arg.length(); i++) {
+			char c = arg.charAt(i);
+			if (Character.isUpperCase(c)) {
+				retStr = retStr + " " + c;
+			} else {
+				retStr = retStr + c;
+			}
+		}
+		return retStr;
+	}
 }

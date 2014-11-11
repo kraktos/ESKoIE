@@ -33,8 +33,10 @@ import code.dws.wordnet.SimilatityWebService;
  */
 public class ClusteringWithDbpedia {
 
-	public static final String QUERY = "select distinct ?val where {?val <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty>} ";
+	public static final String QUERY_OBJECTTYPE = "select distinct ?val where {?val <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty>} ";
+	public static final String QUERY_DATATYPE = "select distinct ?val where {?val <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty>} ";
 
+	public static String QUERY = null;
 	/**
 	 * logger
 	 */
@@ -44,19 +46,20 @@ public class ClusteringWithDbpedia {
 
 	static BufferedWriter writerDbpProps = null;
 
-	static int k = 100; // ReverbClusterProperty.TOPK_REV_PROPS;
+	static int k = -1; // ReverbClusterProperty.TOPK_REV_PROPS;
 
 	/**
 	 * initialize writers.
 	 */
 	private static void init() {
 		try {
+			QUERY = QUERY_DATATYPE;
 
 			writerDbpProps = new BufferedWriter(new FileWriter(new File(
 					Constants.OIE_DATA_PATH).getParent()
 					+ "/dbp."
 					+ k
-					+ ".objects.csv"));
+					+ ".props.csv"));
 
 		} catch (IOException e) {
 			logger.error(e.getMessage());
@@ -79,8 +82,8 @@ public class ClusteringWithDbpedia {
 
 		String arg1 = null;
 		String arg2 = null;
-		String targ1 = null;
-		String targ2 = null;
+		String oArg1 = null;
+		String oArg2 = null;
 		long starTime = 0;
 		long cntr = 0;
 		PairDto resultPair = null;
@@ -96,9 +99,7 @@ public class ClusteringWithDbpedia {
 
 		logger.info("Loaded " + dbpProps.size() + " DBpedia properties");
 
-		logger.info("Writing sim scores to "
-				+ new File(Constants.OIE_DATA_PATH).getParent()
-				+ "/dbp." + k + ".pairwise.sim.csv");
+		logger.info("Writing sim scores to " + writerDbpProps);
 
 		long start = Utilities.startTimer();
 
@@ -107,7 +108,7 @@ public class ClusteringWithDbpedia {
 				: Constants.THREAD_MAX_POOL_SIZE;
 
 		int SIZE = dbpProps.size();
-		
+
 		ExecutorService executorPool = Executors.newFixedThreadPool(cores);
 		ExecutorCompletionService<PairDto> completionService = new ExecutorCompletionService<PairDto>(
 				executorPool);
@@ -121,17 +122,23 @@ public class ClusteringWithDbpedia {
 			for (int outer = 0; outer < SIZE; outer++) {
 
 				// get the first operand
-				targ1 = dbpProps.get(outer);
-				arg1 = Utilities.splitAtCapitals(targ1);
+				oArg1 = dbpProps.get(outer);
+				if (QUERY.equals(QUERY_OBJECTTYPE))
+					arg1 = Utilities.splitAtCapitals(oArg1);
+				else
+					arg1 = Utilities.splitAtCapitalsExt(oArg1);
 
 				for (int inner = outer + 1; inner < SIZE; inner++) {
 
-					targ2 = dbpProps.get(inner);
-					arg2 = Utilities.splitAtCapitals(dbpProps.get(inner));
+					oArg2 = dbpProps.get(inner);
+					if (QUERY.equals(QUERY_OBJECTTYPE))
+						arg2 = Utilities.splitAtCapitals(oArg2);
+					else
+						arg2 = Utilities.splitAtCapitalsExt(oArg2);
 
 					// submit task to a thread
-					taskList.add(completionService
-							.submit(new Worker(arg1, arg2)));
+					taskList.add(completionService.submit(new Worker(arg1,
+							arg2, oArg1, oArg2)));
 
 				}
 			}

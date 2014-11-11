@@ -99,7 +99,7 @@ public class SPARQLEndPointQueryAPI {
 
 		// trying ENDPOINT 1
 		qexec = QueryExecutionFactory.sparqlService(
-				Constants.DBPEDIA_SPARQL_ENDPOINT_LOCAL, query);
+				Constants.DBPEDIA_SPARQL_ENDPOINT, query);
 		try {
 			// get the result set
 			results = qexec.execSelect();
@@ -108,7 +108,7 @@ public class SPARQLEndPointQueryAPI {
 			try {
 				// trying ENDPOINT 2
 				qexec = QueryExecutionFactory.sparqlService(
-						Constants.DBPEDIA_SPARQL_ENDPOINT, query);
+						Constants.DBPEDIA_SPARQL_ENDPOINT_LOCAL, query);
 				results = qexec.execSelect();
 
 			} catch (Exception ee) {
@@ -373,22 +373,22 @@ public class SPARQLEndPointQueryAPI {
 	 * @return
 	 */
 	public static List<String> loadDbpediaProperties(long topKDBPediaProperties) {
-	
+
 		String prop = null;
 		String cnt = "0";
 		int c = 0;
-	
+
 		List<String> retS = new ArrayList<String>();
-	
+
 		Map<String, Long> props = new HashMap<String, Long>();
-	
+
 		List<QuerySolution> count = null;
-	
+
 		List<QuerySolution> dbpObjProps = queryDBPediaEndPoint(ClusteringWithDbpedia.QUERY);
-	
+
 		for (QuerySolution querySol : dbpObjProps) {
 			prop = querySol.get("val").toString();
-	
+
 			if ((prop.indexOf(Constants.DBPEDIA_PREDICATE_NS) != -1)
 					&& (prop.indexOf("wikiPageWikiLink") == -1)
 					&& (prop.indexOf("wikiPageExternalLink") == -1)
@@ -396,31 +396,37 @@ public class SPARQLEndPointQueryAPI {
 					&& (prop.indexOf("thumbnail") == -1)
 					&& (prop.indexOf("wikiPageDisambiguates") == -1)
 					&& (prop.indexOf("wikiPageInterLanguageLink") == -1)) {
-	
-				count = queryDBPediaEndPoint("select (count(*)  as ?val)  where {?a <"
-								+ prop + "> ?c} ");
-	
-				for (QuerySolution sol : count) {
-					cnt = sol.get("val").toString();
+
+				if (topKDBPediaProperties != -1) {
+					count = queryDBPediaEndPoint("select (count(*)  as ?val)  where {?a <"
+							+ prop + "> ?c} ");
+					for (QuerySolution sol : count) {
+						cnt = sol.get("val").toString();
+					}
+					cnt = cnt.substring(0, cnt.indexOf("^"));
+					props.put(
+							prop.replaceAll(Constants.DBPEDIA_PREDICATE_NS, ""),
+							Long.parseLong(cnt));
+				} else {
+					retS.add(prop
+							.replaceAll(Constants.DBPEDIA_PREDICATE_NS, ""));
 				}
-				cnt = cnt.substring(0, cnt.indexOf("^"));
-				props.put(prop.replaceAll(Constants.DBPEDIA_PREDICATE_NS, ""),
-						Long.parseLong(cnt));
 			}
 		}
-	
+
 		// sort only when interested in top-k, else makes no sense
-		if (topKDBPediaProperties != -1)
+		if (topKDBPediaProperties != -1) {
 			props = Utilities.sortByValue(props);
-	
-		for (Entry<String, Long> e : props.entrySet()) {
-			retS.add(e.getKey());
-	
-			c++;
-			if (c == topKDBPediaProperties)
-				return retS;
+
+			for (Entry<String, Long> e : props.entrySet()) {
+				retS.add(e.getKey());
+
+				c++;
+				if (c == topKDBPediaProperties)
+					return retS;
+			}
 		}
-	
+
 		return retS;
 	}
 
