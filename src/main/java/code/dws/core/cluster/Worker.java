@@ -20,8 +20,8 @@ public class Worker implements Callable<PairDto> {
 	private String originalArg2;
 
 	public Worker(String arg1, String arg2) {
-		this.arg1 = arg1;
-		this.arg2 = arg2;
+		this.originalArg1 = arg1;
+		this.originalArg2 = arg2;
 	}
 
 	public Worker(String arg1, String arg2, String originalArg1,
