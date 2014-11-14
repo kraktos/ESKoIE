@@ -24,7 +24,6 @@ import org.grouplens.lenskit.vectors.MutableSparseVector;
 import org.grouplens.lenskit.vectors.SparseVector;
 import org.grouplens.lenskit.vectors.similarity.CosineVectorSimilarity;
 
-import code.dws.core.cluster.PairDto;
 import code.dws.dbConnectivity.DBWrapper;
 import code.dws.utils.Constants;
 import code.dws.utils.Utilities;
@@ -38,6 +37,9 @@ import code.dws.utils.Utilities;
 public class VectorCluster {
 	public static final Map<String, MutableSparseVector> DOMAIN_FEATURE_GLOBAL_MATRIX = new HashMap<String, MutableSparseVector>();
 	public static final Map<String, MutableSparseVector> RANGE_FEATURE_GLOBAL_MATRIX = new HashMap<String, MutableSparseVector>();
+
+	public static final Map<String, Map<Integer, Double>> DOMAIN_FEATURE_MATRIX = new HashMap<String, Map<Integer, Double>>();
+	public static final Map<String, Map<Integer, Double>> RANGE_FEATURE_MATRIX = new HashMap<String, Map<Integer, Double>>();
 
 	// define Logger
 	public static Logger logger = Logger.getLogger(VectorCluster.class
@@ -71,7 +73,7 @@ public class VectorCluster {
 		long start = Utilities.startTimer();
 
 		// do the pairwise scoring for each pairs of OIE properties
-		doPairwiseScoring();
+		// doPairwiseScoring();
 		Utilities.endTimer(start, "Completed scoring " + oieProps.size()
 				+ " properties in ");
 	}
@@ -191,8 +193,10 @@ public class VectorCluster {
 	 */
 	private static void createFeatureVectors() {
 		try {
-			getFeatures(Constants.GET_DOMAINS, DOMAIN_FEATURE_GLOBAL_MATRIX);
-			getFeatures(Constants.GET_RANGES, RANGE_FEATURE_GLOBAL_MATRIX);
+			getFeatures(Constants.GET_DOMAINS, DOMAIN_FEATURE_GLOBAL_MATRIX,
+					DOMAIN_FEATURE_MATRIX);
+			getFeatures(Constants.GET_RANGES, RANGE_FEATURE_GLOBAL_MATRIX,
+					RANGE_FEATURE_MATRIX);
 
 		} catch (Exception e) {
 			logger.error("Problem with readOIEFile");
@@ -207,9 +211,11 @@ public class VectorCluster {
 	 * 
 	 * @param sql
 	 * @param globalMAtrix
+	 * @param domainFeatureMatrix
 	 */
 	private static void getFeatures(String sql,
-			Map<String, MutableSparseVector> globalMAtrix) {
+			Map<String, MutableSparseVector> globalMAtrix,
+			Map<String, Map<Integer, Double>> featureMatrix) {
 
 		Long featureID = null;
 		double score = 0;
@@ -218,29 +224,39 @@ public class VectorCluster {
 		DBWrapper.init(sql);
 
 		List<String> features;
-		Map<Long, Double> featureIdVsScore = null;
+		Map<Long, Double> lnFeatureIdVsScore = null;
+		Map<Integer, Double> intFeatureIdVsScore = null;
 
 		for (String prop : oieProps) {
-			featureIdVsScore = new HashMap<Long, Double>();
+			lnFeatureIdVsScore = new HashMap<Long, Double>();
+			intFeatureIdVsScore = new HashMap<Integer, Double>();
 
 			features = DBWrapper.getOIEFeatures(prop);
 			for (String feature : features) {
 				featureID = new Long(featureSpace.indexOf(feature));
 
-				if (featureIdVsScore.containsKey(featureID)) {
-					score = featureIdVsScore.get(featureID);
-					score = score + 1;
-				} else {
-					score = 1;
+				if (!lnFeatureIdVsScore.containsKey(featureID)) {
+					lnFeatureIdVsScore.put(featureID, 1D);
+					intFeatureIdVsScore.put(
+							new Integer(featureSpace.indexOf(feature)), 1D);
 				}
-				featureIdVsScore.put(featureID, score);
 			}
 			// put in the global matrix
-			globalMAtrix
-					.put(prop, MutableSparseVector.create(featureIdVsScore));
+			globalMAtrix.put(prop,
+					MutableSparseVector.create(lnFeatureIdVsScore));
 
+			featureMatrix.put(prop, intFeatureIdVsScore);
 		}
 		DBWrapper.shutDown();
+	}
+
+	/**
+	 * get the size of oie properties
+	 * 
+	 * @return
+	 */
+	public static int getDataSize() {
+		return oieProps.size();
 	}
 
 	/**

@@ -26,7 +26,8 @@ public class Constants {
 
 	public static long WORKFLOW = 0;
 
-	public static DecimalFormat formatter = new DecimalFormat("###.############");
+	public static DecimalFormat formatter = new DecimalFormat(
+			"###.############");
 
 	public static String DBPEDIA_TBOX;
 
@@ -180,9 +181,9 @@ public class Constants {
 
 	public static final String GET_REFINED_FACT = "select DBP_SUB, DBP_OBJ from OIE_REFINED where OIE_SUB=? and OIE_PRED=? and OIE_OBJ=?";
 
-	public static final String GET_DOMAINS = "select  d.INSTANCE_TYPE from OIE_REFINED n JOIN DBPEDIA_TYPES d ON n.DBP_SUB=d.DBPEDIA_INSTANCE where OIE_PRED =?";
+	public static final String GET_DOMAINS = "select distinct  d.INSTANCE_TYPE from OIE_REFINED n JOIN DBPEDIA_TYPES d ON n.DBP_SUB=d.DBPEDIA_INSTANCE where OIE_PRED =?";
 
-	public static final String GET_RANGES = "select  d.INSTANCE_TYPE from OIE_REFINED n JOIN DBPEDIA_TYPES d ON n.DBP_OBJ=d.DBPEDIA_INSTANCE where OIE_PRED =?";
+	public static final String GET_RANGES = "select distinct  d.INSTANCE_TYPE from OIE_REFINED n JOIN DBPEDIA_TYPES d ON n.DBP_OBJ=d.DBPEDIA_INSTANCE where OIE_PRED =?";
 
 	public static int HTTP_CONN_MAX_TOTAL = 0;
 
