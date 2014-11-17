@@ -4,14 +4,13 @@
 package code.dws.core.cluster.vector;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
-import code.dws.utils.Utilities;
 import net.sf.javaml.clustering.Clusterer;
-import net.sf.javaml.clustering.KMeans;
+import net.sf.javaml.clustering.KMedoids;
 import net.sf.javaml.core.Dataset;
 import net.sf.javaml.core.DefaultDataset;
 import net.sf.javaml.core.Instance;
@@ -19,9 +18,13 @@ import net.sf.javaml.core.SparseInstance;
 import net.sf.javaml.distance.CosineSimilarity;
 import net.sf.javaml.distance.DistanceMeasure;
 
+import org.apache.log4j.Logger;
+
+import code.dws.utils.Utilities;
+
 /**
  * This is an alternate way of clustering the OIE properties. Here we use the
- * K-Means clustering scheme
+ * K-Mediods clustering scheme
  * 
  * @author adutta
  *
@@ -36,8 +39,11 @@ public class KMeansClustering {
 	private static int NO_OF_ITERATIONS = 0;
 
 	private static Map<Instance, String> INSTANCE_TO_PROPERTY_MAP = new HashMap<Instance, String>();
+	public static Map<String, List<String>> CLUSTERS = new HashMap<String, List<String>>();
 
 	private static int dataSize;
+
+	static Dataset[] datasets;
 
 	/**
 	 * @param args
@@ -45,34 +51,27 @@ public class KMeansClustering {
 	 */
 	public static void main(String[] args) throws IOException {
 
-		Instance inst = null;
-		String oieProp = null;
-
-		long start = System.currentTimeMillis();
-
 		VectorCluster
 				.main(new String[] { "/home/adutta/git/ESKoIE/CONFIG.cfg" });
 
 		// parameter setting
-		dataSize = 10;// VectorCluster.getDataSize();
-		NO_OF_CLUSTERS = (int) Math.ceil(0.3 * dataSize) + 2;
-		NO_OF_ITERATIONS = 5;
+		dataSize = VectorCluster.getDataSize();
+		NO_OF_CLUSTERS = (int) Math.ceil(0.3 * dataSize);
+		NO_OF_ITERATIONS = 80;
 
 		// get the data set
 		Dataset data = getDataSet();
-		logger.info("Added " + data.size() + " data instances");
+		logger.debug("Added " + data.size() + " data instances");
 
 		// get the distance measure
-		DistanceMeasure dm = getDistanceMeasure();
+		DistanceMeasure dm = getDistanceMeasure(data);
 
-		Clusterer km = new KMeans(NO_OF_CLUSTERS, NO_OF_ITERATIONS, dm);
-		logger.info("Performing K-Means with " + NO_OF_CLUSTERS + " clusters");
+		Clusterer km = new KMedoids(NO_OF_CLUSTERS, NO_OF_ITERATIONS, dm);
+		logger.debug("Performing K-Means with " + NO_OF_CLUSTERS + " clusters");
 
 		// make a recursive call
-
 		getRecursivelyDatasets(data, km);
 
-		Utilities.endTimer(start, "Finished clustering in ");
 	}
 
 	/**
@@ -85,33 +84,36 @@ public class KMeansClustering {
 	private static void getRecursivelyDatasets(Dataset ds, Clusterer km) {
 		Instance inst = null;
 		String oieProp = null;
+		long start = System.currentTimeMillis();
+		List<String> clusterElems = null;
+
+		int elemCntr = 0;
 		try {
-			Dataset[] datasets = km.cluster(ds);
+			datasets = km.cluster(ds);
 
 			for (int clusterCount = 0; clusterCount < datasets.length; clusterCount++) {
-				Dataset cluster = datasets[clusterCount];
+				elemCntr++;
 				
-				if (cluster.size() > 2) { // clustering possible further
-					getRecursivelyDatasets(cluster, km);
-				} else { // no more sub clustering..print it out
-					// each data set has multiple instances,
-					for (int dsCntr = 0; dsCntr < cluster.size(); dsCntr++) {
-						inst = cluster.instance(dsCntr);
-						oieProp = INSTANCE_TO_PROPERTY_MAP.get(inst);
-						System.out.print(oieProp + "\t");
-					}
+				Dataset cluster = datasets[clusterCount];
+				clusterElems = new ArrayList<String>();
+
+				for (int dsCntr = 0; dsCntr < cluster.size(); dsCntr++) {
+					inst = cluster.instance(dsCntr);
+					oieProp = INSTANCE_TO_PROPERTY_MAP.get(inst);
+
+					clusterElems.add(oieProp);
 				}
-
-				System.out.println("\n");
+				// put it into collection
+				CLUSTERS.put("C" + elemCntr, clusterElems);
 			}
-
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-		}		
-		return;
+		}
+
+		// Utilities.endTimer(start, "Finished clustering in ");
 	}
 
-	private static DistanceMeasure getDistanceMeasure() {
+	private static DistanceMeasure getDistanceMeasure(Dataset data) {
 		return new CosineSimilarity();
 	}
 

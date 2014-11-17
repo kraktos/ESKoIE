@@ -64,11 +64,11 @@ public class VectorCluster {
 		DBWrapper.init(Constants.GET_FULLY_MAPPED_OIE_PROPS_SQL);
 		oieProps = DBWrapper.getFullyMappedFacts();
 
-		logger.info("Loaded " + oieProps.size() + " OIE properties");
+		logger.debug("Loaded " + oieProps.size() + " OIE properties");
 
 		// generate feature vectors for the domain and range
 		createFeatureVectors();
-		logger.info("Created domain and range feature vector");
+		logger.debug("Created domain and range feature vector");
 
 		long start = Utilities.startTimer();
 
