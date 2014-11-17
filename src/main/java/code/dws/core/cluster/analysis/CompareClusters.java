@@ -85,19 +85,23 @@ public class CompareClusters {
 			CLUSTER_INDICES = "src/main/resources/CLUSTER_SCORES."
 					+ Constants.SIMILARITY_FACTOR + ".tsv";
 		} else { // test arbitrary file set
-			PAIR_SCORE_FILE = "/home/adutta/git/ESKoIE/src/main/resources/dbp.-1.props.csv";
-			MCL_CLUSTERS_OUTPUT = "/home/adutta/git/ESKoIE/src/main/resources/oli_Clusters";
+			PAIR_SCORE_FILE = "/home/adutta/git/ESKoIE/src/main/resources/rvb.vector.sim.csv";
+			MCL_CLUSTERS_OUTPUT = "/home/adutta/git/ESKoIE/src/main/resources/vector_Clusters/KMEDIOD_CLUSTERS.csv";
 			CLUSTER_INDICES = "/home/adutta/git/ESKoIE/src/main/resources/oli_Clusters/CLUSTER_SCORES."
 					+ Constants.SIMILARITY_FACTOR + ".tsv";
 		}
 		if (Constants.OPTIMAL_INFLATION == 0) {
 			// load the pairwise scores of all relevant properties
-			logger.info("Loading " + PAIR_SCORE_FILE					 );
+			logger.info("Loading " + PAIR_SCORE_FILE);
 
+			// load the pairwise score file in memory
 			loadScores(PAIR_SCORE_FILE, "\t");
-
 			logger.info("Loaded " + SCORE_MAP.size() + " pairs");
-			scanAndWriteClusterScores();
+
+			if (false)
+				scanAndWriteClusterScores();
+			else
+				getClusterScore();
 
 			logger.info("Optimal Inflation at Threshold "
 					+ Constants.SIMILARITY_FACTOR + " is = "
@@ -109,9 +113,22 @@ public class CompareClusters {
 
 		// readMarkovClusters(MCL_CLUSTERS_OUTPUT + Constants.SIMILARITY_FACTOR
 		// + "/rev.cluster." + Constants.OPTIMAL_INFLATION + ".out");
-
+		//
 		readMarkovClusters(MCL_CLUSTERS_OUTPUT + "/rev.cluster."
 				+ Constants.OPTIMAL_INFLATION + ".out");
+	}
+
+	private static void getClusterScore() {
+		try {
+			CLUSTER = new HashMap<String, List<String>>();
+			readMarkovClusters(MCL_CLUSTERS_OUTPUT);
+			double mclIndex = computeClusterIndex(CLUSTER);
+			System.out.println(mclIndex);
+
+		} catch (IOException e) {
+			logger.error("Error in getClusterScore()");
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -137,8 +154,7 @@ public class CompareClusters {
 		double mclIndex = 0;
 		int inf = 0;
 
-		Path filePath = Paths.get(MCL_CLUSTERS_OUTPUT
-				 + "/");
+		Path filePath = Paths.get(MCL_CLUSTERS_OUTPUT + "/");
 
 		BufferedWriter writer = new BufferedWriter(new FileWriter(
 				CLUSTER_INDICES));
@@ -153,8 +169,7 @@ public class CompareClusters {
 			public FileVisitResult visitFile(Path file,
 					BasicFileAttributes attrs) throws IOException {
 				if (file.toString().startsWith(
-						MCL_CLUSTERS_OUTPUT  + "/"
-								+ "rev.cluster")
+						MCL_CLUSTERS_OUTPUT + "/" + "rev.cluster")
 						&& file.toString().endsWith(".out"))
 					files.add(file);
 				return FileVisitResult.CONTINUE;
@@ -238,8 +253,7 @@ public class CompareClusters {
 		while (scan.hasNextLine()) {
 			list = new ArrayList<String>();
 			sCurrentLine = scan.nextLine();
-			if (sCurrentLine.indexOf("is member of") != -1)
-				System.out.println();
+
 			elem = sCurrentLine.split("\t");
 			for (String s : elem)
 				list.add(s);

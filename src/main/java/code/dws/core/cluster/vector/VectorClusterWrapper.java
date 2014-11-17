@@ -1,5 +1,7 @@
 package code.dws.core.cluster.vector;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +13,7 @@ import org.apache.log4j.Logger;
 
 public class VectorClusterWrapper {
 
+	private static final String MEDIOD_CLUSTERS_OP = "/home/adutta/git/ESKoIE/src/main/resources/vector_Clusters/KMEDIOD_CLUSTERS.";
 	// define Logger
 	public static Logger logger = Logger.getLogger(KMeansClustering.class
 			.getName());
@@ -21,21 +24,35 @@ public class VectorClusterWrapper {
 		int iOpt = 0;
 		Map<String, List<String>> CLUSTERS = null;
 
-		for (int i = 0; i < 300; i++) {
-			KMeansClustering.main(new String[] { "" });
-			tScore = new SumOfSquaredErrors().score(KMeansClustering.datasets);
-			logger.info("Score at " + i + " = " + tScore);
-			if (tScore < score) {
-				CLUSTERS = new HashMap<String, List<String>>();
-				score = tScore;
-				iOpt = i;
-				CLUSTERS = KMeansClustering.CLUSTERS;
-			}
-		}
+		BufferedWriter writer = null;
 
-		logger.info("best so far at " + iOpt);
-		for (Map.Entry<String, List<String>> e : CLUSTERS.entrySet()) {
-			logger.info(e.getKey() + " \t" + e.getValue());
-		}
+		for (int noOfClusters = 10; noOfClusters < 82; noOfClusters++) {
+
+			writer = new BufferedWriter(new FileWriter(MEDIOD_CLUSTERS_OP
+					+ noOfClusters + ".out"));
+
+			for (int i = 0; i < 50; i++) {
+				KMeansClustering.main(new String[] { String
+						.valueOf(noOfClusters) });
+				tScore = new SumOfSquaredErrors()
+						.score(KMeansClustering.datasets);
+				logger.info("Score at " + i + " = " + tScore);
+				if (tScore < score) {
+					CLUSTERS = new HashMap<String, List<String>>();
+					score = tScore;
+					iOpt = i;
+					CLUSTERS = KMeansClustering.CLUSTERS;
+				}
+			}
+			// logger.info("best far " + noOfClusters + " at " + iOpt);
+			for (Map.Entry<String, List<String>> e : CLUSTERS.entrySet()) {
+				for (String elem : e.getValue()) {
+					writer.write(elem + "\t");
+				}
+				writer.write("\n");
+			}
+
+			writer.flush();
+		} // end of for outer loop
 	}
 }

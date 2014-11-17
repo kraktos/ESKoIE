@@ -56,7 +56,7 @@ public class KMeansClustering {
 
 		// parameter setting
 		dataSize = VectorCluster.getDataSize();
-		NO_OF_CLUSTERS = (int) Math.ceil(0.3 * dataSize);
+		NO_OF_CLUSTERS = (int) Math.ceil(Integer.valueOf(args[0]));
 		NO_OF_ITERATIONS = 80;
 
 		// get the data set
@@ -93,7 +93,7 @@ public class KMeansClustering {
 
 			for (int clusterCount = 0; clusterCount < datasets.length; clusterCount++) {
 				elemCntr++;
-				
+
 				Dataset cluster = datasets[clusterCount];
 				clusterElems = new ArrayList<String>();
 
