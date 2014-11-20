@@ -86,8 +86,8 @@ public class CompareClusters {
 					+ Constants.SIMILARITY_FACTOR + ".tsv";
 		} else { // test arbitrary file set
 			PAIR_SCORE_FILE = "/home/adutta/git/ESKoIE/src/main/resources/rvb.vector.sim.csv";
-			MCL_CLUSTERS_OUTPUT = "/home/adutta/git/ESKoIE/src/main/resources/vector_Clusters/KMEDIOD_CLUSTERS.csv";
-			CLUSTER_INDICES = "/home/adutta/git/ESKoIE/src/main/resources/oli_Clusters/CLUSTER_SCORES."
+			MCL_CLUSTERS_OUTPUT = "/home/adutta/git/ESKoIE/src/main/resources/vector_Clusters";
+			CLUSTER_INDICES = "/home/adutta/git/ESKoIE/src/main/resources/vector_Clusters/CLUSTER_SCORES."
 					+ Constants.SIMILARITY_FACTOR + ".tsv";
 		}
 		if (Constants.OPTIMAL_INFLATION == 0) {
@@ -98,7 +98,7 @@ public class CompareClusters {
 			loadScores(PAIR_SCORE_FILE, "\t");
 			logger.info("Loaded " + SCORE_MAP.size() + " pairs");
 
-			if (false)
+			if (true)
 				scanAndWriteClusterScores();
 			else
 				getClusterScore();
@@ -114,7 +114,7 @@ public class CompareClusters {
 		// readMarkovClusters(MCL_CLUSTERS_OUTPUT + Constants.SIMILARITY_FACTOR
 		// + "/rev.cluster." + Constants.OPTIMAL_INFLATION + ".out");
 		//
-		readMarkovClusters(MCL_CLUSTERS_OUTPUT + "/rev.cluster."
+		readMarkovClusters(MCL_CLUSTERS_OUTPUT + "/KMEDIOD_CLUSTERS."
 				+ Constants.OPTIMAL_INFLATION + ".out");
 	}
 
@@ -169,7 +169,7 @@ public class CompareClusters {
 			public FileVisitResult visitFile(Path file,
 					BasicFileAttributes attrs) throws IOException {
 				if (file.toString().startsWith(
-						MCL_CLUSTERS_OUTPUT + "/" + "rev.cluster")
+						MCL_CLUSTERS_OUTPUT+"/KMEDIOD_CLUSTERS")
 						&& file.toString().endsWith(".out"))
 					files.add(file);
 				return FileVisitResult.CONTINUE;
