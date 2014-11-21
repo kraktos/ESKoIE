@@ -12,77 +12,78 @@ import code.dws.dbConnectivity.DBWrapper;
 import code.dws.query.SPARQLEndPointQueryAPI;
 import code.dws.utils.Constants;
 
-public class PairSplitter {
+public class PairSplitter
+{
 
-	// define Logger
-	public static Logger logger = Logger
-			.getLogger(PairSplitter.class.getName());
+    // define Logger
+    public static Logger logger = Logger.getLogger(PairSplitter.class.getName());
 
-	private static List<String> revbProps = null;
+    private static List<String> revbProps = null;
 
-	public static void main(String[] args) {
+    public static void main(String[] args)
+    {
 
-		Constants.loadConfigParameters(new String[] { "", args[0] });
+        Constants.loadConfigParameters(new String[] {"", args[0]});
 
-		int cnt = 1;
-		int node = 5;
-		String arg1 = null;
-		String arg2 = null;
+        int cnt = 1;
+        int node = 5;
+        String arg1 = null;
+        String arg2 = null;
 
-		BufferedWriter pairNode1 = null;
+        BufferedWriter pairNode1 = null;
 
-		// only f+ properties
-		DBWrapper.init(Constants.GET_FULLY_MAPPED_OIE_PROPS_SQL);
-		revbProps = DBWrapper.getFullyMappedFacts();
+        // only f+ properties
+        DBWrapper.init(Constants.GET_FULLY_MAPPED_OIE_PROPS_SQL);
+        revbProps = DBWrapper.getFullyMappedFacts();
 
-		logger.info("Loaded " + revbProps.size() + " OIE properties");
+        logger.info("Loaded " + revbProps.size() + " OIE properties");
 
-		List<String> dbpProps = null;
+        List<String> dbpProps = null;
 
-		// call to retrieve DBPedia owl object property
-		dbpProps = SPARQLEndPointQueryAPI.loadDbpediaProperties(-1);
+        // call to retrieve DBPedia owl object property
+        dbpProps = SPARQLEndPointQueryAPI.loadDbpediaProperties(-1, Constants.QUERY_OBJECTTYPE);
 
-		logger.info("Loaded " + dbpProps.size() + " DBpedia properties");
+        logger.info("Loaded " + dbpProps.size() + " DBpedia properties");
 
-//		revbProps.addAll(dbpProps);
-		try {
+        // revbProps.addAll(dbpProps);
+        try {
 
-			pairNode1 = new BufferedWriter(new FileWriter(new File(
-					Constants.OIE_DATA_PATH).getParent() + "/pairNodeAll.csv"));
+            pairNode1 =
+                new BufferedWriter(new FileWriter(new File(Constants.OIE_DATA_PATH).getParent() + "/pairNodeAll.csv"));
 
-			for (int outerIdx = 0; outerIdx < revbProps.size(); outerIdx++) {
+            for (int outerIdx = 0; outerIdx < revbProps.size(); outerIdx++) {
 
-				arg1 = revbProps.get(outerIdx);
+                arg1 = revbProps.get(outerIdx);
 
-				for (int innerIdx = 0; innerIdx < dbpProps.size(); innerIdx++) {
+                for (int innerIdx = 0; innerIdx < dbpProps.size(); innerIdx++) {
 
-					arg2 = dbpProps.get(innerIdx);
+                    arg2 = dbpProps.get(innerIdx);
 
-					pairNode1.write(arg1 + "\t" + arg2 + "\n");
+                    pairNode1.write(arg1 + "\t" + arg2 + "\n");
 
-					cnt++;
-				}
+                    cnt++;
+                }
 
-				pairNode1.flush();
-			}
+                pairNode1.flush();
+            }
 
-		} catch (IOException e) {
+        } catch (IOException e) {
 
-		} finally {
-			try {
-				if (pairNode1 != null)
-					pairNode1.close();
+        } finally {
+            try {
+                if (pairNode1 != null)
+                    pairNode1.close();
 
-				// pairNode2.close();
-				// pairNode3.close();
-				//
-				// pairNode4.close();
-				// pairNode5.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+                // pairNode2.close();
+                // pairNode3.close();
+                //
+                // pairNode4.close();
+                // pairNode5.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-		}
+        }
 
-	}
+    }
 }

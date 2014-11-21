@@ -16,308 +16,314 @@ import java.util.Set;
  * 
  * @author Arnab Dutta
  */
-public class Constants {
+public class Constants
+{
 
-	public static enum OIE {
-		NELL, REVERB
-	}
+    public static enum OIE
+    {
+        NELL,
+        REVERB
+    }
 
-	public static long TIMEOUT_MINS = 0;
+    public static final String QUERY_DATATYPE =
+        "select distinct ?val where {?val <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty>} ";
 
-	public static long WORKFLOW = 0;
+    public static final String QUERY_OBJECTTYPE =
+        "select distinct ?val where {?val <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty>} ";
 
-	public static DecimalFormat formatter = new DecimalFormat(
-			"###.############");
+    
 
-	public static String DBPEDIA_TBOX;
+    public static long TIMEOUT_MINS = 0;
 
-	public static String INSTANCE_THRESHOLD;
+    public static long WORKFLOW = 0;
 
-	public static final String DELIMIT = "\",";
+    public static DecimalFormat formatter = new DecimalFormat("###.############");
 
-	/**
-	 * Parameters
-	 */
-	public static int BATCH_SIZE = 2000;
+    public static String DBPEDIA_TBOX;
 
-	public static String PREDICATE = null;
+    public static String INSTANCE_THRESHOLD;
 
-	public static Double PROPGTN_FACTOR = 0D;
+    public static final String DELIMIT = "\",";
 
-	public static Double SIMILARITY_FACTOR = 0D;
+    /**
+     * Parameters
+     */
+    public static int BATCH_SIZE = 2000;
 
-	public static int TOP_K_MATCHES = 1;
+    public static String PREDICATE = null;
 
-	public static int THREAD_MAX_POOL_SIZE = 0;
+    public static Double PROPGTN_FACTOR = 0D;
 
-	public static String OIE_DATA_PATH;
+    public static Double SIMILARITY_FACTOR = 0D;
 
-	/**
-	 * location of the output file generated the IE Engine ReVerb
-	 */
-	public static final String NELL_DATA_PATH = "/home/arnab/Work/data/NELL/Nell.csv";
+    public static int TOP_K_MATCHES = 1;
 
-	public static boolean IS_NELL;
+    public static int THREAD_MAX_POOL_SIZE = 0;
 
-	public static boolean USE_LOGIT;
+    public static String OIE_DATA_PATH;
 
-	public static boolean BOOTSTRAP;
+    /**
+     * location of the output file generated the IE Engine ReVerb
+     */
+    public static final String NELL_DATA_PATH = "/home/arnab/Work/data/NELL/Nell.csv";
 
-	public static boolean RELOAD_TYPE;
+    public static boolean IS_NELL;
 
-	public static boolean LOAD_TYPES;
+    public static boolean USE_LOGIT;
 
-	public static int SCALE_WEIGHT;
+    public static boolean BOOTSTRAP;
 
-	public static boolean ENGAGE_INTER_STEP;
+    public static boolean RELOAD_TYPE;
 
-	public static int OPTIMAL_INFLATION;
+    public static boolean LOAD_TYPES;
 
-	public static int TOP_K_NUMERIC_PROPERTIES;
+    public static int SCALE_WEIGHT;
 
-	public static boolean INCLUDE_YAGO_TYPES;
+    public static boolean ENGAGE_INTER_STEP;
 
-	public static boolean WORKFLOW_NORMAL;
+    public static int OPTIMAL_INFLATION;
 
-	public static final String DOMAIN = "Domain";
+    public static int TOP_K_NUMERIC_PROPERTIES;
 
-	public static final String RANGE = "Range";
+    public static boolean INCLUDE_YAGO_TYPES;
 
-	public static final String POST_FIX = "_";
+    public static boolean WORKFLOW_NORMAL;
 
-	/**
-	 * Substitute placeholder for missing type information
-	 */
-	public static final String UNTYPED = "UNTYPED";
+    public static final String DOMAIN = "Domain";
 
-	/**
-	 * Namespaces
-	 */
+    public static final String RANGE = "Range";
 
-	public static final String YAGO_HEADER = "http://dbpedia.org/class/yago";
+    public static final String POST_FIX = "_";
 
-	public static String ONTOLOGY_NAMESPACE = "http://dbpedia.org/ontology/";
+    /**
+     * Substitute placeholder for missing type information
+     */
+    public static final String UNTYPED = "UNTYPED";
 
-	public static String DBPEDIA_NAMESPACE = "http://dbpedia.org/";
+    /**
+     * Namespaces
+     */
 
-	public static String DBPEDIA_INSTANCE_NS = DBPEDIA_NAMESPACE + "resource/";
+    public static final String YAGO_HEADER = "http://dbpedia.org/class/yago";
 
-	public static String DBPEDIA_CONCEPT_NS = DBPEDIA_NAMESPACE + "ontology/";
+    public static String ONTOLOGY_NAMESPACE = "http://dbpedia.org/ontology/";
 
-	public static String DBPEDIA_PREDICATE_NS = DBPEDIA_NAMESPACE + "ontology/";
+    public static String DBPEDIA_NAMESPACE = "http://dbpedia.org/";
 
-	/**
-	 * delimiter for the the CSV file coming as input from extraction engines'
-	 * output
-	 */
-	public static final String DELIMIT_IE_FILE = ",";
+    public static String DBPEDIA_INSTANCE_NS = DBPEDIA_NAMESPACE + "resource/";
 
-	public static String VIRTUSO_ENDPOINT = "http://wifo5-38.informatik.uni-mannheim.de:8890/sparql";
+    public static String DBPEDIA_CONCEPT_NS = DBPEDIA_NAMESPACE + "ontology/";
 
-	public static String YAGO_KB = "http://yago-knowledge.org";
+    public static String DBPEDIA_PREDICATE_NS = DBPEDIA_NAMESPACE + "ontology/";
 
-	public static String YAGO_NS = "http://yago-knowledge.org/resource/";
+    /**
+     * delimiter for the the CSV file coming as input from extraction engines' output
+     */
+    public static final String DELIMIT_IE_FILE = ",";
 
-	/**
-	 * DBPedia End point URL
-	 */
-	public static String DBPEDIA_SPARQL_ENDPOINT_LOCAL = "http://wifo5-32.informatik.uni-mannheim.de:8891/sparql";
+    public static String VIRTUSO_ENDPOINT = "http://wifo5-38.informatik.uni-mannheim.de:8890/sparql";
 
-	public static String DBPEDIA_SPARQL_ENDPOINT = "http://dbpedia.org/sparql";
+    public static String YAGO_KB = "http://yago-knowledge.org";
 
-	public static String DBPEDIA_SPARQL_ENDPOINT_LIVE_DBP = "http://live.dbpedia.org/sparql";
+    public static String YAGO_NS = "http://yago-knowledge.org/resource/";
 
-	// *****************DIRECTORY LOCATIONS
-	// ************************************************
+    /**
+     * DBPedia End point URL
+     */
+    public static String DBPEDIA_SPARQL_ENDPOINT_LOCAL = "http://wifo5-32.informatik.uni-mannheim.de:8891/sparql";
 
-	/**
-	 * file I/O location
-	 */
-	public static final String sample_dumps = "src/main/resources/output/ds_";
+    public static String DBPEDIA_SPARQL_ENDPOINT = "http://dbpedia.org/sparql";
 
-	public static String ALL_MLN_EVIDENCE;
+    public static String DBPEDIA_SPARQL_ENDPOINT_LIVE_DBP = "http://live.dbpedia.org/sparql";
 
-	/**
-	 * gold standard evidence file, post-fixed
-	 */
-	public static String ALL_MLN_EVIDENCE_T1;
+    // *****************DIRECTORY LOCATIONS
+    // ************************************************
 
-	public static String BASIC_REASON_OUT_FILE;
+    /**
+     * file I/O location
+     */
+    public static final String sample_dumps = "src/main/resources/output/ds_";
 
-	public static String DOMAIN_RANGE_PREFERENCE_FILE;
+    public static String ALL_MLN_EVIDENCE;
 
-	public static String DOMAIN_RANGE_EVIDENCE_FILE;
+    /**
+     * gold standard evidence file, post-fixed
+     */
+    public static String ALL_MLN_EVIDENCE_T1;
 
-	public static String DOMAIN_RANGE_BS_PREFERENCE_FILE;
+    public static String BASIC_REASON_OUT_FILE;
 
-	public static String DOMAIN_RANGE_BS_EVIDENCE_FILE;
+    public static String DOMAIN_RANGE_PREFERENCE_FILE;
 
-	/**
-	 * SQL queries
-	 */
-	public static final String GET_REFINED_MAPPINGS_SQL = "select DBP_SUB, DBP_OBJ from OIE_REFINED where OIE_SUB=? and OIE_PRED=? and OIE_OBJ=?";
+    public static String DOMAIN_RANGE_EVIDENCE_FILE;
 
-	/**
-	 * SQL to fetch the probabilities of the same as links from terms to
-	 * concepts
-	 */
-	public static final String GET_WIKI_LINKS_APRIORI_SQL = "select  URI, (SUM(COUNT)/(select  SUM(COUNT) from wikiPrep  where SF =?)) as p from wikiPrep  where SF =? group by BINARY URI order by p desc limit ?";
+    public static String DOMAIN_RANGE_BS_PREFERENCE_FILE;
 
-	/**
-	 * find those properites which are actually mapped on both sub and obj
-	 */
-	public static final String GET_FULLY_MAPPED_OIE_PROPS_SQL = "select distinct OIE_PRED from OIE_REFINED where DBP_SUB <> 'X' and DBP_OBJ <> 'X'";
+    public static String DOMAIN_RANGE_BS_EVIDENCE_FILE;
 
-	/**
-	 * given a surface form, fetch top titles it refers to
-	 */
-	public static final String GET_WIKI_TITLES_SQL = "select URI, SUM(COUNT) as cnt from wikiPrep where SF = ? group by BINARY URI order by cnt desc limit ?";
+    /**
+     * SQL queries
+     */
+    public static final String GET_REFINED_MAPPINGS_SQL =
+        "select DBP_SUB, DBP_OBJ from OIE_REFINED where OIE_SUB=? and OIE_PRED=? and OIE_OBJ=?";
 
-	public static final String OIE_POSTFIXED = "INSERT INTO OIE_REFINED (OIE_SUB, OIE_PRED, OIE_OBJ, OIE_PFX_SUB, OIE_PFX_OBJ, DBP_SUB, DBP_OBJ) VALUES (?, ?, ?, ?, ?, ?, ?);";
+    /**
+     * SQL to fetch the probabilities of the same as links from terms to concepts
+     */
+    public static final String GET_WIKI_LINKS_APRIORI_SQL =
+        "select  URI, (SUM(COUNT)/(select  SUM(COUNT) from wikiPrep  where SF =?)) as p from wikiPrep  where SF =? group by BINARY URI order by p desc limit ?";
 
-	public static final String GET_DBPTYPE = "select INSTANCE_TYPE from DBPEDIA_TYPES where DBPEDIA_INSTANCE=?";
+    /**
+     * find those properites which are actually mapped on both sub and obj
+     */
+    public static final String GET_FULLY_MAPPED_OIE_PROPS_SQL =
+        "select distinct OIE_PRED from OIE_REFINED where DBP_SUB <> 'X' and DBP_OBJ <> 'X'";
 
-	public static final String UPDT_OIE_POSTFIXED = "UPDATE OIE_REFINED SET DBP_SUB=?, DBP_OBJ=? WHERE OIE_PFX_SUB=? AND OIE_PFX_OBJ=? AND OIE_PRED=?";
+    /**
+     * given a surface form, fetch top titles it refers to
+     */
+    public static final String GET_WIKI_TITLES_SQL =
+        "select URI, SUM(COUNT) as cnt from wikiPrep where SF = ? group by BINARY URI order by cnt desc limit ?";
 
-	public static final String GET_REFINED_FACT = "select DBP_SUB, DBP_OBJ from OIE_REFINED where OIE_SUB=? and OIE_PRED=? and OIE_OBJ=?";
+    public static final String OIE_POSTFIXED =
+        "INSERT INTO OIE_REFINED (OIE_SUB, OIE_PRED, OIE_OBJ, OIE_PFX_SUB, OIE_PFX_OBJ, DBP_SUB, DBP_OBJ) VALUES (?, ?, ?, ?, ?, ?, ?);";
 
-	public static final String GET_DOMAINS = "select distinct  d.INSTANCE_TYPE from OIE_REFINED n JOIN DBPEDIA_TYPES d ON n.DBP_SUB=d.DBPEDIA_INSTANCE where OIE_PRED =?";
+    public static final String GET_DBPTYPE = "select INSTANCE_TYPE from DBPEDIA_TYPES where DBPEDIA_INSTANCE=?";
 
-	public static final String GET_RANGES = "select distinct  d.INSTANCE_TYPE from OIE_REFINED n JOIN DBPEDIA_TYPES d ON n.DBP_OBJ=d.DBPEDIA_INSTANCE where OIE_PRED =?";
+    public static final String UPDT_OIE_POSTFIXED =
+        "UPDATE OIE_REFINED SET DBP_SUB=?, DBP_OBJ=? WHERE OIE_PFX_SUB=? AND OIE_PFX_OBJ=? AND OIE_PRED=?";
 
-	public static int HTTP_CONN_MAX_TOTAL = 0;
+    public static final String GET_REFINED_FACT =
+        "select DBP_SUB, DBP_OBJ from OIE_REFINED where OIE_SUB=? and OIE_PRED=? and OIE_OBJ=?";
 
-	public static int HTTP_CONN_MAX_TOTAL_PER_ROUTE = 0;
+    public static final String GET_DOMAINS =
+        "select distinct  d.INSTANCE_TYPE from OIE_REFINED n JOIN DBPEDIA_TYPES d ON n.DBP_SUB=d.DBPEDIA_INSTANCE where OIE_PRED =?";
 
-	public static String WORDNET_DICTIONARY = null;
+    public static final String GET_RANGES =
+        "select distinct  d.INSTANCE_TYPE from OIE_REFINED n JOIN DBPEDIA_TYPES d ON n.DBP_OBJ=d.DBPEDIA_INSTANCE where OIE_PRED =?";
 
-	/**
-	 * insert DBPedia types SQL
-	 */
-	public static String INSERT_DBP_TYPES = "INSERT IGNORE INTO DBPEDIA_TYPES (DBPEDIA_INSTANCE, INSTANCE_TYPE) VALUES ( ?, ? )";
+    public static int HTTP_CONN_MAX_TOTAL = 0;
 
-	/*
-	 * DB Details
-	 */
+    public static int HTTP_CONN_MAX_TOTAL_PER_ROUTE = 0;
 
-	// DB Driver name
-	public static String DRIVER_NAME = "com.mysql.jdbc.Driver";
+    public static String WORDNET_DICTIONARY = null;
 
-	// Url to conenct to the Database
-	// public static String CONNECTION_URL = "jdbc:mysql://134.155.86.39/";
-	public static String CONNECTION_URL = "jdbc:mysql://134.155.95.117:3306/";
+    /**
+     * insert DBPedia types SQL
+     */
+    public static String INSERT_DBP_TYPES =
+        "INSERT IGNORE INTO DBPEDIA_TYPES (DBPEDIA_INSTANCE, INSTANCE_TYPE) VALUES ( ?, ? )";
 
-	// name of the database
-	public static String DB_NAME = "wikiStat";
+    /*
+     * DB Details
+     */
 
-	// user of the database. Make sure this user is created for the DB
-	public static String DB_USER = "root";
+    // DB Driver name
+    public static String DRIVER_NAME = "com.mysql.jdbc.Driver";
 
-	// password for the user
-	public static String DB_PWD = "mannheim1234";
+    // Url to conenct to the Database
+    // public static String CONNECTION_URL = "jdbc:mysql://134.155.86.39/";
+    public static String CONNECTION_URL = "jdbc:mysql://134.155.95.117:3306/";
 
-	public static Set<String> SUB_SET_TYPES = new HashSet<String>();
+    // name of the database
+    public static String DB_NAME = "wikiStat";
 
-	public static Set<String> OBJ_SET_TYPES = new HashSet<String>();
+    // user of the database. Make sure this user is created for the DB
+    public static String DB_USER = "root";
 
-	/**
-	 * load the variables from Configuration file
-	 * 
-	 * @param args
-	 */
-	public static void loadConfigParameters(String[] args) {
+    // password for the user
+    public static String DB_PWD = "mannheim1234";
 
-		Properties prop = new Properties();
+    public static Set<String> SUB_SET_TYPES = new HashSet<String>();
 
-		try {
-			PREDICATE = args[0];
+    public static Set<String> OBJ_SET_TYPES = new HashSet<String>();
 
-			// load a properties file
-			prop.load(new FileInputStream(args[1]));
+    /**
+     * load the variables from Configuration file
+     * 
+     * @param args
+     */
+    public static void loadConfigParameters(String[] args)
+    {
 
-			PROPGTN_FACTOR = Double.parseDouble(prop
-					.getProperty("TREE_PROPAGATION_FACTOR"));
-			TOP_K_MATCHES = Integer.parseInt(prop.getProperty("TOPK_ANCHORS"));
-			DBPEDIA_SPARQL_ENDPOINT = prop
-					.getProperty("DBPEDIA_SPARQL_ENDPOINT");
-			USE_LOGIT = Boolean.valueOf(prop.getProperty("USE_LOGIT"));
-			IS_NELL = Boolean.valueOf(prop.getProperty("IS_NELL"));
+        Properties prop = new Properties();
 
-			INCLUDE_YAGO_TYPES = Boolean.valueOf(prop
-					.getProperty("INCLUDE_YAGO_TYPES"));
+        try {
+            PREDICATE = args[0];
 
-			RELOAD_TYPE = false;// Boolean.valueOf(prop.getProperty("RELOAD_TYPE"));
-			LOAD_TYPES = Boolean.valueOf(prop.getProperty("LOAD_TYPES"));
+            // load a properties file
+            prop.load(new FileInputStream(args[1]));
 
-			BATCH_SIZE = Integer.parseInt(prop.getProperty("BATCH_SIZE"));
+            PROPGTN_FACTOR = Double.parseDouble(prop.getProperty("TREE_PROPAGATION_FACTOR"));
+            TOP_K_MATCHES = Integer.parseInt(prop.getProperty("TOPK_ANCHORS"));
+            DBPEDIA_SPARQL_ENDPOINT = prop.getProperty("DBPEDIA_SPARQL_ENDPOINT");
+            USE_LOGIT = Boolean.valueOf(prop.getProperty("USE_LOGIT"));
+            IS_NELL = Boolean.valueOf(prop.getProperty("IS_NELL"));
 
-			SCALE_WEIGHT = Integer.parseInt(prop.getProperty("SCALE_WEIGHT"));
+            INCLUDE_YAGO_TYPES = Boolean.valueOf(prop.getProperty("INCLUDE_YAGO_TYPES"));
 
-			ENGAGE_INTER_STEP = Boolean.valueOf(prop
-					.getProperty("ENGAGE_INTER_STEP"));
+            RELOAD_TYPE = false;// Boolean.valueOf(prop.getProperty("RELOAD_TYPE"));
+            LOAD_TYPES = Boolean.valueOf(prop.getProperty("LOAD_TYPES"));
 
-			OPTIMAL_INFLATION = Integer.parseInt(prop
-					.getProperty("OPTIMAL_INFLATION"));
+            BATCH_SIZE = Integer.parseInt(prop.getProperty("BATCH_SIZE"));
 
-			TOP_K_NUMERIC_PROPERTIES = Integer.parseInt(prop
-					.getProperty("TOP_K_NUMERIC_PROPERTIES"));
+            SCALE_WEIGHT = Integer.parseInt(prop.getProperty("SCALE_WEIGHT"));
 
-			OIE_DATA_PATH = prop.getProperty("OIE_DATA_PATH");
+            ENGAGE_INTER_STEP = Boolean.valueOf(prop.getProperty("ENGAGE_INTER_STEP"));
 
-			WORKFLOW_NORMAL = Boolean.valueOf(prop
-					.getProperty("WORKFLOW_NORMAL"));
+            OPTIMAL_INFLATION = Integer.parseInt(prop.getProperty("OPTIMAL_INFLATION"));
 
-			DBPEDIA_TBOX = prop.getProperty("DBPEDIA_TBOX");
+            TOP_K_NUMERIC_PROPERTIES = Integer.parseInt(prop.getProperty("TOP_K_NUMERIC_PROPERTIES"));
 
-			INSTANCE_THRESHOLD = prop.getProperty("INSTANCE_THRESHOLD");
+            OIE_DATA_PATH = prop.getProperty("OIE_DATA_PATH");
 
-			WORDNET_DICTIONARY = prop.getProperty("WORDNET_DICTIONARY");
+            WORKFLOW_NORMAL = Boolean.valueOf(prop.getProperty("WORKFLOW_NORMAL"));
 
-			SIMILARITY_FACTOR = Double.parseDouble(prop
-					.getProperty("SIMILARITY_FACTOR"));
+            DBPEDIA_TBOX = prop.getProperty("DBPEDIA_TBOX");
 
-			THREAD_MAX_POOL_SIZE = Integer.parseInt(prop
-					.getProperty("THREAD_MAX_POOL_SIZE"));
+            INSTANCE_THRESHOLD = prop.getProperty("INSTANCE_THRESHOLD");
 
-			HTTP_CONN_MAX_TOTAL = Integer.parseInt(prop
-					.getProperty("HTTP_CONN_MAX_TOTAL"));
+            WORDNET_DICTIONARY = prop.getProperty("WORDNET_DICTIONARY");
 
-			HTTP_CONN_MAX_TOTAL_PER_ROUTE = Integer.parseInt(prop
-					.getProperty("HTTP_CONN_MAX_TOTAL_PER_ROUTE"));
+            SIMILARITY_FACTOR = Double.parseDouble(prop.getProperty("SIMILARITY_FACTOR"));
 
-			TIMEOUT_MINS = Integer.parseInt(prop.getProperty("TIMEOUT_MINS"));
+            THREAD_MAX_POOL_SIZE = Integer.parseInt(prop.getProperty("THREAD_MAX_POOL_SIZE"));
 
-			WORKFLOW = Integer.parseInt(prop.getProperty("WORKFLOW"));
+            HTTP_CONN_MAX_TOTAL = Integer.parseInt(prop.getProperty("HTTP_CONN_MAX_TOTAL"));
 
-			init();
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
-	}
+            HTTP_CONN_MAX_TOTAL_PER_ROUTE = Integer.parseInt(prop.getProperty("HTTP_CONN_MAX_TOTAL_PER_ROUTE"));
 
-	public static void init() {
-		ALL_MLN_EVIDENCE = sample_dumps + PREDICATE + "/AllEvidence.db";
+            TIMEOUT_MINS = Integer.parseInt(prop.getProperty("TIMEOUT_MINS"));
 
-		/**
-		 * gold standard evidence file, post-fixed
-		 */
-		ALL_MLN_EVIDENCE_T1 = sample_dumps + PREDICATE + "/AllEvidence_T1.db";
+            WORKFLOW = Integer.parseInt(prop.getProperty("WORKFLOW"));
 
-		BASIC_REASON_OUT_FILE = sample_dumps + PREDICATE + "/out.db";
+            init();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
 
-		DOMAIN_RANGE_PREFERENCE_FILE = sample_dumps + PREDICATE
-				+ "/domRanAlpha" + PROPGTN_FACTOR + "."
-				+ String.valueOf(USE_LOGIT) + ".out";
+    public static void init()
+    {
+        ALL_MLN_EVIDENCE = sample_dumps + PREDICATE + "/AllEvidence.db";
 
-		DOMAIN_RANGE_EVIDENCE_FILE = sample_dumps + PREDICATE
-				+ "/domRanEvidence.db";
+        /**
+         * gold standard evidence file, post-fixed
+         */
+        ALL_MLN_EVIDENCE_T1 = sample_dumps + PREDICATE + "/AllEvidence_T1.db";
 
-		DOMAIN_RANGE_BS_PREFERENCE_FILE = sample_dumps + PREDICATE
-				+ "/domRanAlphaBS" + PROPGTN_FACTOR + "."
-				+ String.valueOf(USE_LOGIT) + ".out";
+        BASIC_REASON_OUT_FILE = sample_dumps + PREDICATE + "/out.db";
 
-		DOMAIN_RANGE_BS_EVIDENCE_FILE = sample_dumps + PREDICATE
-				+ "/domRanEvidenceBS.db";
+        DOMAIN_RANGE_PREFERENCE_FILE =
+            sample_dumps + PREDICATE + "/domRanAlpha" + PROPGTN_FACTOR + "." + String.valueOf(USE_LOGIT) + ".out";
 
-	}
+        DOMAIN_RANGE_EVIDENCE_FILE = sample_dumps + PREDICATE + "/domRanEvidence.db";
+
+        DOMAIN_RANGE_BS_PREFERENCE_FILE =
+            sample_dumps + PREDICATE + "/domRanAlphaBS" + PROPGTN_FACTOR + "." + String.valueOf(USE_LOGIT) + ".out";
+
+        DOMAIN_RANGE_BS_EVIDENCE_FILE = sample_dumps + PREDICATE + "/domRanEvidenceBS.db";
+
+    }
+
 }
