@@ -31,8 +31,6 @@ public class Constants
     public static final String QUERY_OBJECTTYPE =
         "select distinct ?val where {?val <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty>} ";
 
-    
-
     public static long TIMEOUT_MINS = 0;
 
     public static long WORKFLOW = 0;
@@ -201,6 +199,9 @@ public class Constants
 
     public static final String GET_RANGES =
         "select distinct  d.INSTANCE_TYPE from OIE_REFINED n JOIN DBPEDIA_TYPES d ON n.DBP_OBJ=d.DBPEDIA_INSTANCE where OIE_PRED =?";
+
+    public static final String GET_SF =
+        "select r1.SF, r2.SF from wikiPrep as r1 cross join wikiPrep as r2 where r1.URI=? and r2.URI=?";
 
     public static int HTTP_CONN_MAX_TOTAL = 0;
 

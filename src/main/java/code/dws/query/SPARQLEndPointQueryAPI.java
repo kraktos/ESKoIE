@@ -16,10 +16,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
+import weka.core.Debug.DBO;
+import code.dws.core.cluster.PairDto;
+import code.dws.dbConnectivity.DBWrapper;
 import code.dws.markovLogic.YagoDbpediaMapping;
 import code.dws.utils.Constants;
 import code.dws.utils.Utilities;
@@ -117,9 +119,8 @@ public class SPARQLEndPointQueryAPI
                     results = qexec.execSelect();
 
                 } catch (Exception eee) {
-
-                    System.out.println(query);
-                    eee.printStackTrace();
+                    // System.out.println(query);
+                    // eee.printStackTrace();
                 }
             }
 
@@ -411,18 +412,36 @@ public class SPARQLEndPointQueryAPI
         return retS;
     }
 
-    public static Pair<String, String> getRandomInstance(String randomKBProp, int nextInt)
+    public static List<PairDto> getRandomInstance(String randomKBProp, int nextInt)
     {
+        String dbpSub = null;
+        String dbpObj = null;
+
+        List<Pair<String, String>> sfPairs = null;
+        List<PairDto> pairDtos = new ArrayList<PairDto>();
+
         String QUERY_RANDOM_PROPERTY_INSTANCE =
             "select * where {?s <http://dbpedia.org/ontology/" + randomKBProp + "> ?o} OFFSET " + nextInt + " LIMIT 1";
 
         List<QuerySolution> res = queryDBPediaEndPoint(QUERY_RANDOM_PROPERTY_INSTANCE);
 
         for (QuerySolution querySol : res) {
-            return new ImmutablePair<String, String>(querySol.get("s").toString(), querySol.get("o").toString());
+            dbpSub = querySol.get("s").toString();
+            dbpObj = querySol.get("o").toString();
+
+            dbpSub =
+                Utilities.utf8ToCharacter(dbpSub.replaceAll(Constants.DBPEDIA_INSTANCE_NS, "").replaceAll("_", " "));
+            dbpObj =
+                Utilities.utf8ToCharacter(dbpObj.replaceAll(Constants.DBPEDIA_INSTANCE_NS, "").replaceAll("_", " "));
+
+            // make a DB call for the surface forms
+            sfPairs = DBWrapper.getSurfaceForms(dbpSub, dbpObj);
+            for (Pair<String, String> pair : sfPairs) {
+                pairDtos.add(new PairDto(pair.getLeft(), randomKBProp, pair.getRight(), dbpSub, dbpObj));
+            }
+            return pairDtos;
         }
         return null;
     }
-
 } // end class
 
