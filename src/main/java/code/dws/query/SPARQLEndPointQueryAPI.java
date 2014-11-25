@@ -439,6 +439,10 @@ public class SPARQLEndPointQueryAPI
             for (Pair<String, String> pair : sfPairs) {
                 pairDtos.add(new PairDto(pair.getLeft(), randomKBProp, pair.getRight(), dbpSub, dbpObj));
             }
+            if (pairDtos.size() == 0)
+                return null;
+
+            // System.out.println(pairDtos.size() + " for " + randomKBProp + "(" + dbpSub + ", " + dbpObj + ")");
             return pairDtos;
         }
         return null;

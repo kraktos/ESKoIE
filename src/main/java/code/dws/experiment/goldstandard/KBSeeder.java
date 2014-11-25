@@ -24,6 +24,7 @@ import code.dws.core.cluster.PairDto;
 import code.dws.dbConnectivity.DBWrapper;
 import code.dws.query.SPARQLEndPointQueryAPI;
 import code.dws.utils.Constants;
+import code.dws.utils.Utilities;
 
 /**
  * Distant supervision based
@@ -102,20 +103,18 @@ public class KBSeeder
         long i = 0;
         // iterate the KB properties and find a prop instance prop(sub, obj), randomly
         // repeat for a long time
-        logger.info("Pushing tasks to the pool ");
-        while (i++ != 50) {
-            final String randomKBProp = dbpProps.get(randomizer.nextInt(dbpProps.size()));
 
-            final int randomNum = offsetGen.nextInt((39999 - 1) + 1) + 1;
+        while (i++ != 1000) {
+            final String randomKBProp = dbpProps.get(randomizer.nextInt(dbpProps.size()));
+            final int randomNum = offsetGen.nextInt((39990 - 1) + 1) + 1;
+            // System.out.println(randomKBProp + " at " + i + "\t" + randomNum);
 
             // add to the pool of tasks
             taskList.add(completionService.submit(new Callable<List<PairDto>>()
             {
                 @Override
                 public List<PairDto> call() throws Exception
-                {
-                    // Thread.sleep(3000);
-                    // find a random instance with this random KB property
+                { // find a random instance with this random KB property
                     return SPARQLEndPointQueryAPI.getRandomInstance(randomKBProp, randomNum);
                 }
             }));
@@ -125,15 +124,17 @@ public class KBSeeder
         // shutdown pool thread
         executorPool.shutdown();
         try {
+            writer = new BufferedWriter(new FileWriter(new File(SEED_KB)));
+
+            long start = System.currentTimeMillis();
             while (!executorPool.isTerminated()) {
                 Future<List<PairDto>> futureTask;
 
-                futureTask = completionService.poll(Constants.TIMEOUT_MINS, TimeUnit.SECONDS);
+                futureTask = completionService.poll(Constants.TIMEOUT_MINS, TimeUnit.MINUTES);
 
                 if (futureTask != null) {
                     List<PairDto> result = futureTask.get();
                     if (result != null) {
-                        writer = new BufferedWriter(new FileWriter(new File(SEED_KB)));
                         for (PairDto pDto : result) {
                             logger.debug(pDto.getArg1() + "\t" + pDto.getRel() + "\t" + pDto.getArg2());
                             writer.write(pDto.getArg1() + "\t" + pDto.getRel() + "\t" + pDto.getArg2() + "\t"
@@ -143,13 +144,12 @@ public class KBSeeder
                     }
                 }
             }
+            Utilities.endTimer(start, "1000 tasks finished in ");
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             if (executorPool.isTerminated())
                 DBWrapper.shutDown();
         }
-
-        // http://dbpedia.org/resource/B%C3%A2rlea_River riverMouth http://dbpedia.org/resource/Dobrunu_River
     }
 }

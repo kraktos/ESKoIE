@@ -17,6 +17,8 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
+import com.mysql.jdbc.EscapeTokenizer;
+
 import antlr.collections.impl.Vector;
 import code.dws.core.cluster.vector.VectorCluster;
 import code.dws.experiment.evaluation.FactDao;
@@ -280,25 +282,20 @@ public class DBWrapper
     public static List<Pair<String, String>> getSurfaceForms(String dbpSub, String dbpObj)
     {
         ResultSet rs = null;
-        ResultSetMetaData rsmd = null;
         List<Pair<String, String>> results = new ArrayList<Pair<String, String>>();
 
         try {
             pstmt.setString(1, dbpSub);
             pstmt.setString(2, dbpObj);
-
+            // System.out.println(pstmt.toString());
             rs = pstmt.executeQuery();
-            rsmd = rs.getMetaData();
 
             results = new ArrayList<Pair<String, String>>();
 
             while (rs.next()) {
-                if (rsmd.getColumnCount() == 2)
-                    results.add(new ImmutablePair<String, String>(rs.getString(1), rs.getString(2)));
+                results.add(new ImmutablePair<String, String>(rs.getString(1), rs.getString(2)));
             }
-
         } catch (Exception e) {
-            e.printStackTrace();
         }
 
         return results;

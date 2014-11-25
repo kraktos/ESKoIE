@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.javaml.distance.fastdtw.timeseries.PAA;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
@@ -94,7 +92,7 @@ public class StreamProcessor
         for (PairDto oieTriple : ALL_OIE) {
             flag1 = oieTriple.getArg1().toLowerCase().equals(sub.toLowerCase());
             flag3 = oieTriple.getArg2().toLowerCase().equalsIgnoreCase(obj.toLowerCase());
-            if (flag1 || flag3)
+            if (flag1 && flag3)
                 System.out.println(oieTriple.getRel() + "\t" + kbRel);
 
         }
