@@ -85,6 +85,24 @@ public class DBWrapper
         }
     }
 
+    public static void insertIntoPropGS(String oieRel, String kbRel)
+    {
+        try {
+
+            pstmt.setString(1, oieRel);
+            pstmt.setString(2, kbRel);
+            pstmt.setString(3, "");
+
+            pstmt.execute();
+            connection.commit();
+            logger.info("FLUSHED TO OIE_PROP_GS...");
+
+        } catch (SQLException e) {
+            logger.error("Error with insertIntoPropGS .." + e.getMessage());
+        }
+
+    }
+
     public static void saveToOIEPostFxd(String oieSub, String oiePred, String oieObj, String oieSubPfxd,
         String oieObjPfxd)
     {

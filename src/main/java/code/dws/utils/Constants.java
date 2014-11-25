@@ -203,17 +203,19 @@ public class Constants
     public static final String GET_SF =
         "select r1.SF, r2.SF from wikiPrep as r1 cross join wikiPrep as r2 where r1.URI=? and r2.URI=?";
 
-    public static int HTTP_CONN_MAX_TOTAL = 0;
-
-    public static int HTTP_CONN_MAX_TOTAL_PER_ROUTE = 0;
-
-    public static String WORDNET_DICTIONARY = null;
+    public static final String INSERT_GS_PROP = "INSERT IGNORE INTO OIE_PROP_GS(PHRASE, KB_PROP,EVAL) VALUES (?,?,?)";
 
     /**
      * insert DBPedia types SQL
      */
     public static String INSERT_DBP_TYPES =
         "INSERT IGNORE INTO DBPEDIA_TYPES (DBPEDIA_INSTANCE, INSTANCE_TYPE) VALUES ( ?, ? )";
+
+    public static int HTTP_CONN_MAX_TOTAL = 0;
+
+    public static int HTTP_CONN_MAX_TOTAL_PER_ROUTE = 0;
+
+    public static String WORDNET_DICTIONARY = null;
 
     /*
      * DB Details

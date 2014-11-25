@@ -9,6 +9,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import code.dws.core.cluster.PairDto;
+import code.dws.dbConnectivity.DBWrapper;
 import code.dws.utils.Constants;
 
 public class StreamProcessor
@@ -35,9 +36,11 @@ public class StreamProcessor
 
         List<String> list = null;
 
-        logger.info("Loaded OIE facts...");
+        logger.info("Loading OIE facts...");
         loadOIEInMemory();
         logger.info("Loaded " + ALL_OIE.size() + " lines of OIE facts");
+
+        DBWrapper.init(Constants.INSERT_GS_PROP);
 
         // load a file repeatedly to process the snapshot of samples
         while (true) {
@@ -76,27 +79,30 @@ public class StreamProcessor
      * @param obj
      * @return
      */
-    private static boolean scanOIEFile(String sub, String kbRel, String obj)
+    private static void scanOIEFile(String sub, String kbRel, String obj)
     {
-        if (existsInList(sub, kbRel, obj))
-            return true;
-        return false;
+        String oieRel = existsInOIEDataSet(sub, obj);
+
+        if (oieRel != null) {
+            // flush to DB
+            System.out.println(oieRel + "\t" + kbRel);
+            DBWrapper.insertIntoPropGS(oieRel, kbRel);
+        }
+
     }
 
-    private static boolean existsInList(String sub, String kbRel, String obj)
+    private static String existsInOIEDataSet(String sub, String obj)
     {
         boolean flag1;
-        boolean flag2;
         boolean flag3;
 
         for (PairDto oieTriple : ALL_OIE) {
             flag1 = oieTriple.getArg1().toLowerCase().equals(sub.toLowerCase());
             flag3 = oieTriple.getArg2().toLowerCase().equalsIgnoreCase(obj.toLowerCase());
             if (flag1 && flag3)
-                System.out.println(oieTriple.getRel() + "\t" + kbRel);
-
+                return oieTriple.getRel();
         }
 
-        return false;
+        return null;
     }
 };
