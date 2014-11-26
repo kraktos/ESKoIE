@@ -104,9 +104,9 @@ public class KBSeeder
         // iterate the KB properties and find a prop instance prop(sub, obj), randomly
         // repeat for a long time
 
-        while (i++ != 500) {
+        while (i++ != Constants.THREAD_MAX_POOL_SIZE) {
             final String randomKBProp = dbpProps.get(randomizer.nextInt(dbpProps.size()));
-            final int randomNum = offsetGen.nextInt((39990 - 1) + 1) + 1;
+            final int randomNum = offsetGen.nextInt(45000) + 1;
             // System.out.println(randomKBProp + " at " + i + "\t" + randomNum);
 
             // add to the pool of tasks
@@ -139,11 +139,11 @@ public class KBSeeder
                             writer.write(pDto.getArg1() + "\t" + pDto.getRel() + "\t" + pDto.getArg2() + "\t"
                                 + pDto.getKbArg1() + "\t" + pDto.getKbArg2() + "\n");
                         }
+                        writer.flush();
                     }
                 }
             }
-            writer.flush();
-            Utilities.endTimer(start, "1000 tasks finished in ");
+            Utilities.endTimer(start, i + " tasks finished in ");
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
