@@ -203,7 +203,8 @@ public class Constants
     public static final String GET_SF =
         "select r1.SF, r2.SF from wikiPrep as r1 cross join wikiPrep as r2 where r1.URI=? and r2.URI=?";
 
-    public static final String INSERT_GS_PROP = "INSERT IGNORE INTO OIE_PROP_GS(PHRASE, KB_PROP,EVAL) VALUES (?,?,?)";
+    public static final String INSERT_GS_PROP =
+        "INSERT IGNORE INTO OIE_PROP_GS(PHRASE, KB_PROP,EVAL, INV) VALUES (?,?,?,?)";
 
     /**
      * insert DBPedia types SQL

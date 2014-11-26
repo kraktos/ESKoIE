@@ -85,14 +85,15 @@ public class DBWrapper
         }
     }
 
-    public static void insertIntoPropGS(String oieRel, String kbRel)
+    public static void insertIntoPropGS(String oieRel, String kbRel, String inv)
     {
         try {
 
             pstmt.setString(1, oieRel);
             pstmt.setString(2, kbRel);
             pstmt.setString(3, "");
-
+            pstmt.setString(4, inv);
+            
             pstmt.execute();
             connection.commit();
             logger.info("FLUSHED TO OIE_PROP_GS...");
