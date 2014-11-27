@@ -55,11 +55,6 @@
 	</build>
 	<dependencies>
 
-		<dependency>
-			<groupId>org.apache.lucene</groupId>
-			<artifactId>lucene-analyzers</artifactId>
-			<version>3.6.2</version>
-		</dependency>
 
 
 		<dependency>
@@ -140,11 +135,6 @@
 			<version>3.2</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.lucene</groupId>
-			<artifactId>lucene-snowball</artifactId>
-			<version>3.0.3</version>
-		</dependency>
-		<dependency>
 			<groupId>org.kie.modules</groupId>
 			<artifactId>org-apache-commons-lang3</artifactId>
 			<version>6.1.0.CR1</version>
@@ -194,6 +184,16 @@
 			<groupId>nz.ac.waikato.cms.weka</groupId>
 			<artifactId>XMeans</artifactId>
 			<version>1.0.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-core</artifactId>
+			<version>4.10.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-analyzers-common</artifactId>
+			<version>4.10.0</version>
 		</dependency>
 	</dependencies>
 	

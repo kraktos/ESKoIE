@@ -118,7 +118,7 @@ public class SPARQLEndPointQueryAPI
                     qexec = QueryExecutionFactory.sparqlService(Constants.DBPEDIA_SPARQL_ENDPOINT_LIVE_DBP, query);
                     results = qexec.execSelect();
 
-                } catch (Exception eee) {                    
+                } catch (Exception eee) {
                 }
             }
 
@@ -418,7 +418,6 @@ public class SPARQLEndPointQueryAPI
         List<Pair<String, String>> sfPairs = null;
         List<PairDto> pairDtos = new ArrayList<PairDto>();
 
-        // "select * where {?s <http://dbpedia.org/ontology/" + randomKBProp + "> ?o} OFFSET " + nextInt + " LIMIT 1";
         String QUERY_RANDOM_PROPERTY_INSTANCE =
             "SELECT * WHERE {{SELECT * WHERE {?s <http://dbpedia.org/ontology/" + randomKBProp
                 + "> ?o} ORDER BY ASC(?s)}} OFFSET " + nextInt + "  LIMIT 1";
@@ -442,7 +441,6 @@ public class SPARQLEndPointQueryAPI
             if (pairDtos.size() == 0)
                 return null;
 
-            // System.out.println(pairDtos.size() + " for " + randomKBProp + "(" + dbpSub + ", " + dbpObj + ")");
             return pairDtos;
         }
         return null;

@@ -104,10 +104,9 @@ public class KBSeeder
         // iterate the KB properties and find a prop instance prop(sub, obj), randomly
         // repeat for a long time
 
-        while (i++ != Constants.THREAD_MAX_POOL_SIZE) {
+        while (i++ != 10) {
             final String randomKBProp = dbpProps.get(randomizer.nextInt(dbpProps.size()));
             final int randomNum = offsetGen.nextInt(45000) + 1;
-            // System.out.println(randomKBProp + " at " + i + "\t" + randomNum);
 
             // add to the pool of tasks
             taskList.add(completionService.submit(new Callable<List<PairDto>>()

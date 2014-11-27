@@ -11,7 +11,10 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
+import com.hp.hpl.jena.sparql.core.assembler.DatasetAssembler;
+
 import code.dws.dbConnectivity.DBWrapper;
+import code.dws.indexer.DataSearcher;
 import code.dws.utils.Constants;
 
 public class StreamProcessor
@@ -36,11 +39,14 @@ public class StreamProcessor
 
         Constants.loadConfigParameters(new String[] {"", args[0]});
 
-        logger.info("Loading OIE facts...");
-        loadOIEInMemory();
-        logger.info("Loaded " + ALL_OIE.size() + " lines of OIE facts");
+        // logger.info("Loading OIE facts...");
+        // loadOIEInMemory();
+        // logger.info("Loaded " + ALL_OIE.size() + " lines of OIE facts");
 
         DBWrapper.init(Constants.INSERT_GS_PROP);
+
+        // make the lucene index directory ready
+        DataSearcher.main(new String[] {args[1]});
 
         // Create the monitor
         FileMonitor monitor = FileMonitor.getInstance();
@@ -81,21 +87,27 @@ public class StreamProcessor
      */
     public static void existsInOIEDataSet(String sub, String kbRel, String obj)
     {
-        String rel = null;
-        Pair<String, String> searchKey = null;
+        List<String> reltns;
+        try {
+            reltns = DataSearcher.doSearch(sub, obj);
 
-        searchKey = new ImmutablePair<String, String>(sub, obj);
-        if (ALL_OIE.containsKey(searchKey)) {
-            rel = ALL_OIE.get(searchKey);
-            logger.info(rel + " => " + kbRel + "\tD");
-            DBWrapper.insertIntoPropGS(rel, kbRel, "N"); // this is direct
-        } else {
-            searchKey = new ImmutablePair<String, String>(obj, sub);
-            if (ALL_OIE.containsKey(searchKey)) {
-                rel = ALL_OIE.get(searchKey);
-                logger.info(rel + " => " + kbRel + "\tI");
-                DBWrapper.insertIntoPropGS(rel, kbRel, "Y"); // this is inverse
+            if (reltns != null) { // populate DB
+                for (String rel : reltns) {
+                    logger.info(rel + " => " + kbRel + "\tI");
+                    DBWrapper.insertIntoPropGS(rel, kbRel, "N"); // this is direct
+                }
+            } else {
+                reltns = DataSearcher.doSearch(obj, sub);
+                if (reltns != null) { // populate DB
+                    for (String rel : reltns) {
+                        logger.info(rel + " => " + kbRel + "\tI");
+                        DBWrapper.insertIntoPropGS(rel, kbRel, "Y"); // this is inverse
+                    }
+                }
             }
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
 
     }

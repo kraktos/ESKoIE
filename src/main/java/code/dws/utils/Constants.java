@@ -128,11 +128,11 @@ public class Constants
     /**
      * DBPedia End point URL
      */
-    public static String DBPEDIA_SPARQL_ENDPOINT_LOCAL = "http://wifo5-32.informatik.uni-mannheim.de:8891/sparql";
+    public static String DBPEDIA_SPARQL_ENDPOINT_LOCAL = null;
 
-    public static String DBPEDIA_SPARQL_ENDPOINT = "http://dbpedia.org/sparql";
+    public static String DBPEDIA_SPARQL_ENDPOINT = null;
 
-    public static String DBPEDIA_SPARQL_ENDPOINT_LIVE_DBP = "http://live.dbpedia.org/sparql";
+    public static String DBPEDIA_SPARQL_ENDPOINT_LIVE_DBP = null;
 
     // *****************DIRECTORY LOCATIONS
     // ************************************************
@@ -201,7 +201,7 @@ public class Constants
         "select distinct  d.INSTANCE_TYPE from OIE_REFINED n JOIN DBPEDIA_TYPES d ON n.DBP_OBJ=d.DBPEDIA_INSTANCE where OIE_PRED =?";
 
     public static final String GET_SF =
-        "select r1.SF, r2.SF from wikiPrep as r1 cross join wikiPrep as r2 where r1.URI=? and r2.URI=?";
+        "select r1.SF, r2.SF from wikiPrep as r1 cross join wikiPrep as r2 where r1.URI=? and r2.URI=? and r1.COUNT > 1 and r2.COUNT > 1";
 
     public static final String INSERT_GS_PROP =
         "INSERT IGNORE INTO OIE_PROP_GS(PHRASE, KB_PROP,EVAL, INV) VALUES (?,?,?,?)";
@@ -260,7 +260,11 @@ public class Constants
 
             PROPGTN_FACTOR = Double.parseDouble(prop.getProperty("TREE_PROPAGATION_FACTOR"));
             TOP_K_MATCHES = Integer.parseInt(prop.getProperty("TOPK_ANCHORS"));
+
             DBPEDIA_SPARQL_ENDPOINT = prop.getProperty("DBPEDIA_SPARQL_ENDPOINT");
+            DBPEDIA_SPARQL_ENDPOINT_LOCAL = prop.getProperty("DBPEDIA_SPARQL_ENDPOINT_LOCAL");
+            DBPEDIA_SPARQL_ENDPOINT_LIVE_DBP = prop.getProperty("DBPEDIA_SPARQL_ENDPOINT_LIVE_DBP");
+
             USE_LOGIT = Boolean.valueOf(prop.getProperty("USE_LOGIT"));
             IS_NELL = Boolean.valueOf(prop.getProperty("IS_NELL"));
 
