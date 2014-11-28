@@ -93,7 +93,7 @@ public class StreamProcessor
 
             if (reltns != null) { // populate DB
                 for (String rel : reltns) {
-                    logger.info(rel + " => " + kbRel + "\tI");
+                    logger.info(rel + " => " + kbRel + "\tD");
                     DBWrapper.insertIntoPropGS(rel, kbRel, "N"); // this is direct
                 }
             } else {
