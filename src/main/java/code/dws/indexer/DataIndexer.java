@@ -9,7 +9,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -42,6 +46,8 @@ public class DataIndexer
 
     private static final String DATA_DELIMIT = ";";
 
+    // private static Map<String, Long> OIE_PROP_COUNT_MAP = new HashMap<String, Long>();
+
     private static String INDEX_DIR = null;
 
     private static boolean create;
@@ -52,15 +58,22 @@ public class DataIndexer
      */
     public static void main(String[] args) throws Exception
     {
-        if (args.length != 1)
+        if (args.length != 2)
             throw new IllegalArgumentException();
-        else
+        else {
             INPUT_OIE_FILE = args[0];
+            // Constants.loadConfigParameters(new String[] {"", args[1]});
+        }
 
         if (INPUT_OIE_FILE != null)
             INDEX_DIR = new File(INPUT_OIE_FILE).getParent() + "/index/";
 
         create = true;
+
+        // logger.info("Loading OIE facts...");
+        // loadOIEInMemory();
+        // logger.info("Loaded " + ALL_OIE.size() + " lines of OIE facts");
+
         indexer();
     }
 
@@ -118,7 +131,6 @@ public class DataIndexer
         Utilities.endTimer(start, "INDEXING COMPLETED IN ");
     }
 
-   
     private static void indexDocs(IndexWriter writer, File file) throws IOException
     {
         // do not try to index files that cannot be read
@@ -171,21 +183,20 @@ public class DataIndexer
                             oieRel = array[1];
                             oieObj = array[2];
 
+                            // if (OIE_PROP_COUNT_MAP.get(oieRel.toLowerCase()) >= 100) {
                             // define all the fields to be indexed
                             oieSubField = new StringField("oieSubField", oieSub.trim().toLowerCase(), Field.Store.YES);
                             oieRelField = new StringField("oieRelField", oieRel.trim().toLowerCase(), Field.Store.YES);
                             oieObjField = new StringField("oieObjField", oieObj.trim().toLowerCase(), Field.Store.YES);
-
-//                            System.out.println(oieSub + "\t" + oieRel + "\t" + oieObj);
+                            // System.out.println(oieSub + "\t" + oieRel + "\t" + oieObj);
                             // add to document
                             document = new Document();
                             document.add(oieSubField);
                             document.add(oieRelField);
                             document.add(oieObjField);
-
                             // add the document finally into the writer
                             writer.addDocument(document);
-
+                            // }
                         }
                     }
 
@@ -199,5 +210,36 @@ public class DataIndexer
             }
         }
     }
+
+    /**
+     * load the oie file base in memory
+     */
+    // private static void loadOIEInMemory()
+    // {
+    // String[] arr = null;
+    // long count;
+    // try {
+    // List<String> oieTriples = FileUtils.readLines(new File(Constants.OIE_DATA_PATH), "UTF-8");
+    //
+    // for (String oieTriple : oieTriples) {
+    // count = 1;
+    // arr = oieTriple.split(";");
+    //
+    // if (arr[1].equalsIgnoreCase("won a tony award for"))
+    // System.out.println();
+    //
+    // if (OIE_PROP_COUNT_MAP.containsKey(arr[1].toLowerCase())) {
+    // count = OIE_PROP_COUNT_MAP.get(arr[1].toLowerCase());
+    // count = count + 1;
+    // }
+    // OIE_PROP_COUNT_MAP.put(arr[1].toLowerCase(), count);
+    //
+    // }
+    //
+    // logger.info("Loaded " + OIE_PROP_COUNT_MAP.size() + ", properties");
+    // } catch (IOException e) {
+    // logger.error(e.getMessage());
+    // }
+    // }
 
 }
