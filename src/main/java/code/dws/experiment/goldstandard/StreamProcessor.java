@@ -68,12 +68,15 @@ public class StreamProcessor {
 			for (String oieTriple : oieTriples) {
 				arr = oieTriple.split(";");
 
-				if (OIE_PROP_COUNT_MAP.containsKey(arr[1])) {
-					count = OIE_PROP_COUNT_MAP.get(arr[1]);
+				if (OIE_PROP_COUNT_MAP.containsKey(arr[1].toLowerCase())) {
+					count = OIE_PROP_COUNT_MAP.get(arr[1].toLowerCase());
 					count = count + 1;
 				}
-				OIE_PROP_COUNT_MAP.put(arr[1].toLowerCase().trim(), count);
+				OIE_PROP_COUNT_MAP.put(arr[1].toLowerCase(), count);
+
 			}
+
+			logger.info("Loaded " + OIE_PROP_COUNT_MAP.size() + ", properties");
 		} catch (IOException e) {
 			logger.error(e.getMessage());
 		}
@@ -97,7 +100,7 @@ public class StreamProcessor {
 					if (OIE_PROP_COUNT_MAP.get(rel.toLowerCase().trim()) >= Long
 							.parseLong(Constants.INSTANCE_THRESHOLD)) {
 						logger.info(rel + " => " + kbRel + "\tD");
-						
+
 						// this is direct
 						DBWrapper.insertIntoPropGS(rel, kbRel, "N");
 					}
