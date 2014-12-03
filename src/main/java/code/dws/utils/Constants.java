@@ -32,7 +32,7 @@ public class Constants
         "select distinct ?val where {?val <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty>} ";
 
     public static long TIMEOUT_MINS = 0;
-
+    
     public static long WORKFLOW = 0;
 
     public static DecimalFormat formatter = new DecimalFormat("###.############");

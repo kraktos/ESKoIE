@@ -97,7 +97,7 @@ public class DataSearcher {
 		subQuery.add(subQuery10, BooleanClause.Occur.SHOULD);
 		subQuery.add(subQuery11, BooleanClause.Occur.SHOULD);
 
-		return subQuery;
+		return subQuery00;
 	}
 
 	/**
@@ -143,8 +143,6 @@ public class DataSearcher {
 			// frame a query on the surname field
 			subQuery = frameQuery(subjQuery, objQuery, "oieSubField",
 					"oieObjField");
-			// subQuery = new TermQuery(new Term("oieSubField",
-			// userQuery.toLowerCase()));
 
 			// execute the search on top results
 			hits = searcher.search(subQuery, null, MAX_RESULTS);
