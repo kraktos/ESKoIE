@@ -10,7 +10,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.sql.DataSource;
+
 import org.apache.log4j.Logger;
+import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 
 import code.dws.utils.Constants;
 
@@ -90,6 +93,22 @@ public class DBConnection {
 
 		logger.debug(driverName + " Registered!\n");
 
+	}
+
+	public static DataSource getDataSource() {
+		BasicDataSource ds = new BasicDataSource();
+
+		try {
+			ds.setDriverClassName(driverName);
+			ds.setUrl(connectionURL + dbName);
+			ds.setUsername(dbUser);
+			ds.setPassword(dbUserPassword);
+
+			return ds;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	public Connection initDB() throws SQLException {

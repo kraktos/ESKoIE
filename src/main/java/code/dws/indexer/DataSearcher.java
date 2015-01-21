@@ -42,7 +42,7 @@ public class DataSearcher {
 		INDEX_DIR = new File(INPUT_OIE_FILE).getParent() + "/index/";
 
 		// uncomment to use as a test client
-		doSearch("eight", "ch");
+		// doSearch("eight", "ch");
 		logger.info("Lucene Index ready for query");
 	}
 

@@ -31,123 +31,131 @@ import code.dws.utils.Utilities;
  * 
  * @author adutta
  */
-public class KBSeeder
-{
+public class KBSeeder {
 
-    // define Logger
-    public static Logger logger = Logger.getLogger(KBSeeder.class.getName());
+	// define Logger
+	public static Logger logger = Logger.getLogger(KBSeeder.class.getName());
 
-    public static final String SEED_KB = "SEED_KB_FACTS.tsv";
+	public static final String SEED_KB = "SEED_KB_FACTS.tsv";
 
-    /**
+	/**
 	 * 
 	 */
-    public KBSeeder()
-    {
+	public KBSeeder() {
 
-    }
+	}
 
-    public static void main(String[] args) throws IOException
-    {
-        int k = 0;
+	public static void main(String[] args) throws IOException {
+		int k = 0;
 
-        Constants.loadConfigParameters(new String[] {"", args[0]});
+		Constants.loadConfigParameters(new String[] { "", args[0] });
 
-        List<String> dbpProps = null;
+		List<String> dbpProps = null;
 
-        // number of KB properties interested in, -1 is all
-        long topKKBProperties = -1;
+		// number of KB properties interested in, -1 is all
+		long topKKBProperties = -1;
 
-        // get the KB object properties
-        // feed based
-        dbpProps = SPARQLEndPointQueryAPI.loadDbpediaProperties(topKKBProperties, Constants.QUERY_OBJECTTYPE);
+		// get the KB object properties
+		// feed based
+		dbpProps = SPARQLEndPointQueryAPI.loadDbpediaProperties(
+				topKKBProperties, Constants.QUERY_OBJECTTYPE);
 
-        while (true) {
-            getKBSampleFeeds(dbpProps);
-        }
+		// init DB
+		DBWrapper.init(Constants.GET_SF);
 
-        // get the ReVerb facts
+		while (true) {
+			getKBSampleFeeds(dbpProps);
+		}
 
-        // get raw triples
+		// get the ReVerb facts
 
-        // scan and match
-    }
+		// get raw triples
 
-    /**
-     * @param dbpProps
-     * @param writer
-     * @param randomizer
-     * @param offsetGen
-     * @param completionService
-     * @param taskList
-     */
-    public static void getKBSampleFeeds(List<String> dbpProps)
-    {
-        BufferedWriter writer = null;
-        Random randomizer = new Random();
-        Random offsetGen = new Random();
+		// scan and match
+	}
 
-        int cores = Runtime.getRuntime().availableProcessors();
-        cores = (cores > Constants.THREAD_MAX_POOL_SIZE) ? cores : Constants.THREAD_MAX_POOL_SIZE;
+	/**
+	 * @param dbpProps
+	 * @param writer
+	 * @param randomizer
+	 * @param offsetGen
+	 * @param completionService
+	 * @param taskList
+	 */
+	public static void getKBSampleFeeds(List<String> dbpProps) {
+		BufferedWriter writer = null;
+		Random randomizer = new Random();
+		Random offsetGen = new Random();
 
-        ExecutorService executorPool = Executors.newFixedThreadPool(cores);
-        ExecutorCompletionService<List<PairDto>> completionService =
-            new ExecutorCompletionService<List<PairDto>>(executorPool);
+		int cores = Runtime.getRuntime().availableProcessors();
+		cores = (cores > Constants.THREAD_MAX_POOL_SIZE) ? cores
+				: Constants.THREAD_MAX_POOL_SIZE;
 
-        // init task list
-        List<Future<List<PairDto>>> taskList = new ArrayList<Future<List<PairDto>>>();
+		ExecutorService executorPool = Executors.newFixedThreadPool(cores);
+		ExecutorCompletionService<List<PairDto>> completionService = new ExecutorCompletionService<List<PairDto>>(
+				executorPool);
 
-        // init DB
-        DBWrapper.init(Constants.GET_SF);
+		// init task list
+		List<Future<List<PairDto>>> taskList = new ArrayList<Future<List<PairDto>>>();
 
-        long i = 0;
-        // iterate the KB properties and find a prop instance prop(sub, obj), randomly
-        // repeat for a long time
+		// init DB
+		// DBWrapper.init(Constants.GET_SF);
 
-        while (i++ != 10) {
-            final String randomKBProp = dbpProps.get(randomizer.nextInt(dbpProps.size()));
-            final int randomNum = offsetGen.nextInt(45000) + 1;
+		long i = 0;
+		// iterate the KB properties and find a prop instance prop(sub, obj),
+		// randomly
+		// repeat for a long time
 
-            // add to the pool of tasks
-            taskList.add(completionService.submit(new Callable<List<PairDto>>()
-            {
-                @Override
-                public List<PairDto> call() throws Exception
-                { // find a random instance with this random KB property
-                    return SPARQLEndPointQueryAPI.getRandomInstance(randomKBProp, randomNum);
-                }
-            }));
-        }
+		while (i++ < 10) {
+			final String randomKBProp = dbpProps.get(randomizer
+					.nextInt(dbpProps.size()));
+			final int randomNum = offsetGen.nextInt(45000) + 1;
 
-        // shutdown pool thread
-        executorPool.shutdown();
-        try {
-            writer = new BufferedWriter(new FileWriter(new File(SEED_KB)));
+			// add to the pool of tasks
+			taskList.add(completionService
+					.submit(new Callable<List<PairDto>>() {
+						@Override
+						// find a random instance with this random KB property
+						public List<PairDto> call() throws Exception {
+							return SPARQLEndPointQueryAPI.getRandomInstance(
+									randomKBProp, randomNum);
+						}
+					}));
+		}
 
-            long start = System.currentTimeMillis();
-            while (!executorPool.isTerminated()) {
-                Future<List<PairDto>> futureTask;
+		// shutdown pool thread
+		executorPool.shutdown();
+		try {
+			writer = new BufferedWriter(new FileWriter(new File(SEED_KB)));
 
-                futureTask = completionService.poll(Constants.TIMEOUT_MINS, TimeUnit.MINUTES);
+			long start = System.currentTimeMillis();
+			while (!executorPool.isTerminated()) {
+				Future<List<PairDto>> futureTask;
 
-                if (futureTask != null) {
-                    List<PairDto> result = futureTask.get();
-                    if (result != null) {
-                        for (PairDto pDto : result) {
-                            logger.debug(pDto.getArg1() + "\t" + pDto.getRel() + "\t" + pDto.getArg2());
-                            writer.write(pDto.getArg1() + "\t" + pDto.getRel() + "\t" + pDto.getArg2() + "\t"
-                                + pDto.getKbArg1() + "\t" + pDto.getKbArg2() + "\n");
-                        }
-                        writer.flush();
-                    }
-                }
-            }
-            Utilities.endTimer(start, i + " tasks finished in ");
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (executorPool.isTerminated())
-                DBWrapper.shutDown();
-        }
-    }
+				futureTask = completionService.poll(Constants.TIMEOUT_MINS,
+						TimeUnit.MINUTES);
+
+				if (futureTask != null) {
+					List<PairDto> result = futureTask.get();
+					if (result != null) {
+						for (PairDto pDto : result) {
+							logger.info(pDto.getArg1() + "\t" + pDto.getRel()
+									+ "\t" + pDto.getArg2());
+							writer.write(pDto.getArg1() + "\t" + pDto.getRel()
+									+ "\t" + pDto.getArg2() + "\t"
+									+ pDto.getKbArg1() + "\t"
+									+ pDto.getKbArg2() + "\n");
+							writer.flush();
+						}
+					}
+				}
+			}
+			Utilities.endTimer(start, i + " tasks finished in ");
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			// if (executorPool.isTerminated())
+			// DBWrapper.shutDown();
+		}
+	}
 }

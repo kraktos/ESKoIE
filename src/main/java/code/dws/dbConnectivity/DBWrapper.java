@@ -88,17 +88,24 @@ public class DBWrapper {
 		}
 	}
 
-	public static void insertIntoPropGS(String oieRel, String kbRel, String inv) {
+	public static void insertIntoPropGS(String oieSub, String oieRel,
+			String oieObj, String kbSub, String kbRel, String kbObj, String inv) {
 		try {
 
-			pstmt.setString(1, oieRel);
-			pstmt.setString(2, kbRel);
-			pstmt.setString(3, "");
-			pstmt.setString(4, inv);
+			pstmt.setString(1, oieSub);
+			pstmt.setString(2, oieRel);
+			pstmt.setString(3, oieObj);
+			pstmt.setString(4, kbSub);
+			pstmt.setString(5, kbRel);
+			pstmt.setString(6, kbObj);
+			pstmt.setString(7, "");
+			pstmt.setString(8, "");
+			pstmt.setString(9, "");
+			pstmt.setString(10, inv);
 
 			pstmt.execute();
 			connection.commit();
-			logger.info("FLUSHED TO OIE_PROP_GS...");
+			logger.info("FLUSHED TO OIE_GS...");
 
 		} catch (SQLException e) {
 			logger.error("Error with insertIntoPropGS .." + e.getMessage());
@@ -363,8 +370,6 @@ public class DBWrapper {
 
 		return results;
 	}
-
-	
 
 	/**
 	 * find the top k candidates for a given surface form/term/ oie instance

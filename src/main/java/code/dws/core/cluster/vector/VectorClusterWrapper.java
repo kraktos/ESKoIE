@@ -25,13 +25,15 @@ public class VectorClusterWrapper {
 		Map<String, List<String>> CLUSTERS = null;
 
 		BufferedWriter writer = null;
+		int bang;
 
 		for (int noOfClusters = 10; noOfClusters < 82; noOfClusters++) {
 
 			writer = new BufferedWriter(new FileWriter(MEDIOD_CLUSTERS_OP
 					+ noOfClusters + ".out"));
 
-			for (int i = 0; i < 50; i++) {
+			for (int i = 0; i < 5; i++) {
+
 				KMeansClustering.main(new String[] { String
 						.valueOf(noOfClusters) });
 				tScore = new SumOfSquaredErrors()
@@ -44,15 +46,20 @@ public class VectorClusterWrapper {
 					CLUSTERS = KMeansClustering.CLUSTERS;
 				}
 			}
-			// logger.info("best far " + noOfClusters + " at " + iOpt);
+			bang = 0;
 			for (Map.Entry<String, List<String>> e : CLUSTERS.entrySet()) {
 				for (String elem : e.getValue()) {
+					bang++;
 					writer.write(elem + "\t");
 				}
 				writer.write("\n");
+				writer.flush();
 			}
 
-			writer.flush();
+			logger.info("best far " + noOfClusters + " at " + iOpt
+					+ " size of elems = " + CLUSTERS.size() + " with " + bang
+					+ " elemnets ");
+
 		} // end of for outer loop
 	}
 }
