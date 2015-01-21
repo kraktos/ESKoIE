@@ -192,7 +192,7 @@ public class Constants {
 	public static final String GET_SF = "select r1.SF, r2.SF from (select SF from wikiPrep where URI=? order by COUNT DESC limit 15) as r1 cross join (select SF from wikiPrep where URI =? order by COUNT DESC limit 15) as r2";
 	// "select r1.SF, r2.SF from wikiPrep as r1 cross join wikiPrep as r2 where r1.URI=? and r2.URI=? and r1.COUNT > 1 and r2.COUNT > 1";
 
-	public static final String INSERT_GS_PROP = "INSERT IGNORE INTO OIE_GS(OIE_SUB, OIE_REL, OIE_OBJ, KB_SUB, KB_REL, KB_OBJ, SUB_EVAL, OBJ_EVAL, REL_EVAL, INVERSE) VALUES (?,?,?,?,?,?,?,?,?,? )";
+	public static final String INSERT_GS_PROP = "INSERT IGNORE INTO OIE_GS(OIE_SUB, OIE_REL, OIE_OBJ, KB_SUB, KB_REL, KB_OBJ, REL_EVAL, INVERSE) VALUES (?,?,?,?,?,?,?,? )";
 	// "INSERT IGNORE INTO OIE_PROP_GS(PHRASE, KB_PROP,EVAL, INV) VALUES (?,?,?,?)";
 
 	public static final String GET_ANNO_PROPERTIES = "SELECT PHRASE, KB_PROP, EVAL, INV FROM OIE_PROP_GS where EVAL = '' limit 1;";

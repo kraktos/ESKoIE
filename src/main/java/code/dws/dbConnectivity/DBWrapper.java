@@ -89,19 +89,17 @@ public class DBWrapper {
 	}
 
 	public static void insertIntoPropGS(String oieSub, String oieRel,
-			String oieObj, String kbSub, String kbRel, String kbObj, String inv) {
+			String oieObj, String kbRel, String inv) {
 		try {
 
 			pstmt.setString(1, oieSub);
 			pstmt.setString(2, oieRel);
 			pstmt.setString(3, oieObj);
-			pstmt.setString(4, kbSub);
+			pstmt.setString(4, "");
 			pstmt.setString(5, kbRel);
-			pstmt.setString(6, kbObj);
+			pstmt.setString(6, "");
 			pstmt.setString(7, "");
-			pstmt.setString(8, "");
-			pstmt.setString(9, "");
-			pstmt.setString(10, inv);
+			pstmt.setString(8, inv);
 
 			pstmt.execute();
 			connection.commit();

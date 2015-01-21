@@ -97,8 +97,6 @@ public class StreamProcessor {
 		try {
 			reltns = DataSearcher.doSearch(oieSub, oieObj);
 
-			// this is inverse
-
 			if (reltns != null) { // populate DB
 				for (String rel : reltns) {
 					System.out.println(Constants.INSTANCE_THRESHOLD);
@@ -110,8 +108,8 @@ public class StreamProcessor {
 										.trim()) + ") => " + kbRel + "\tD");
 
 						// this is direct
-						DBWrapper.insertIntoPropGS(oieSub, rel, oieObj, kbSub,
-								kbRel, kbObj, "N");
+						DBWrapper.insertIntoPropGS(oieSub, rel, oieObj, kbRel,
+								"N");
 					}
 				}
 			} else {
@@ -123,7 +121,7 @@ public class StreamProcessor {
 							logger.info(rel + " => " + kbRel + "\tI");
 							// this is inverse
 							DBWrapper.insertIntoPropGS(oieSub, rel, oieObj,
-									kbSub, kbRel, kbObj, "Y");
+									kbRel, "Y");
 						}
 					}
 				}
