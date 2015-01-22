@@ -108,8 +108,8 @@ public class StreamProcessor {
 										.trim()) + ") => " + kbRel + "\tD");
 
 						// this is direct
-						DBWrapper.insertIntoPropGS(oieSub, rel, oieObj, kbRel,
-								"N");
+						DBWrapper.insertIntoPropGS(oieSub, rel, oieObj, kbSub,
+								kbRel, kbObj, "N");
 					}
 				}
 			} else {
@@ -121,7 +121,7 @@ public class StreamProcessor {
 							logger.info(rel + " => " + kbRel + "\tI");
 							// this is inverse
 							DBWrapper.insertIntoPropGS(oieSub, rel, oieObj,
-									kbRel, "Y");
+									kbObj, kbRel, kbSub, "Y");
 						}
 					}
 				}
