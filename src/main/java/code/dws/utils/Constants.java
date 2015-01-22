@@ -197,6 +197,8 @@ public class Constants {
 
 	public static final String GET_ANNO_PROPERTIES = "SELECT PHRASE, KB_PROP, EVAL, INV FROM OIE_PROP_GS where EVAL = '' limit 1;";
 
+	public static String OIE_DATA_SEPERARTOR = null;
+
 	/**
 	 * insert DBPedia types SQL
 	 */
@@ -281,6 +283,8 @@ public class Constants {
 					.getProperty("TOP_K_NUMERIC_PROPERTIES"));
 
 			OIE_DATA_PATH = prop.getProperty("OIE_DATA_PATH");
+			
+			OIE_DATA_SEPERARTOR = prop.getProperty("OIE_DATA_SEPERARTOR");
 
 			WORKFLOW_NORMAL = Boolean.valueOf(prop
 					.getProperty("WORKFLOW_NORMAL"));
