@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 
 import code.dws.dbConnectivity.DBWrapper;
 import code.dws.utils.Constants;
+import code.dws.utils.Utilities;
 
 /**
  * @author adutta
@@ -24,6 +25,8 @@ public class GSSampleCreator {
 	// define Logger
 	public static Logger logger = Logger.getLogger(GSSampleCreator.class
 			.getName());
+
+	private static Map<String, List<List<String>>> ANNO_PROPS = new HashMap<String, List<List<String>>>();
 
 	/**
 	 * 
@@ -53,8 +56,6 @@ public class GSSampleCreator {
 	 */
 	private static void loadAnnotatedProperties() {
 
-		Map<String, List<List<String>>> ANNO_PROPS = new HashMap<String, List<List<String>>>();
-
 		// init the DB
 		DBWrapper.init(Constants.GET_OIE_PROPERTIES_ANNOTATED);
 		ANNO_PROPS = DBWrapper.getAnnoPairs();
@@ -75,6 +76,13 @@ public class GSSampleCreator {
 	private static void sampleFile(String fMinusFile) {
 		String line = null;
 		Scanner scan = null;
+		String oieSub = null;
+		String oieObj = null;
+
+		String[] elems = null;
+
+		List<String> candidateSubjs = null;
+		List<String> candidateObjs = null;
 
 		try {
 			scan = new Scanner(new File(fMinusFile), "UTF-8");
@@ -82,10 +90,43 @@ public class GSSampleCreator {
 			e.printStackTrace();
 		}
 
+		// init DB
+		DBWrapper.init(Constants.GET_WIKI_LINKS_APRIORI_SQL);
+
 		// iterate the file
 		while (scan.hasNextLine()) {
 			line = scan.nextLine();
-			logger.info(line);
+			elems = line.split(Constants.OIE_DATA_SEPERARTOR);
+
+			// valid line which can be used for evaluation
+			if (ANNO_PROPS.containsKey(elems[1])) {
+
+				logger.info(line);
+
+				oieSub = elems[0];
+				oieObj = elems[2];
+
+				// get the top-k concepts for the subject
+				candidateSubjs = DBWrapper.fetchTopKLinksWikiPrepProb(Utilities
+						.cleanse(oieSub).replaceAll("\\_+", " ").trim(),
+						Constants.TOP_K_MATCHES);
+
+				// get the top-k concepts for the object
+				candidateObjs = DBWrapper.fetchTopKLinksWikiPrepProb(Utilities
+						.cleanse(oieObj).replaceAll("\\_+", " ").trim(),
+						Constants.TOP_K_MATCHES);
+
+				writeOut(candidateSubjs, candidateObjs,
+						ANNO_PROPS.get(elems[1]));
+
+			}
+
 		}
+		DBWrapper.shutDown();
+	}
+
+	private static void writeOut(List<String> candidateSubjs,
+			List<String> candidateObjs, List<List<String>> list) {
+
 	}
 }
