@@ -36,6 +36,7 @@ public class OIEFactSeperator {
 	// define Logger
 	public static Logger log = Logger.getLogger(GenerateNewProperties.class
 			.getName());
+	private static long missed = 0;
 
 	/**
 	 * @param args
@@ -115,7 +116,8 @@ public class OIEFactSeperator {
 						factMinusWriter);
 
 			} catch (Exception ex) {
-				log.error("Problem with line " + line + "\t" + ex.getMessage());
+				missed++;
+				log.error("Problem with line " + line + "\t; mised = " + missed);
 			}
 		}
 	}

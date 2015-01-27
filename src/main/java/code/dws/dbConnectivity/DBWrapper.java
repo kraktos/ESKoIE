@@ -11,7 +11,9 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -361,7 +363,6 @@ public class DBWrapper {
 						.replaceAll("\\s", "_").replaceAll("\\[", "\\(")
 						.replaceAll("\\]", "\\")));
 			}
-
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
@@ -523,4 +524,43 @@ public class DBWrapper {
 
 	}
 
+	/**
+	 * retrieves the list of fully annotated property mappings
+	 * 
+	 * @return
+	 */
+	public static Map<String, List<List<String>>> getAnnoPairs() {
+
+		Map<String, List<List<String>>> results = null;
+		List<String> attributes = null;
+		List<List<String>> val = null;
+
+		ResultSet rs = null;
+
+		String oiePred = null;
+
+		try {
+			rs = pstmt.executeQuery();
+			results = new HashMap<String, List<List<String>>>();
+
+			while (rs.next()) {
+				attributes = new ArrayList<String>();
+				oiePred = rs.getString(1);
+
+				attributes.add(rs.getString(2));
+				attributes.add(rs.getString(3));
+				attributes.add(rs.getString(4));
+
+				if (results.containsKey(oiePred)) {
+					val = results.get(oiePred);
+				} else {
+					val = new ArrayList<List<String>>();
+				}
+				val.add(attributes);
+				results.put(oiePred, val);
+			}
+		} catch (Exception e) {
+		}
+		return results;
+	}
 }
