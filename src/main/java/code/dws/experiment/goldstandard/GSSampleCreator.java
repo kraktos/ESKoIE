@@ -3,8 +3,11 @@
  */
 package code.dws.experiment.goldstandard;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +51,11 @@ public class GSSampleCreator {
 		loadAnnotatedProperties();
 
 		// load the fminus File, randomly sampling lines
-		sampleFile(location + "/fMinus.dat");
+		try {
+			sampleFile(location);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -71,12 +78,14 @@ public class GSSampleCreator {
 	/**
 	 * sample for the triples which should be used for annotation
 	 * 
-	 * @param fMinusFile
+	 * @param directory
+	 * @throws IOException
 	 */
-	private static void sampleFile(String fMinusFile) {
+	private static void sampleFile(String directory) throws IOException {
 		String line = null;
 		Scanner scan = null;
 		String oieSub = null;
+		String oieRel = null;
 		String oieObj = null;
 
 		String[] elems = null;
@@ -85,10 +94,13 @@ public class GSSampleCreator {
 		List<String> candidateObjs = null;
 
 		try {
-			scan = new Scanner(new File(fMinusFile), "UTF-8");
+			scan = new Scanner(new File(directory + "/fMinus.dat"), "UTF-8");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
+
+		BufferedWriter goldFile = new BufferedWriter(new FileWriter(directory
+				+ "/GOLD.tsv"));
 
 		// init DB
 		DBWrapper.init(Constants.GET_WIKI_LINKS_APRIORI_SQL);
@@ -104,6 +116,7 @@ public class GSSampleCreator {
 				logger.debug(line);
 
 				oieSub = elems[0];
+				oieRel = elems[1];
 				oieObj = elems[2];
 
 				// get the top-k concepts for the subject
@@ -116,22 +129,53 @@ public class GSSampleCreator {
 						.cleanse(oieObj).replaceAll("\\_+", " ").trim(),
 						Constants.TOP_K_MATCHES);
 
-				writeOut(line, candidateSubjs, candidateObjs,
-						ANNO_PROPS.get(elems[1]));
+				writeOut(line, candidateSubjs, candidateObjs, oieSub, oieRel,
+						oieObj, goldFile);
 			}
 		}
+
+		if (goldFile != null)
+			goldFile.close();
+
 		DBWrapper.shutDown();
 	}
 
+	/**
+	 * write out in a way it is convenient to annotate
+	 * 
+	 * @param line
+	 * @param candidateSubjs
+	 * @param candidateObjs
+	 * @param goldFile
+	 * @param possibleValues
+	 * @throws IOException
+	 */
 	private static void writeOut(String line, List<String> candidateSubjs,
-			List<String> candidateObjs, List<List<String>> list) {
+			List<String> candidateObjs, String oieSub, String oieRel,
+			String oieObj, BufferedWriter goldFile) throws IOException {
+
+		// header section
+		goldFile.write(oieSub + "\t" + oieRel + "\t" + oieObj + "\t" + ""
+				+ "\t" + "" + "\t\n");
+
+		int depth = (ANNO_PROPS.get(oieRel).size() > Constants.TOP_K_MATCHES) ? ANNO_PROPS
+				.get(oieRel).size() : Constants.TOP_K_MATCHES;
 
 		// iterate the candidates and write out the options
-		for (String sub : candidateSubjs) {
-			for (String obj : candidateObjs) {
-				logger.info(line + "\t" + sub.split("\t")[0] + "\t"
-						+ obj.split("\t")[0]);
-			}
+		for (int i = 0; i < depth; i++) {
+			String candSub = (i >= candidateSubjs.size()) ? "" : candidateSubjs
+					.get(i).split("\t")[0];
+			String candObj = (i >= candidateObjs.size()) ? "" : candidateObjs
+					.get(i).split("\t")[0];
+			String candRel = (i >= ANNO_PROPS.get(oieRel).size()) ? ""
+					: ANNO_PROPS.get(oieRel).get(i).get(0);
+
+			goldFile.write("\t\t\t" + Utilities.utf8ToCharacter(candSub) + "\t"
+					+ candRel + "\t" + Utilities.utf8ToCharacter(candObj)
+					+ "\n");
 		}
+		// a line separator
+		goldFile.write("\n");
+		goldFile.flush();
 	}
 }
