@@ -110,7 +110,7 @@ public class GSSampleCreator {
 
 		// iterate the file
 		while (gsSize != k) {
-			line = lines.get(rand.nextInt(lines.size()) + 1);
+			line = lines.get(rand.nextInt(lines.size()));
 			elems = line.split(Constants.OIE_DATA_SEPERARTOR);
 
 			// valid line which can be used for evaluation
