@@ -384,6 +384,8 @@ public class DBWrapper {
 
 		DecimalFormat decimalFormatter = new DecimalFormat("0.00000");
 
+		if (arg == null || arg.length() == 0)
+			return new ArrayList<String>();
 		try {
 			if (!EvidenceBuilder.INSTANCE_CANDIDATES.containsKey(arg)) {
 

@@ -101,7 +101,7 @@ public class GSSampleCreator {
 			// valid line which can be used for evaluation
 			if (ANNO_PROPS.containsKey(elems[1])) {
 
-				logger.info(line);
+				logger.debug(line);
 
 				oieSub = elems[0];
 				oieObj = elems[2];
@@ -116,17 +116,22 @@ public class GSSampleCreator {
 						.cleanse(oieObj).replaceAll("\\_+", " ").trim(),
 						Constants.TOP_K_MATCHES);
 
-				writeOut(candidateSubjs, candidateObjs,
+				writeOut(line, candidateSubjs, candidateObjs,
 						ANNO_PROPS.get(elems[1]));
-
 			}
-
 		}
 		DBWrapper.shutDown();
 	}
 
-	private static void writeOut(List<String> candidateSubjs,
+	private static void writeOut(String line, List<String> candidateSubjs,
 			List<String> candidateObjs, List<List<String>> list) {
 
+		// iterate the candidates and write out the options
+		for (String sub : candidateSubjs) {
+			for (String obj : candidateObjs) {
+				logger.info(line + "\t" + sub.split("\t")[0] + "\t"
+						+ obj.split("\t")[0]);
+			}
+		}
 	}
 }

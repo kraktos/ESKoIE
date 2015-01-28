@@ -19,6 +19,7 @@ import code.dws.query.SPARQLEndPointQueryAPI;
 import code.dws.utils.Constants;
 import code.dws.utils.Utilities;
 
+import com.hp.hpl.jena.query.QueryException;
 import com.hp.hpl.jena.query.QuerySolution;
 
 /**
@@ -36,7 +37,7 @@ public class OIEFactSeperator {
 	// define Logger
 	public static Logger log = Logger.getLogger(GenerateNewProperties.class
 			.getName());
-	private static long missed = 0;
+	private static long noURIfactMinus = 0;
 
 	/**
 	 * @param args
@@ -95,31 +96,35 @@ public class OIEFactSeperator {
 			line = scan.nextLine();
 
 			elems = line.split(Constants.OIE_DATA_SEPERARTOR);
-			try {
-				log.debug(elems[0] + "\t" + elems[1] + "\t" + elems[2] + "\n");
 
-				// get the nell subjects and objects
-				oieRawSubj = elems[0];
-				oieRawObj = elems[2];
+			log.debug(elems[0] + "\t" + elems[1] + "\t" + elems[2] + "\n");
 
-				// get the top-k concepts for the subject
-				candidateSubjs = DBWrapper.fetchTopKLinksWikiPrepProb(Utilities
-						.cleanse(oieRawSubj).replaceAll("\\_+", " ").trim(),
-						Constants.TOP_K_MATCHES);
+			// get the nell subjects and objects
+			oieRawSubj = elems[0];
+			oieRawObj = elems[2];
 
-				// get the top-k concepts for the object
-				candidateObjs = DBWrapper.fetchTopKLinksWikiPrepProb(Utilities
-						.cleanse(oieRawObj).replaceAll("\\_+", " ").trim(),
-						Constants.TOP_K_MATCHES);
+			if (oieRawSubj.indexOf("A Bird") != -1)
+				System.out.println();
 
+			// get the top-k concepts for the subject
+			candidateSubjs = DBWrapper.fetchTopKLinksWikiPrepProb(Utilities
+					.cleanse(oieRawSubj).replaceAll("\\_+", " ").trim(),
+					Constants.TOP_K_MATCHES);
+
+			// get the top-k concepts for the object
+			candidateObjs = DBWrapper.fetchTopKLinksWikiPrepProb(Utilities
+					.cleanse(oieRawObj).replaceAll("\\_+", " ").trim(),
+					Constants.TOP_K_MATCHES);
+
+			if (candidateSubjs.size() > 0 && candidateObjs.size() > 0)
 				findInKB(line, candidateSubjs, candidateObjs, factPlusWriter,
 						factMinusWriter);
-
-			} catch (Exception ex) {
-				missed++;
-				log.error("Problem with line " + line + "\t; mised = " + missed);
-			}
+			else
+				noURIfactMinus++;
 		}
+
+		log.info("zero mappability facts (subset of factMinus) = "
+				+ noURIfactMinus);
 	}
 
 	/**
@@ -139,9 +144,12 @@ public class OIEFactSeperator {
 
 		for (String subjCand : candidateSubjs) {
 			for (String objCand : candidateObjs) {
-
-				hasInKB = getAssertionFromEndpoint(subjCand.split("\t")[0],
-						objCand.split("\t")[0]);
+				try {
+					hasInKB = getAssertionFromEndpoint(subjCand.split("\t")[0],
+							objCand.split("\t")[0]);
+				} catch (QueryException ex) {
+					log.error("Problem with finding in KB " + line);
+				}
 				if (hasInKB)
 					break;
 			}
@@ -158,9 +166,7 @@ public class OIEFactSeperator {
 				factMinusWriter.flush();
 			}
 		} catch (IOException e) {
-			log.error("Problem with finding in KB " + e.getMessage());
 		}
-
 	}
 
 	/**
@@ -173,16 +179,6 @@ public class OIEFactSeperator {
 	private static boolean getAssertionFromEndpoint(String candSubj,
 			String candObj) {
 
-		// remove all utf-8 characters and convert them to characters
-		candSubj = Utilities.utf8ToCharacter(candSubj);
-		candObj = Utilities.utf8ToCharacter(candObj);
-
-		if (candSubj.endsWith("%"))
-			candSubj = candSubj.replaceAll("%", "");
-
-		if (candObj.endsWith("%"))
-			candObj = candObj.replaceAll("%", "");
-
 		String sparqlQuery = "select * where {<"
 				+ Constants.DBPEDIA_INSTANCE_NS
 				+ candSubj
@@ -193,11 +189,34 @@ public class OIEFactSeperator {
 				+ "?val <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty>."
 				+ "FILTER(!regex(str(?val), 'http://dbpedia.org/ontology/wikiPageWikiLink'))}";
 
-		log.debug(sparqlQuery);
-
 		// fetch the result set
 		List<QuerySolution> listResults = SPARQLEndPointQueryAPI
 				.queryDBPediaEndPoint(sparqlQuery);
+
+		if (listResults.size() == 0) {
+			candSubj = Utilities.utf8ToCharacter(candSubj);
+			candObj = Utilities.utf8ToCharacter(candObj);
+
+			if (candSubj.endsWith("%"))
+				candSubj = candSubj.replaceAll("%", "");
+
+			if (candObj.endsWith("%"))
+				candObj = candObj.replaceAll("%", "");
+
+			sparqlQuery = "select * where {<"
+					+ Constants.DBPEDIA_INSTANCE_NS
+					+ candSubj
+					+ "> ?val <"
+					+ Constants.DBPEDIA_INSTANCE_NS
+					+ candObj
+					+ ">. "
+					+ "?val <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty>."
+					+ "FILTER(!regex(str(?val), 'http://dbpedia.org/ontology/wikiPageWikiLink'))}";
+
+			// fetch the result set
+			listResults = SPARQLEndPointQueryAPI
+					.queryDBPediaEndPoint(sparqlQuery);
+		}
 
 		// debug point if interested in seeing the assertion in KB
 		// for (QuerySolution querySol : listResults) {

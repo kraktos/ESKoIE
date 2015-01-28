@@ -30,423 +30,409 @@ import org.apache.log4j.Logger;
  * 
  * @author Arnab Dutta
  */
-public class Utilities
-{
-    // define Logger
-    public static Logger logger = Logger.getLogger(Utilities.class.getName());
+public class Utilities {
+	// define Logger
+	public static Logger logger = Logger.getLogger(Utilities.class.getName());
 
-    public static HashSet<String> dict = new HashSet<String>();
+	public static HashSet<String> dict = new HashSet<String>();
 
-    public static int countGlbl = 10;
+	public static int countGlbl = 10;
 
-    public static Set<String> set = new TreeSet<String>();
+	public static Set<String> set = new TreeSet<String>();
 
-    // define Logger
+	// define Logger
 
-    static Set<Long> UNIQUE_PROPERTIES = new HashSet<Long>();
+	static Set<Long> UNIQUE_PROPERTIES = new HashSet<Long>();
 
-    // set of stop words
-    static final Set<String> STOP_WORDS = new HashSet<String>(Arrays.asList("a", "the", "an", "of"));
+	// set of stop words
+	static final Set<String> STOP_WORDS = new HashSet<String>(Arrays.asList(
+			"a", "the", "an", "of"));
 
-    /**
-     * Prints a map
-     * 
-     * @param map
-     */
-    public static void printMap(Map< ? , ? > map)
-    {
-        for (Iterator< ? > it = map.entrySet().iterator(); it.hasNext();) {
-            Map.Entry< ? , ? > entry = (Entry< ? , ? >) it.next();
-            Object key = entry.getKey();
-            Object value = entry.getValue();
-            logger.info(key + "  " + value);
-        }
-    }
+	/**
+	 * Prints a map
+	 * 
+	 * @param map
+	 */
+	public static void printMap(Map<?, ?> map) {
+		for (Iterator<?> it = map.entrySet().iterator(); it.hasNext();) {
+			Map.Entry<?, ?> entry = (Entry<?, ?>) it.next();
+			Object key = entry.getKey();
+			Object value = entry.getValue();
+			logger.info(key + "  " + value);
+		}
+	}
 
-    /**
-     * Iterate the list and print out the string literals for the query
-     * 
-     * @param resultList
-     * @param out
-     */
-    public static void printList(List<Long> resultList, BufferedWriter out)
-    {
-        try {
-            for (int listCounter = 0; listCounter < resultList.size(); listCounter++) {
-                // print only the odd values
-                if (listCounter % 2 != 0) {
-                    // this gives a set of properties for the given query
-                    UNIQUE_PROPERTIES.add(resultList.get(listCounter));
-                }
-            }
-            logger.info("Unique properties  = " + UNIQUE_PROPERTIES.size() + "\n");
-        } finally {
-            UNIQUE_PROPERTIES.clear();
-        }
+	/**
+	 * Iterate the list and print out the string literals for the query
+	 * 
+	 * @param resultList
+	 * @param out
+	 */
+	public static void printList(List<Long> resultList, BufferedWriter out) {
+		try {
+			for (int listCounter = 0; listCounter < resultList.size(); listCounter++) {
+				// print only the odd values
+				if (listCounter % 2 != 0) {
+					// this gives a set of properties for the given query
+					UNIQUE_PROPERTIES.add(resultList.get(listCounter));
+				}
+			}
+			logger.info("Unique properties  = " + UNIQUE_PROPERTIES.size()
+					+ "\n");
+		} finally {
+			UNIQUE_PROPERTIES.clear();
+		}
 
-    }
+	}
 
-    /**
-     * Prints a set
-     * 
-     * @param set
-     */
-    public static void printSet(final Set< ? > set)
-    {
-        Iterator< ? > it = set.iterator();
-        while (it.hasNext()) {
-            logger.info(it.next().toString());
-        }
-    }
+	/**
+	 * Prints a set
+	 * 
+	 * @param set
+	 */
+	public static void printSet(final Set<?> set) {
+		Iterator<?> it = set.iterator();
+		while (it.hasNext()) {
+			logger.info(it.next().toString());
+		}
+	}
 
-    /**
-     * @param start the timer start point
-     * @param message the message you want to display
-     */
-    public static void endTimer(final long start, final String message)
-    {
-        long end = System.currentTimeMillis();
-        long execTime = end - start;
-        logger.info(message + " " + String.format("%02d ms", TimeUnit.MILLISECONDS.toMillis(execTime)));
-    }
+	/**
+	 * @param start
+	 *            the timer start point
+	 * @param message
+	 *            the message you want to display
+	 */
+	public static void endTimer(final long start, final String message) {
+		long end = System.currentTimeMillis();
+		long execTime = end - start;
+		logger.info(message
+				+ " "
+				+ String.format("%02d ms",
+						TimeUnit.MILLISECONDS.toMillis(execTime)));
+	}
 
-    /**
-     * @return the start point of time
-     */
-    public static long startTimer()
-    {
-        return System.currentTimeMillis();
-    }
+	/**
+	 * @return the start point of time
+	 */
+	public static long startTimer() {
+		return System.currentTimeMillis();
+	}
 
-    public static void printList(List< ? > resultList)
-    {
-        for (int listCounter = 0; listCounter < resultList.size(); listCounter++) {
-            logger.info(resultList.get(listCounter).toString());
-        }
-    }
+	public static void printList(List<?> resultList) {
+		for (int listCounter = 0; listCounter < resultList.size(); listCounter++) {
+			logger.info(resultList.get(listCounter).toString());
+		}
+	}
 
-    public static String prun(String uri)
-    {
-        String s = uri.substring(uri.lastIndexOf("/") + 1, uri.length());
-        if (s.indexOf(":") != -1)
-            s = s.replaceAll(":", "");
+	public static String prun(String uri) {
+		String s = uri.substring(uri.lastIndexOf("/") + 1, uri.length());
+		if (s.indexOf(":") != -1)
+			s = s.replaceAll(":", "");
 
-        return s;
-    }
+		return s;
+	}
 
-    public static String cleanse(String arg)
-    {
-        // arg = arg.substring(arg.lastIndexOf(":") + 1, arg.length());
-        if (arg.indexOf(":") != -1)
-            arg = StringUtils.substringAfter(arg, ":");
-        return arg.toLowerCase();
-    }
+	public static String cleanse(String arg) {
 
-    /**
-     * oie instance cleaning
-     * 
-     * @param arg
-     * @return
-     */
-    public static String clean(String arg)
-    {
-        if (arg.indexOf(":") != -1)
-            arg = arg.substring(arg.indexOf(":") + 1, arg.length());
+		if (arg.indexOf(":") != -1)
+			arg = StringUtils.substringAfter(arg, ":");
 
-        return arg.replaceAll("\\_+", " ");
-    }
+		arg = arg.replaceAll("^(A|a)", "");
+		return arg.toLowerCase();
+	}
 
-    public static String removeStopWords(String originalWord)
-    {
-        StringBuffer retVal = new StringBuffer();
-        String[] arrWords = originalWord.split(" ");
-        for (String word : arrWords) {
-            if (!STOP_WORDS.contains(word.toLowerCase())) {
-                retVal.append(word + " ");
-            }
-        }
+	/**
+	 * oie instance cleaning
+	 * 
+	 * @param arg
+	 * @return
+	 */
+	public static String clean(String arg) {
+		if (arg.indexOf(":") != -1)
+			arg = arg.substring(arg.indexOf(":") + 1, arg.length());
 
-        return retVal.toString().toLowerCase().trim();
-    }
+		return arg.replaceAll("\\_+", " ");
 
-    /**
-     * encodes a string with special character to one with UTF-8 encoding
-     * 
-     * @param arg
-     * @return
-     */
-    public static String characterToUTF8(String arg)
-    {
-        try {
-            if (arg == null)
-                return arg;
-            return URLEncoder.encode(arg, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            logger.info("Exception while encoding");
-        }
-        return arg;
-    }
+	}
 
-    /**
-     * decodes a string with UTF-8 encoding to special character
-     * 
-     * @param arg
-     * @return
-     */
-    public static String utf8ToCharacter(String arg)
-    {
-        try {
-            if (arg == null)
-                return arg;
-            return URLDecoder.decode(arg, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            logger.info("Exception while dencoding");
-            e.printStackTrace();
-        } catch (IllegalArgumentException e2) {
-            logger.info("Exception while dencoding");
-            e2.printStackTrace();
-        }
-        return arg;
-    }
+	public static String removeStopWords(String originalWord) {
+		StringBuffer retVal = new StringBuffer();
+		String[] arrWords = originalWord.split(" ");
+		for (String word : arrWords) {
+			if (!STOP_WORDS.contains(word.toLowerCase())) {
+				retVal.append(word + " ");
+			}
+		}
 
-    /**
-     * converts a probability to weights with smoothing
-     * 
-     * @param prob
-     * @return
-     */
-    public static double convertProbabilityToWeight(double prob)
-    {
-        if (Constants.USE_LOGIT) {
-            // smoothing
-            if (prob >= 1)
-                prob = 1 - Math.pow(10, -6);
-            if (prob <= 0)
-                prob = 0 + Math.pow(10, -6);
+		return retVal.toString().toLowerCase().trim();
+	}
 
-            return Constants.SCALE_WEIGHT + Math.log(prob / (1 - prob));
-        } else
-            return prob;
-    }
+	/**
+	 * encodes a string with special character to one with UTF-8 encoding
+	 * 
+	 * @param arg
+	 * @return
+	 */
+	public static String characterToUTF8(String arg) {
+		try {
+			if (arg == null)
+				return arg;
+			return URLEncoder.encode(arg, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			logger.info("Exception while encoding");
+		}
+		return arg;
+	}
 
-    // public static Map sortByValue(Map map) {
-    // List list = new LinkedList(map.entrySet());
-    // Collections.sort(list, new Comparator() {
-    // public int compare(Object o2, Object o1) {
-    // return ((Comparable) ((Map.Entry) (o1)).getValue())
-    // .compareTo(((Map.Entry) (o2)).getValue());
-    // }
-    // });
-    //
-    // Map result = new LinkedHashMap();
-    // for (Iterator it = list.iterator(); it.hasNext();) {
-    // Map.Entry entry = (Map.Entry) it.next();
-    // result.put(entry.getKey(), entry.getValue());
-    // }
-    // return result;
-    // }
+	/**
+	 * decodes a string with UTF-8 encoding to special character
+	 * 
+	 * @param arg
+	 * @return
+	 */
+	public static String utf8ToCharacter(String arg) {
+		try {
+			if (arg == null)
+				return arg;
+			return URLDecoder.decode(arg, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			logger.info("Exception while dencoding");
+			e.printStackTrace();
+		} catch (IllegalArgumentException e2) {
+			logger.info("Exception while dencoding");
+			e2.printStackTrace();
+		}
+		return arg;
+	}
 
-    // ***************************************************************
-    /**
-     * removes the DBpedia header uri information and cleanes the concept from any special character by converting it to
-     * to UTF-8
-     * 
-     * @param arg
-     * @return
-     */
-    public static String cleanDBpediaURI(String arg)
-    {
-        return arg.replaceAll(Constants.DBPEDIA_PREDICATE_NS, "").replaceAll(Constants.DBPEDIA_INSTANCE_NS, "")
-            .replaceAll("\"", ""); // TODO
-        // replaceAll(":_", "__")
-    }
+	/**
+	 * converts a probability to weights with smoothing
+	 * 
+	 * @param prob
+	 * @return
+	 */
+	public static double convertProbabilityToWeight(double prob) {
+		if (Constants.USE_LOGIT) {
+			// smoothing
+			if (prob >= 1)
+				prob = 1 - Math.pow(10, -6);
+			if (prob <= 0)
+				prob = 0 + Math.pow(10, -6);
 
-    public static String cleanYagoURI(String arg)
-    {
-        return arg.replaceAll(Constants.YAGO_HEADER + "/", "").replaceAll(Constants.DBPEDIA_INSTANCE_NS, "")
-            .replaceAll("\"", ""); // TODO
-        // replaceAll(":_", "__")
-    }
+			return Constants.SCALE_WEIGHT + Math.log(prob / (1 - prob));
+		} else
+			return prob;
+	}
 
-    public static String cleanForMLNPresentation(String arg)
-    {
-        arg = arg.replaceAll("(", "[");
-        arg = arg.replaceAll(")", "]");
-        arg = arg.replaceAll("&", "~26");
+	// public static Map sortByValue(Map map) {
+	// List list = new LinkedList(map.entrySet());
+	// Collections.sort(list, new Comparator() {
+	// public int compare(Object o2, Object o1) {
+	// return ((Comparable) ((Map.Entry) (o1)).getValue())
+	// .compareTo(((Map.Entry) (o2)).getValue());
+	// }
+	// });
+	//
+	// Map result = new LinkedHashMap();
+	// for (Iterator it = list.iterator(); it.hasNext();) {
+	// Map.Entry entry = (Map.Entry) it.next();
+	// result.put(entry.getKey(), entry.getValue());
+	// }
+	// return result;
+	// }
 
-        return arg;
-    }
+	// ***************************************************************
+	/**
+	 * removes the DBpedia header uri information and cleanes the concept from
+	 * any special character by converting it to to UTF-8
+	 * 
+	 * @param arg
+	 * @return
+	 */
+	public static String cleanDBpediaURI(String arg) {
+		return arg.replaceAll(Constants.DBPEDIA_PREDICATE_NS, "")
+				.replaceAll(Constants.DBPEDIA_INSTANCE_NS, "")
+				.replaceAll("\"", ""); // TODO
+		// replaceAll(":_", "__")
+	}
 
-    public static String cleanTerms(String arg)
-    {
-        arg = arg.replaceAll("\"", "").trim();
-        arg = arg.replaceAll("http://dbpedia.org/resource/", "");
-        return arg;
-    }
+	public static String cleanYagoURI(String arg) {
+		return arg.replaceAll(Constants.YAGO_HEADER + "/", "")
+				.replaceAll(Constants.DBPEDIA_INSTANCE_NS, "")
+				.replaceAll("\"", ""); // TODO
+		// replaceAll(":_", "__")
+	}
 
-    public static String cleanseInstances(String dbpInst)
-    {
-        dbpInst = dbpInst.replaceAll("~", "%");
-        dbpInst = dbpInst.replaceAll("\\[", "(");
-        dbpInst = dbpInst.replaceAll("\\]", ")");
-        dbpInst = dbpInst.replaceAll("\\*", "'");
-        return utf8ToCharacter(dbpInst);
-    }
+	public static String cleanForMLNPresentation(String arg) {
+		arg = arg.replaceAll("(", "[");
+		arg = arg.replaceAll(")", "]");
+		arg = arg.replaceAll("&", "~26");
 
-    /**
-     * sort a map by value descending
-     * 
-     * @param map
-     * @param totalScore
-     * @param tripleCounter
-     * @return
-     */
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public static Map<String, Long> sortByValue(Map map)
-    {
-        List list = new LinkedList(map.entrySet());
-        Collections.sort(list, new Comparator()
-        {
-            public int compare(Object o2, Object o1)
-            {
-                return ((Comparable) ((Map.Entry) (o1)).getValue()).compareTo(((Map.Entry) (o2)).getValue());
-            }
-        });
+		return arg;
+	}
 
-        Map result = new LinkedHashMap();
-        for (Iterator it = list.iterator(); it.hasNext();) {
-            Map.Entry<String, Long> entry = (Map.Entry) it.next();
-            result.put(entry.getKey(), entry.getValue());
-        }
-        return result;
-    }
+	public static String cleanTerms(String arg) {
+		arg = arg.replaceAll("\"", "").trim();
+		arg = arg.replaceAll("http://dbpedia.org/resource/", "");
+		return arg;
+	}
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public static Map sortByValue(Map map, Long cutOff)
-    {
-        List list = new LinkedList(map.entrySet());
-        Collections.sort(list, new Comparator()
-        {
-            public int compare(Object o1, Object o2)
-            {
-                return ((Comparable) ((Map.Entry) (o2)).getValue()).compareTo(((Map.Entry) (o1)).getValue());
-            }
-        });
+	public static String cleanseInstances(String dbpInst) {
+		dbpInst = dbpInst.replaceAll("~", "%");
+		dbpInst = dbpInst.replaceAll("\\[", "(");
+		dbpInst = dbpInst.replaceAll("\\]", ")");
+		dbpInst = dbpInst.replaceAll("\\*", "'");
+		return utf8ToCharacter(dbpInst);
+	}
 
-        Map result = new LinkedHashMap();
-        for (Iterator it = list.iterator(); it.hasNext();) {
-            Map.Entry<String, Long> entry = (Map.Entry) it.next();
-            if (entry.getValue() >= cutOff)
-                result.put(entry.getKey(), entry.getValue());
-        }
-        return result;
-    }
+	/**
+	 * sort a map by value descending
+	 * 
+	 * @param map
+	 * @param totalScore
+	 * @param tripleCounter
+	 * @return
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static Map<String, Long> sortByValue(Map map) {
+		List list = new LinkedList(map.entrySet());
+		Collections.sort(list, new Comparator() {
+			public int compare(Object o2, Object o1) {
+				return ((Comparable) ((Map.Entry) (o1)).getValue())
+						.compareTo(((Map.Entry) (o2)).getValue());
+			}
+		});
 
-    /**
-     * get the actual nell instance, following the ":" if any
-     * 
-     * @param arg
-     * @param identifier
-     * @return
-     */
-    public static String getInst(String arg)
-    {
+		Map result = new LinkedHashMap();
+		for (Iterator it = list.iterator(); it.hasNext();) {
+			Map.Entry<String, Long> entry = (Map.Entry) it.next();
+			result.put(entry.getKey(), entry.getValue());
+		}
+		return result;
+	}
 
-        if (arg.indexOf(":") != -1)
-            return arg.substring(arg.indexOf(":") + 1, arg.length());
-        else
-            return arg;
-    }
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static Map sortByValue(Map map, Long cutOff) {
+		List list = new LinkedList(map.entrySet());
+		Collections.sort(list, new Comparator() {
+			public int compare(Object o1, Object o2) {
+				return ((Comparable) ((Map.Entry) (o2)).getValue())
+						.compareTo(((Map.Entry) (o1)).getValue());
+			}
+		});
 
-    /**
-     * cleans of the "<" or ">" on the concepts
-     * 
-     * @param arg value to be cleaned
-     * @return
-     */
-    public static String removeTags(String arg)
-    {
+		Map result = new LinkedHashMap();
+		for (Iterator it = list.iterator(); it.hasNext();) {
+			Map.Entry<String, Long> entry = (Map.Entry) it.next();
+			if (entry.getValue() >= cutOff)
+				result.put(entry.getKey(), entry.getValue());
+		}
+		return result;
+	}
 
-        arg = StringUtils.replace(arg, "_:", "");
-        arg = StringUtils.replace(arg, "<", "");
-        arg = StringUtils.replace(arg, ">\\)", "");
-        arg = StringUtils.replace(arg, ">", "");
-        arg = StringUtils.replace(arg, ",", "~2C");
-        arg = StringUtils.replace(arg, "'", "*");
-        arg = StringUtils.replace(arg, "%", "~");
-        arg = StringUtils.replace(arg, "~28", "[");
-        arg = StringUtils.replace(arg, "~29", "]");
-        arg = StringUtils.replace(arg, "~27", "*");
-        arg = StringUtils.replace(arg, "Node\\(", "");
-        arg = StringUtils.replace(arg, "\\)", "]");
-        arg = StringUtils.replace(arg, "\\(", "[");
-        arg = StringUtils.replace(arg, "http://dbpedia.org/", "DBP#");
-        arg = StringUtils.replace(arg, "\\(", "[");
-        arg = StringUtils.replace(arg, "http://dws/OIE", "NELL");
+	/**
+	 * get the actual nell instance, following the ":" if any
+	 * 
+	 * @param arg
+	 * @param identifier
+	 * @return
+	 */
+	public static String getInst(String arg) {
 
-        // arg = arg.replaceAll("_:", "");
-        // arg = arg.replaceAll("<", "");
-        // arg = arg.replaceAll(">\\)", "");
-        // arg = arg.replaceAll(">", "");
+		if (arg.indexOf(":") != -1)
+			return arg.substring(arg.indexOf(":") + 1, arg.length());
+		else
+			return arg;
+	}
 
-        // arg = arg.replaceAll(",", "~2C");
-        // arg = arg.replaceAll("'", "*");
-        // arg = arg.replaceAll("%", "~");
-        //
-        // arg = arg.replaceAll("~28", "[");
-        // arg = arg.replaceAll("~29", "]");
-        // arg = arg.replaceAll("~27", "*");
-        //
-        // arg = arg.replaceAll("Node\\(", "");
-        // arg = arg.replaceAll("\\)", "]");
-        // arg = arg.replaceAll("\\(", "[");
-        // arg = arg.replaceAll("http://dbpedia.org/", "DBP#");
-        // arg = arg.replaceAll("http://dws/OIE", "NELL");
-        return "\"" + arg.trim() + "\"";
-    }
+	/**
+	 * cleans of the "<" or ">" on the concepts
+	 * 
+	 * @param arg
+	 *            value to be cleaned
+	 * @return
+	 */
+	public static String removeTags(String arg) {
 
-    public static String format(String arg)
-    {
-        arg = StringUtils.replace(arg, ",", "~2C");
-        arg = StringUtils.replace(arg, "\\$", "~24");
-        arg = StringUtils.replace(arg, "%", "~25");
-        return arg;
-    }
+		arg = StringUtils.replace(arg, "_:", "");
+		arg = StringUtils.replace(arg, "<", "");
+		arg = StringUtils.replace(arg, ">\\)", "");
+		arg = StringUtils.replace(arg, ">", "");
+		arg = StringUtils.replace(arg, ",", "~2C");
+		arg = StringUtils.replace(arg, "'", "*");
+		arg = StringUtils.replace(arg, "%", "~");
+		arg = StringUtils.replace(arg, "~28", "[");
+		arg = StringUtils.replace(arg, "~29", "]");
+		arg = StringUtils.replace(arg, "~27", "*");
+		arg = StringUtils.replace(arg, "Node\\(", "");
+		arg = StringUtils.replace(arg, "\\)", "]");
+		arg = StringUtils.replace(arg, "\\(", "[");
+		arg = StringUtils.replace(arg, "http://dbpedia.org/", "DBP#");
+		arg = StringUtils.replace(arg, "\\(", "[");
+		arg = StringUtils.replace(arg, "http://dws/OIE", "NELL");
 
-    public static String splitAtCapitals(String arg)
-    {
-        String retStr = "";
-        for (int i = 0; i < arg.length(); i++) {
-            char c = arg.charAt(i);
-            if (Character.isUpperCase(c)) {
-                retStr = retStr + " " + c;
-            } else {
-                retStr = retStr + c;
-            }
-        }
-        return retStr;
-    }
+		// arg = arg.replaceAll("_:", "");
+		// arg = arg.replaceAll("<", "");
+		// arg = arg.replaceAll(">\\)", "");
+		// arg = arg.replaceAll(">", "");
 
-    /**
-     * extended splitter to take care of data type properties with /ontologu/A/prop structure
-     * 
-     * @param arg
-     * @return
-     */
-    public static String splitAtCapitalsExt(String arg)
-    {
-        String retStr = "";
-        if (arg.indexOf("/") != -1) {
-            arg = arg.substring(arg.lastIndexOf("/") + 1, arg.length());
-        }
-        for (int i = 0; i < arg.length(); i++) {
-            char c = arg.charAt(i);
-            if (Character.isUpperCase(c)) {
-                retStr = retStr + " " + c;
-            } else {
-                retStr = retStr + c;
-            }
-        }
-        return retStr;
-    }
+		// arg = arg.replaceAll(",", "~2C");
+		// arg = arg.replaceAll("'", "*");
+		// arg = arg.replaceAll("%", "~");
+		//
+		// arg = arg.replaceAll("~28", "[");
+		// arg = arg.replaceAll("~29", "]");
+		// arg = arg.replaceAll("~27", "*");
+		//
+		// arg = arg.replaceAll("Node\\(", "");
+		// arg = arg.replaceAll("\\)", "]");
+		// arg = arg.replaceAll("\\(", "[");
+		// arg = arg.replaceAll("http://dbpedia.org/", "DBP#");
+		// arg = arg.replaceAll("http://dws/OIE", "NELL");
+		return "\"" + arg.trim() + "\"";
+	}
+
+	public static String format(String arg) {
+		arg = StringUtils.replace(arg, ",", "~2C");
+		arg = StringUtils.replace(arg, "\\$", "~24");
+		arg = StringUtils.replace(arg, "%", "~25");
+		return arg;
+	}
+
+	public static String splitAtCapitals(String arg) {
+		String retStr = "";
+		for (int i = 0; i < arg.length(); i++) {
+			char c = arg.charAt(i);
+			if (Character.isUpperCase(c)) {
+				retStr = retStr + " " + c;
+			} else {
+				retStr = retStr + c;
+			}
+		}
+		return retStr;
+	}
+
+	/**
+	 * extended splitter to take care of data type properties with
+	 * /ontologu/A/prop structure
+	 * 
+	 * @param arg
+	 * @return
+	 */
+	public static String splitAtCapitalsExt(String arg) {
+		String retStr = "";
+		if (arg.indexOf("/") != -1) {
+			arg = arg.substring(arg.lastIndexOf("/") + 1, arg.length());
+		}
+		for (int i = 0; i < arg.length(); i++) {
+			char c = arg.charAt(i);
+			if (Character.isUpperCase(c)) {
+				retStr = retStr + " " + c;
+			} else {
+				retStr = retStr + c;
+			}
+		}
+		return retStr;
+	}
 }
