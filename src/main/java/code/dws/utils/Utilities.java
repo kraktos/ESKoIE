@@ -141,7 +141,7 @@ public class Utilities {
 		if (arg.indexOf(":") != -1)
 			arg = StringUtils.substringAfter(arg, ":");
 
-		arg = arg.replaceAll("^(A|a)", "");
+		arg = arg.replaceAll("^(A |a ) ", "");
 		return arg.toLowerCase();
 	}
 
