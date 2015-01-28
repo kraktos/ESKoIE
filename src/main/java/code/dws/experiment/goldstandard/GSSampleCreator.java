@@ -5,14 +5,14 @@ package code.dws.experiment.goldstandard;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
+import java.util.Random;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import code.dws.dbConnectivity.DBWrapper;
@@ -52,7 +52,7 @@ public class GSSampleCreator {
 
 		// load the fminus File, randomly sampling lines
 		try {
-			sampleFile(location);
+			sampleFile(location, Integer.parseInt(args[0]));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -79,11 +79,11 @@ public class GSSampleCreator {
 	 * sample for the triples which should be used for annotation
 	 * 
 	 * @param directory
+	 * @param k
 	 * @throws IOException
 	 */
-	private static void sampleFile(String directory) throws IOException {
+	private static void sampleFile(String directory, int k) throws IOException {
 		String line = null;
-		Scanner scan = null;
 		String oieSub = null;
 		String oieRel = null;
 		String oieObj = null;
@@ -93,11 +93,7 @@ public class GSSampleCreator {
 		List<String> candidateSubjs = null;
 		List<String> candidateObjs = null;
 
-		try {
-			scan = new Scanner(new File(directory + "/fMinus.dat"), "UTF-8");
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
+		int gsSize = 0;
 
 		BufferedWriter goldFile = new BufferedWriter(new FileWriter(directory
 				+ "/GOLD.tsv"));
@@ -105,14 +101,21 @@ public class GSSampleCreator {
 		// init DB
 		DBWrapper.init(Constants.GET_WIKI_LINKS_APRIORI_SQL);
 
+		logger.info("Writing to " + directory + "/GOLD.tsv");
+
+		Random rand = new Random();
+
+		List<String> lines = FileUtils.readLines(new File(directory
+				+ "/fMinus.dat"), "UTF-8");
+
 		// iterate the file
-		while (scan.hasNextLine()) {
-			line = scan.nextLine();
+		while (gsSize != k) {
+			line = lines.get(rand.nextInt(lines.size()) + 1);
 			elems = line.split(Constants.OIE_DATA_SEPERARTOR);
 
 			// valid line which can be used for evaluation
 			if (ANNO_PROPS.containsKey(elems[1])) {
-
+				gsSize++;
 				logger.debug(line);
 
 				oieSub = elems[0];
@@ -131,11 +134,14 @@ public class GSSampleCreator {
 
 				writeOut(line, candidateSubjs, candidateObjs, oieSub, oieRel,
 						oieObj, goldFile);
+
 			}
 		}
 
 		if (goldFile != null)
 			goldFile.close();
+
+		logger.info("Done writing .. ");
 
 		DBWrapper.shutDown();
 	}
